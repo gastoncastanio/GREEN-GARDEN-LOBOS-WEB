@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GREEN GARDEN LOBOS | Malla Romboidal Galvanizada - Obras de Gran Escala</title>
+  <meta name="description" content="Líder en malla romboidal galvanizada y servicios de instalación para obras de 1km+. Máxima calidad, tecnología avanzada.">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap');
+    body { font-family: 'Poppins', sans-serif; }
+    .gradient-hero { background: linear-gradient(135deg, #1e3a5f 0%, #2d5a8c 100%); }
+    .gradient-accent { background: linear-gradient(135deg, #16a34a 0%, #22c55e 100%); }
+    .section-title { font-size: 2.5rem; font-weight: 800; letter-spacing: -0.5px; }
+    .btn-primary { @apply bg-green-500 hover:bg-green-600 text-white px-8 py-3 rounded-lg font-600 transition; }
+    .btn-secondary { @apply border-2 border-green-500 text-green-500 hover:bg-green-50 px-8 py-3 rounded-lg font-600 transition; }
+  </style>
+</head>
+<body class="bg-gray-50">
+
+  <!-- NAVBAR PREMIUM -->
+  <nav class="fixed w-full z-50 bg-white shadow-lg">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-12 h-12 bg-green-600 rounded-full flex items-center justify-center text-white font-800">GG</div>
+        <div>
+          <p class="text-lg font-800 text-gray-900">GREEN GARDEN</p>
+          <p class="text-xs text-green-600 font-600">LOBOS</p>
+        </div>
+      </div>
+      <div class="hidden md:flex gap-8 text-sm font-600">
+        <a href="#productos" class="hover:text-green-600 transition">PRODUCTOS</a>
+        <a href="#servicios" class="hover:text-green-600 transition">SERVICIOS</a>
+        <a href="#proyectos" class="hover:text-green-600 transition">PROYECTOS</a>
+        <a href="#contacto" class="hover:text-green-600 transition">CONTACTO</a>
+      </div>
+      <button onclick="abrirWhatsApp()" class="btn-primary flex items-center gap-2">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.272-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.67-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.076 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421-7.403h-.004c-1.025 0-2.02-.315-2.884-.9l-.2-.128-2.06.501.51-1.996-.129-.207A4.754 4.754 0 0 1 6.654 2.889c1.196 0 2.329.465 3.176 1.311.847.847 1.312 1.98 1.312 3.176 0 .855-.203 1.683-.594 2.425z"/>
+        </svg>
+        COTIZAR
+      </button>
+    </div>
+  </nav>
+
+  <!-- HERO SECTION -->
+  <section class="gradient-hero text-white pt-32 pb-20">
+    <div class="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-12 items-center">
+      <div>
+        <h1 class="text-5xl md:text-6xl font-800 mb-6 leading-tight">
+          Malla Romboidal Galvanizada de <span class="text-green-400">Máxima Calidad</span>
+        </h1>
+        <p class="text-xl text-gray-200 mb-8">
+          Especialistas en obras de gran escala. Desde 1km en adelante. Soluciones integrales con instalación profesional y garantía respaldada.
+        </p>
+        <div class="flex gap-4">
+          <button onclick="abrirWhatsApp()" class="bg-green-500 hover:bg-green-600 text-white px-8 py-4 rounded-lg font-700 text-lg transition">
+            SOLICITAR PRESUPUESTO
+          </button>
+          <button onclick="document.getElementById('productos').scrollIntoView({behavior:'smooth'})" class="btn-secondary">
+            VER PRODUCTOS
+          </button>
+        </div>
+      </div>
+      <div class="bg-gradient-to-br from-green-400 to-green-600 rounded-2xl h-96 flex items-center justify-center">
+        <div class="text-center text-white">
+          <p class="text-6xl mb-2">📦</p>
+          <p class="text-xl font-600">Tu imagen/video aquí</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS PREMIUM -->
+  <section class="bg-white py-16 border-b-4 border-green-500">
+    <div class="max-w-7xl mx-auto px-6 grid md:grid-cols-4 gap-8">
+      <div class="text-center">
+        <p class="text-4xl font-800 text-green-600 mb-2">15+</p>
+        <p class="text-gray-600 font-600">Años de Experiencia</p>
+      </div>
+      <div class="text-center">
+        <p class="text-4xl font-800 text-green-600 mb-2">500+</p>
+        <p class="text-gray-600 font-600">Proyectos Completados</p>
+      </div>
+      <div class="text-center">
+        <p class="text-4xl font-800 text-green-600 mb-2">1000+km</p>
+        <p class="text-gray-600 font-600">Malla Instalada</p>
+      </div>
+      <div class="text-center">
+        <p class="text-4xl font-800 text-green-600 mb-2">ISO 9001</p>
+        <p class="text-gray-600 font-600">Certificado</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRODUCTOS -->
+  <section id="productos" class="py-20 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-6">
+      <h2 class="section-title text-center mb-4 text-gray-900">PRODUCTOS PREMIUM</h2>
+      <p class="text-center text-gray-600 text-lg mb-16 max-w-2xl mx-auto">
+        Catálogo completo de materiales para instalación de malla romboidal galvanizada de máxima calidad.
+      </p>
+
+      <!-- GALERÍA DE PRODUCTOS (ESTILO STORIES) -->
+      <div class="mb-20">
+        <h3 class="text-xl font-700 mb-6 text-gray-900 text-center">Galería de Productos</h3>
+        <div class="grid md:grid-cols-5 gap-4 overflow-x-auto pb-4">
+          <!-- Card 1: Logo Oficial -->
+          <div class="min-w-64 md:min-w-0 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition h-96 flex items-center justify-center bg-white border-2 border-gray-200">
+            <div class="text-center">
+              <div class="w-24 h-24 bg-gradient-to-br from-green-600 to-green-800 rounded-full mx-auto mb-4 flex items-center justify-center">
+                <svg width="56" height="56" viewBox="0 0 48 48" fill="none">
+                  <circle cx="24" cy="24" r="20" fill="#ffffff" stroke="#1e3a5f" stroke-width="2"/>
+                  <line x1="10" y1="24" x2="38" y2="24" stroke="#1e3a5f" stroke-width="2"/>
+                  <path d="M24 20L26 24L24 28L22 24Z" fill="#1e3a5f"/>
+                  <line x1="20" y1="22" x2="28" y2="22" stroke="#1e3a5f" stroke-width="1.5"/>
+                  <line x1="20" y1="26" x2="28" y2="26" stroke="#1e3a5f" stroke-width="1.5"/>
+                </svg>
+              </div>
+              <p class="text-sm font-700 text-gray-900 mb-2">LOGO OFICIAL</p>
+              <p class="text-xs text-gray-600">Green Garden Lobos</p>
+            </div>
+          </div>
+
+          <!-- Card 2: Rafias - Media Sombra -->
+          <div class="min-w-64 md:min-w-0 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition h-96 bg-cover bg-center relative group flex items-end" style="background-image: url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 540 960%22><rect fill=%22%231a5a1f%22 width=%22540%22 height=%22960%22/><text x=%22270%22 y=%22200%22 font-size=%2244%22 font-weight=%22bold%22 fill=%22white%22 text-anchor=%22middle%22>EN STOCK</text><text x=%22270%22 y=%22260%22 font-size=%2260%22 font-weight=%22bold%22 fill=%22white%22 text-anchor=%22middle%22>RAFIAS</text><text x=%22270%22 y=%22340%22 font-size=%2248%22 font-weight=%22bold%22 fill=%22white%22 text-anchor=%22middle%22>MEDIA SOMBRA</text><text x=%22270%22 y=%22420%22 font-size=%2244%22 font-weight=%22bold%22 fill=%22white%22 text-anchor=%22middle%22>CINTA CUBRECERC</text></svg>'), linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.6) 100%)">
+            <div class="w-full h-full flex items-end justify-between p-4 absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/50">
+              <div>
+                <p class="font-700 text-white text-sm">Rafias Media Sombra</p>
+                <p class="text-xs text-gray-200">Cinta Cubrecerc</p>
+              </div>
+              <button onclick="abrirWhatsApp()" class="bg-green-500 hover:bg-green-600 text-white p-2 rounded-full shadow-lg transition">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.272-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.67-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.076 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421-7.403h-.004c-1.025 0-2.02-.315-2.884-.9l-.2-.128-2.06.501.51-1.996-.129-.207A4.754 4.754 0 0 1 6.654 2.889c1.196 0 2.329.465 3.176 1.311.847.847 1.312 1.98 1.312 3.176 0 .855-.203 1.683-.594 2.425z"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Card 3: Postes (Hormigón) -->
+          <div class="min-w-64 md:min-w-0 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition h-96 bg-cover bg-center relative group flex items-end" style="background-image: linear-gradient(180deg, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.5) 100%)">
+            <div class="w-full h-full bg-gradient-to-b from-transparent via-transparent to-black/40 flex items-end justify-between p-4 absolute inset-0">
+              <div>
+                <p class="font-700 text-white text-sm">Postes Hormigón</p>
+                <p class="text-xs text-gray-200">Rectos & Olímpicos</p>
+              </div>
+              <button onclick="abrirWhatsApp()" class="bg-green-500 hover:bg-green-600 text-white p-2 rounded-full shadow-lg transition">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.272-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.67-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.076 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421-7.403h-.004c-1.025 0-2.02-.315-2.884-.9l-.2-.128-2.06.501.51-1.996-.129-.207A4.754 4.754 0 0 1 6.654 2.889c1.196 0 2.329.465 3.176 1.311.847.847 1.312 1.98 1.312 3.176 0 .855-.203 1.683-.594 2.425z"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Card 4: Alambre Tejido x Rollo -->
+          <div class="min-w-64 md:min-w-0 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition h-96 bg-cover bg-center relative group flex items-end" style="background-image: linear-gradient(180deg, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.5) 100%)">
+            <div class="w-full h-full bg-gradient-to-b from-transparent via-transparent to-black/40 flex items-end justify-between p-4 absolute inset-0">
+              <div>
+                <p class="font-700 text-white text-sm">Alambre Tejido</p>
+                <p class="text-xs text-gray-200">x Rollo | Púa & Liso</p>
+              </div>
+              <button onclick="abrirWhatsApp()" class="bg-green-500 hover:bg-green-600 text-white p-2 rounded-full shadow-lg transition">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.272-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.67-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.076 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421-7.403h-.004c-1.025 0-2.02-.315-2.884-.9l-.2-.128-2.06.501.51-1.996-.129-.207A4.754 4.754 0 0 1 6.654 2.889c1.196 0 2.329.465 3.176 1.311.847.847 1.312 1.98 1.312 3.176 0 .855-.203 1.683-.594 2.425z"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Card 5: Hardware (Torniquete/Gancho) -->
+          <div class="min-w-64 md:min-w-0 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition h-96 bg-cover bg-center relative group flex items-end" style="background-image: linear-gradient(180deg, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.5) 100%)">
+            <div class="w-full h-full bg-gradient-to-b from-transparent via-transparent to-black/40 flex items-end justify-between p-4 absolute inset-0">
+              <div>
+                <p class="font-700 text-white text-sm">Hardware Premium</p>
+                <p class="text-xs text-gray-200">Torniquete, Gancho J</p>
+              </div>
+              <button onclick="abrirWhatsApp()" class="bg-green-500 hover:bg-green-600 text-white p-2 rounded-full shadow-lg transition">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.272-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.67-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.076 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421-7.403h-.004c-1.025 0-2.02-.315-2.884-.9l-.2-.128-2.06.501.51-1.996-.129-.207A4.754 4.754 0 0 1 6.654 2.889c1.196 0 2.329.465 3.176 1.311.847.847 1.312 1.98 1.312 3.176 0 .855-.203 1.683-.594 2.425z"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MALLA ROMBOIDAL -->
+      <div class="mb-16">
+        <h3 class="text-2xl font-700 mb-6 text-gray-900 border-b-2 border-green-500 pb-4">Malla Romboidal Galvanizada</h3>
+        <div class="grid md:grid-cols-3 gap-6">
+          <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-2xl transition">
+            <p class="font-700 text-green-600 mb-3 text-lg">Rafia 1,50 m</p>
+            <p class="text-sm text-gray-600 mb-4">Con ojales - Premium quality</p>
+            <button onclick="abrirWhatsApp()" class="w-full btn-primary text-sm">COTIZAR</button>
+          </div>
+          <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-2xl transition">
+            <p class="font-700 text-green-600 mb-3 text-lg">Rafia 1,80 m</p>
+            <p class="text-sm text-gray-600 mb-4">Con ojales - Máxima durabilidad</p>
+            <button onclick="abrirWhatsApp()" class="w-full btn-primary text-sm">COTIZAR</button>
+          </div>
+          <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-2xl transition">
+            <p class="font-700 text-green-600 mb-3 text-lg">Malla Negra 80%</p>
+            <p class="text-sm text-gray-600 mb-4">Sombra y protección UV</p>
+            <button onclick="abrirWhatsApp()" class="w-full btn-primary text-sm">COTIZAR</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- POSTES Y ACCESORIOS -->
+      <div class="mb-16">
+        <h3 class="text-2xl font-700 mb-6 text-gray-900 border-b-2 border-green-500 pb-4">Postes y Accesorios</h3>
+        <div class="grid md:grid-cols-2 gap-6">
+          <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-2xl transition">
+            <p class="font-700 text-green-600 mb-3 text-lg">Postes Quiebracho Cuadrado</p>
+            <ul class="text-xs text-gray-600 space-y-2 mb-4">
+              <li>✓ Alturas: 1.80m a 3.00m</li>
+              <li>✓ Sección cuadrada 4x4 y 3x3</li>
+              <li>✓ Tratado y duradero</li>
+            </ul>
+            <button onclick="abrirWhatsApp()" class="w-full btn-primary text-sm">COTIZAR</button>
+          </div>
+          <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-2xl transition">
+            <p class="font-700 text-green-600 mb-3 text-lg">Postes Redondos</p>
+            <ul class="text-xs text-gray-600 space-y-2 mb-4">
+              <li>✓ Quiebracho colorado 1.80m-3m</li>
+              <li>✓ Varillas 1.20m blanco</li>
+              <li>✓ Premium quality</li>
+            </ul>
+            <button onclick="abrirWhatsApp()" class="w-full btn-primary text-sm">COTIZAR</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- HARDWARE -->
+      <div class="mb-16">
+        <h3 class="text-2xl font-700 mb-6 text-gray-900 border-b-2 border-green-500 pb-4">Hardware y Herrería</h3>
+        <div class="grid md:grid-cols-3 gap-6">
+          <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-2xl transition">
+            <p class="font-700 text-green-600 mb-3">Ganchos</p>
+            <p class="text-xs text-gray-600 mb-4">J5 a J12 - Galvanizados</p>
+            <button onclick="abrirWhatsApp()" class="w-full btn-primary text-sm">COTIZAR</button>
+          </div>
+          <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-2xl transition">
+            <p class="font-700 text-green-600 mb-3">Esparragos</p>
+            <p class="text-xs text-gray-600 mb-4">200, 250, 300, 360 mm</p>
+            <button onclick="abrirWhatsApp()" class="w-full btn-primary text-sm">COTIZAR</button>
+          </div>
+          <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-2xl transition">
+            <p class="font-700 text-green-600 mb-3">Palomitas</p>
+            <p class="text-xs text-gray-600 mb-4">Curva/Recta 3/4 - Premium</p>
+            <button onclick="abrirWhatsApp()" class="w-full btn-primary text-sm">COTIZAR</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- PLANCHUELAS -->
+      <div class="mb-16">
+        <h3 class="text-2xl font-700 mb-6 text-gray-900 border-b-2 border-green-500 pb-4">Planchuelas (Soportes)</h3>
+        <div class="grid md:grid-cols-5 gap-4">
+          <div class="bg-white rounded-lg shadow p-4 text-center">
+            <p class="font-600 text-green-600 mb-2">3/4 x 3/16 x 1m</p>
+            <button onclick="abrirWhatsApp()" class="w-full btn-primary text-xs">COTIZAR</button>
+          </div>
+          <div class="bg-white rounded-lg shadow p-4 text-center">
+            <p class="font-600 text-green-600 mb-2">3/4 x 3/16 x 1,25m</p>
+            <button onclick="abrirWhatsApp()" class="w-full btn-primary text-xs">COTIZAR</button>
+          </div>
+          <div class="bg-white rounded-lg shadow p-4 text-center">
+            <p class="font-600 text-green-600 mb-2">3/4 x 3/16 x 1,50m</p>
+            <button onclick="abrirWhatsApp()" class="w-full btn-primary text-xs">COTIZAR</button>
+          </div>
+          <div class="bg-white rounded-lg shadow p-4 text-center">
+            <p class="font-600 text-green-600 mb-2">3/4 x 3/16 x 1,80m</p>
+            <button onclick="abrirWhatsApp()" class="w-full btn-primary text-xs">COTIZAR</button>
+          </div>
+          <div class="bg-white rounded-lg shadow p-4 text-center">
+            <p class="font-600 text-green-600 mb-2">3/4 x 3/16 x 2m</p>
+            <button onclick="abrirWhatsApp()" class="w-full btn-primary text-xs">COTIZAR</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ROMBO (MALLA EXPANDIDA) -->
+      <div class="mb-16">
+        <h3 class="text-2xl font-700 mb-6 text-gray-900 border-b-2 border-green-500 pb-4">Malla Romboidal Expandida (Rombo)</h3>
+        <p class="text-gray-600 mb-6">Disponible en 4 tipos: Económico • Intermedio • Intermedio Reforzado • Reforzado</p>
+
+        <div class="space-y-6">
+          <!-- 2.0m -->
+          <div class="bg-gray-50 rounded-lg p-6">
+            <p class="font-700 text-lg text-gray-900 mb-4">Altura 2.0m</p>
+            <div class="grid md:grid-cols-4 gap-4">
+              <div class="bg-white rounded p-4 text-center">
+                <p class="text-xs font-600 text-gray-600 mb-2">ECONÓMICO</p>
+                <p class="text-sm text-green-600 font-700">3 pulgadas - Cal 16</p>
+                <button onclick="abrirWhatsApp()" class="w-full btn-primary text-xs mt-3">COTIZAR</button>
+              </div>
+              <div class="bg-white rounded p-4 text-center">
+                <p class="text-xs font-600 text-gray-600 mb-2">INTERMEDIO</p>
+                <p class="text-sm text-green-600 font-700">3 pulgadas - Cal 14</p>
+                <button onclick="abrirWhatsApp()" class="w-full btn-primary text-xs mt-3">COTIZAR</button>
+              </div>
+              <div class="bg-white rounded p-4 text-center">
+                <p class="text-xs font-600 text-gray-600 mb-2">INT. REFORZADO</p>
+                <p class="text-sm text-green-600 font-700">2,5 pulgadas - Cal 14</p>
+                <button onclick="abrirWhatsApp()" class="w-full btn-primary text-xs mt-3">COTIZAR</button>
+              </div>
+              <div class="bg-white rounded p-4 text-center">
+                <p class="text-xs font-600 text-gray-600 mb-2">REFORZADO</p>
+                <p class="text-sm text-green-600 font-700">2 pulgadas - Cal 14</p>
+                <button onclick="abrirWhatsApp()" class="w-full btn-primary text-xs mt-3">COTIZAR</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 1.80m -->
+          <div class="bg-gray-50 rounded-lg p-6">
+            <p class="font-700 text-lg text-gray-900 mb-4">Altura 1.80m</p>
+            <div class="grid md:grid-cols-4 gap-4">
+              <div class="bg-white rounded p-4 text-center">
+                <p class="text-xs font-600 text-gray-600 mb-2">ECONÓMICO</p>
+                <p class="text-sm text-green-600 font-700">3 pulgadas - Cal 16</p>
+                <button onclick="abrirWhatsApp()" class="w-full btn-primary text-xs mt-3">COTIZAR</button>
+              </div>
+              <div class="bg-white rounded p-4 text-center">
+                <p class="text-xs font-600 text-gray-600 mb-2">INTERMEDIO</p>
+                <p class="text-sm text-green-600 font-700">3 pulgadas - Cal 14</p>
+                <button onclick="abrirWhatsApp()" class="w-full btn-primary text-xs mt-3">COTIZAR</button>
+              </div>
+              <div class="bg-white rounded p-4 text-center">
+                <p class="text-xs font-600 text-gray-600 mb-2">INT. REFORZADO</p>
+                <p class="text-sm text-green-600 font-700">2,5 pulgadas - Cal 14</p>
+                <button onclick="abrirWhatsApp()" class="w-full btn-primary text-xs mt-3">COTIZAR</button>
+              </div>
+              <div class="bg-white rounded p-4 text-center">
+                <p class="text-xs font-600 text-gray-600 mb-2">REFORZADO</p>
+                <p class="text-sm text-green-600 font-700">2 pulgadas - Cal 14</p>
+                <button onclick="abrirWhatsApp()" class="w-full btn-primary text-xs mt-3">COTIZAR</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 1.50m -->
+          <div class="bg-gray-50 rounded-lg p-6">
+            <p class="font-700 text-lg text-gray-900 mb-4">Altura 1.50m</p>
+            <div class="grid md:grid-cols-4 gap-4">
+              <div class="bg-white rounded p-4 text-center">
+                <p class="text-xs font-600 text-gray-600 mb-2">ECONÓMICO</p>
+                <p class="text-sm text-green-600 font-700">3 pulgadas - Cal 16</p>
+                <button onclick="abrirWhatsApp()" class="w-full btn-primary text-xs mt-3">COTIZAR</button>
+              </div>
+              <div class="bg-white rounded p-4 text-center">
+                <p class="text-xs font-600 text-gray-600 mb-2">INTERMEDIO</p>
+                <p class="text-sm text-green-600 font-700">3 pulgadas - Cal 14</p>
+                <button onclick="abrirWhatsApp()" class="w-full btn-primary text-xs mt-3">COTIZAR</button>
+              </div>
+              <div class="bg-white rounded p-4 text-center">
+                <p class="text-xs font-600 text-gray-600 mb-2">INT. REFORZADO</p>
+                <p class="text-sm text-green-600 font-700">2,5 pulgadas - Cal 14</p>
+                <button onclick="abrirWhatsApp()" class="w-full btn-primary text-xs mt-3">COTIZAR</button>
+              </div>
+              <div class="bg-white rounded p-4 text-center">
+                <p class="text-xs font-600 text-gray-600 mb-2">REFORZADO</p>
+                <p class="text-sm text-green-600 font-700">2 pulgadas - Cal 14</p>
+                <button onclick="abrirWhatsApp()" class="w-full btn-primary text-xs mt-3">COTIZAR</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 1.20m -->
+          <div class="bg-gray-50 rounded-lg p-6">
+            <p class="font-700 text-lg text-gray-900 mb-4">Altura 1.20m</p>
+            <div class="grid md:grid-cols-4 gap-4">
+              <div class="bg-white rounded p-4 text-center">
+                <p class="text-xs font-600 text-gray-600 mb-2">ECONÓMICO</p>
+                <p class="text-sm text-green-600 font-700">3 pulgadas - Cal 16</p>
+                <button onclick="abrirWhatsApp()" class="w-full btn-primary text-xs mt-3">COTIZAR</button>
+              </div>
+              <div class="bg-white rounded p-4 text-center">
+                <p class="text-xs font-600 text-gray-600 mb-2">INTERMEDIO</p>
+                <p class="text-sm text-green-600 font-700">3 pulgadas - Cal 14</p>
+                <button onclick="abrirWhatsApp()" class="w-full btn-primary text-xs mt-3">COTIZAR</button>
+              </div>
+              <div class="bg-white rounded p-4 text-center">
+                <p class="text-xs font-600 text-gray-600 mb-2">INT. REFORZADO</p>
+                <p class="text-sm text-green-600 font-700">2,5 pulgadas - Cal 14</p>
+                <button onclick="abrirWhatsApp()" class="w-full btn-primary text-xs mt-3">COTIZAR</button>
+              </div>
+              <div class="bg-white rounded p-4 text-center">
+                <p class="text-xs font-600 text-gray-600 mb-2">REFORZADO</p>
+                <p class="text-sm text-green-600 font-700">2 pulgadas - Cal 14</p>
+                <button onclick="abrirWhatsApp()" class="w-full btn-primary text-xs mt-3">COTIZAR</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 1.0m -->
+          <div class="bg-gray-50 rounded-lg p-6">
+            <p class="font-700 text-lg text-gray-900 mb-4">Altura 1.0m</p>
+            <div class="grid md:grid-cols-4 gap-4">
+              <div class="bg-white rounded p-4 text-center">
+                <p class="text-xs font-600 text-gray-600 mb-2">ECONÓMICO</p>
+                <p class="text-sm text-green-600 font-700">3 pulgadas - Cal 16</p>
+                <button onclick="abrirWhatsApp()" class="w-full btn-primary text-xs mt-3">COTIZAR</button>
+              </div>
+              <div class="bg-white rounded p-4 text-center">
+                <p class="text-xs font-600 text-gray-600 mb-2">INTERMEDIO</p>
+                <p class="text-sm text-green-600 font-700">3 pulgadas - Cal 14</p>
+                <button onclick="abrirWhatsApp()" class="w-full btn-primary text-xs mt-3">COTIZAR</button>
+              </div>
+              <div class="bg-white rounded p-4 text-center">
+                <p class="text-xs font-600 text-gray-600 mb-2">INT. REFORZADO</p>
+                <p class="text-sm text-green-600 font-700">2,5 pulgadas - Cal 14</p>
+                <button onclick="abrirWhatsApp()" class="w-full btn-primary text-xs mt-3">COTIZAR</button>
+              </div>
+              <div class="bg-white rounded p-4 text-center">
+                <p class="text-xs font-600 text-gray-600 mb-2">REFORZADO</p>
+                <p class="text-sm text-green-600 font-700">2 pulgadas - Cal 14</p>
+                <button onclick="abrirWhatsApp()" class="w-full btn-primary text-xs mt-3">COTIZAR</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MALLA ELECTROSOLDADA -->
+      <div class="mb-16">
+        <h3 class="text-2xl font-700 mb-6 text-gray-900 border-b-2 border-green-500 pb-4">Malla Electrosoldada</h3>
+        <div class="grid md:grid-cols-3 gap-6">
+          <div class="bg-white rounded-xl shadow-lg p-6">
+            <p class="font-700 text-green-600 mb-3">50x50x1.66mm CAL16</p>
+            <ul class="text-xs text-gray-600 space-y-1 mb-4">
+              <li>✓ 1 x 20m</li>
+              <li>✓ 1.20 x 20m</li>
+              <li>✓ 1.50 x 20m</li>
+            </ul>
+            <button onclick="abrirWhatsApp()" class="w-full btn-primary text-sm">COTIZAR</button>
+          </div>
+          <div class="bg-white rounded-xl shadow-lg p-6">
+            <p class="font-700 text-green-600 mb-3">50x50x1.93mm CAL16</p>
+            <ul class="text-xs text-gray-600 space-y-1 mb-4">
+              <li>✓ 1.50 x 20m</li>
+              <li>✓ Premium</li>
+              <li>✓ Alta resistencia</li>
+            </ul>
+            <button onclick="abrirWhatsApp()" class="w-full btn-primary text-sm">COTIZAR</button>
+          </div>
+          <div class="bg-white rounded-xl shadow-lg p-6">
+            <p class="font-700 text-green-600 mb-3">Consulta Otras Medidas</p>
+            <ul class="text-xs text-gray-600 space-y-1 mb-4">
+              <li>✓ Medidas especiales</li>
+              <li>✓ Presupuesto personalizado</li>
+              <li>✓ Grandes volúmenes</li>
+            </ul>
+            <button onclick="abrirWhatsApp()" class="w-full btn-primary text-sm">COTIZAR</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ALAMBRE -->
+      <div class="mb-16">
+        <h3 class="text-2xl font-700 mb-6 text-gray-900 border-b-2 border-green-500 pb-4">Alambre Liso (Manea)</h3>
+        <div class="grid md:grid-cols-2 gap-6">
+          <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-2xl transition">
+            <p class="font-700 text-green-600 mb-3">Estándar</p>
+            <ul class="text-xs text-gray-600 space-y-1 mb-4">
+              <li>✓ MANEA 12 x kg</li>
+              <li>✓ 17/15 importado</li>
+              <li>✓ 17/15 fortín acindar</li>
+              <li>✓ 16/14 importado</li>
+              <li>✓ 16/14 acerbrag</li>
+              <li>✓ Boyero</li>
+            </ul>
+            <button onclick="abrirWhatsApp()" class="w-full btn-primary text-sm">COTIZAR</button>
+          </div>
+
+          <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-2xl transition">
+            <p class="font-700 text-green-600 mb-3">Calibres Diversos</p>
+            <ul class="text-xs text-gray-600 space-y-1 mb-4">
+              <li>✓ Fardo negro recocido x kg</li>
+              <li>✓ Liso calibre 16</li>
+              <li>✓ Liso calibre 14.5</li>
+              <li>✓ Liso calibre 14</li>
+              <li>✓ Liso calibre 13</li>
+              <li>✓ Disponible a granel</li>
+            </ul>
+            <button onclick="abrirWhatsApp()" class="w-full btn-primary text-sm">COTIZAR</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- AVÍCOLA -->
+      <div class="mb-16">
+        <h3 class="text-2xl font-700 mb-6 text-gray-900 border-b-2 border-green-500 pb-4">Malla Avícola</h3>
+        <div class="grid md:grid-cols-5 gap-4">
+          <div class="bg-white rounded-lg shadow p-4 text-center">
+            <p class="font-600 text-green-600 mb-2">1.0m - Cal 16</p>
+            <button onclick="abrirWhatsApp()" class="w-full btn-primary text-xs">COTIZAR</button>
+          </div>
+          <div class="bg-white rounded-lg shadow p-4 text-center">
+            <p class="font-600 text-green-600 mb-2">1.20m - Cal 16</p>
+            <button onclick="abrirWhatsApp()" class="w-full btn-primary text-xs">COTIZAR</button>
+          </div>
+          <div class="bg-white rounded-lg shadow p-4 text-center">
+            <p class="font-600 text-green-600 mb-2">1.50m - Cal 16</p>
+            <button onclick="abrirWhatsApp()" class="w-full btn-primary text-xs">COTIZAR</button>
+          </div>
+          <div class="bg-white rounded-lg shadow p-4 text-center">
+            <p class="font-600 text-green-600 mb-2">1.80m - Cal 16</p>
+            <button onclick="abrirWhatsApp()" class="w-full btn-primary text-xs">COTIZAR</button>
+          </div>
+          <div class="bg-white rounded-lg shadow p-4 text-center">
+            <p class="font-600 text-green-600 mb-2">2.00m - Cal 16</p>
+            <button onclick="abrirWhatsApp()" class="w-full btn-primary text-xs">COTIZAR</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- PORTONES CUADRADOS -->
+      <div class="mb-16">
+        <h3 class="text-2xl font-700 mb-6 text-gray-900 border-b-2 border-green-500 pb-4">Portones Cuadrados</h3>
+        <p class="text-gray-600 mb-6">Estructura reforzada con diferentes medidas para accesos de todo tipo.</p>
+
+        <div class="grid md:grid-cols-3 gap-6">
+          <div class="bg-white rounded-xl shadow-lg p-6">
+            <p class="font-700 text-green-600 mb-4">Serie 0.9m Ancho</p>
+            <ul class="text-xs text-gray-600 space-y-2 mb-6">
+              <li>✓ 0.9 x 1.0 mts</li>
+              <li>✓ 0.9 x 1.20 mts</li>
+              <li>✓ 0.9 x 1.50 mts</li>
+              <li>✓ 0.9 x 1.80 mts</li>
+              <li>✓ 0.9 x 2.0 mts</li>
+            </ul>
+            <button onclick="abrirWhatsApp()" class="w-full btn-primary text-sm">COTIZAR</button>
+          </div>
+
+          <div class="bg-white rounded-xl shadow-lg p-6">
+            <p class="font-700 text-green-600 mb-4">Serie 3m Ancho</p>
+            <ul class="text-xs text-gray-600 space-y-2 mb-6">
+              <li>✓ 3 x 1.50 mts</li>
+              <li>✓ 3 x 1.80 mts</li>
+              <li>✓ 3 x 2.0 mts</li>
+            </ul>
+            <button onclick="abrirWhatsApp()" class="w-full btn-primary text-sm">COTIZAR</button>
+          </div>
+
+          <div class="bg-white rounded-xl shadow-lg p-6">
+            <p class="font-700 text-green-600 mb-4">Serie 4m Ancho</p>
+            <ul class="text-xs text-gray-600 space-y-2 mb-6">
+              <li>✓ 4 x 1.50 mts</li>
+              <li>✓ 4 x 1.80 mts</li>
+              <li>✓ 4 x 2.0 mts</li>
+            </ul>
+            <button onclick="abrirWhatsApp()" class="w-full btn-primary text-sm">COTIZAR</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- PORTÓN CAÑO REDONDOS -->
+      <div>
+        <h3 class="text-2xl font-700 mb-6 text-gray-900 border-b-2 border-green-500 pb-4">Portón Caño Redondos (Premium)</h3>
+        <p class="text-gray-600 mb-6">Portones con estructura de caño redondo - Máxima resistencia y durabilidad.</p>
+
+        <div class="grid md:grid-cols-2 gap-6">
+          <div class="bg-white rounded-xl shadow-lg p-6">
+            <p class="font-700 text-green-600 mb-4 text-lg">Puertas Caño Redondo</p>
+            <ul class="text-sm text-gray-600 space-y-2 mb-6">
+              <li class="font-600">✓ 0.90 x 1.0 mts</li>
+              <li class="font-600">✓ 0.90 x 1.20 mts</li>
+              <li class="font-600">✓ 0.90 x 1.50 mts</li>
+              <li class="font-600">✓ 0.90 x 1.80 mts</li>
+              <li class="font-600">✓ 0.90 x 2.0 mts</li>
+            </ul>
+            <button onclick="abrirWhatsApp()" class="w-full btn-primary">COTIZAR PUERTAS</button>
+          </div>
+
+          <div class="bg-white rounded-xl shadow-lg p-6">
+            <p class="font-700 text-green-600 mb-4 text-lg">Portones Caño Redondo</p>
+            <ul class="text-sm text-gray-600 space-y-2 mb-6">
+              <li class="font-600">✓ 3 x 1.50 mts</li>
+              <li class="font-600">✓ 3 x 1.80 mts</li>
+              <li class="font-600">✓ 3 x 2.00 mts</li>
+              <li class="font-600">✓ 4 x 1.50 mts</li>
+              <li class="font-600">✓ 4 x 1.80 mts</li>
+              <li class="font-600">✓ 4 x 2.0 mts</li>
+            </ul>
+            <button onclick="abrirWhatsApp()" class="w-full btn-primary">COTIZAR PORTONES</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SERVICIOS -->
+  <section id="servicios" class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-6">
+      <h2 class="section-title text-center mb-4 text-gray-900">SERVICIOS ESPECIALIZADOS</h2>
+      <p class="text-center text-gray-600 text-lg mb-16 max-w-2xl mx-auto">
+        Soluciones completas para proyectos de gran envergadura con equipo profesional certificado.
+      </p>
+
+      <div class="grid md:grid-cols-2 gap-12">
+        <!-- INSTALACIÓN -->
+        <div class="border-l-4 border-green-500 pl-8">
+          <h3 class="text-2xl font-700 mb-4 text-gray-900">Instalación Profesional</h3>
+          <p class="text-gray-600 mb-6">
+            Equipo especializado con más de 15 años en obras de gran escala. Garantizamos instalación según normativas vigentes.
+          </p>
+          <ul class="space-y-3 text-gray-700 font-500">
+            <li>✓ Proyectos 1km+</li>
+            <li>✓ Mano de obra certificada</li>
+            <li>✓ Cronograma ajustado</li>
+            <li>✓ Aseguramiento de calidad</li>
+          </ul>
+        </div>
+
+        <!-- CONSULTING -->
+        <div class="border-l-4 border-green-500 pl-8">
+          <h3 class="text-2xl font-700 mb-4 text-gray-900">Consultoría Técnica</h3>
+          <p class="text-gray-600 mb-6">
+            Asesoramiento experto para elegir la solución ideal según tu proyecto. Análisis de requerimientos y presupuesto personalizado.
+          </p>
+          <ul class="space-y-3 text-gray-700 font-500">
+            <li>✓ Análisis de proyecto</li>
+            <li>✓ Diseño de solución</li>
+            <li>✓ Estimación de costos</li>
+            <li>✓ Seguimiento post-venta</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROYECTOS DESTACADOS -->
+  <section id="proyectos" class="py-20 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-6">
+      <h2 class="section-title text-center mb-4 text-gray-900">PROYECTOS DESTACADOS</h2>
+      <p class="text-center text-gray-600 text-lg mb-16 max-w-2xl mx-auto">
+        Casos de éxito en obras de infraestructura de gran escala.
+      </p>
+
+      <div class="grid md:grid-cols-3 gap-8">
+        <div class="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition">
+          <div class="bg-gradient-to-br from-blue-400 to-blue-600 h-48 flex items-center justify-center text-white text-4xl">
+            🌳
+          </div>
+          <div class="p-6">
+            <h4 class="text-xl font-700 mb-2 text-gray-900">Proyecto Parque</h4>
+            <p class="text-gray-600 text-sm mb-4">2.5 km de malla instalada en tiempo record con máxima precisión.</p>
+            <p class="font-600 text-green-600">+2.5 km</p>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition">
+          <div class="bg-gradient-to-br from-purple-400 to-purple-600 h-48 flex items-center justify-center text-white text-4xl">
+            🏗️
+          </div>
+          <div class="p-6">
+            <h4 class="text-xl font-700 mb-2 text-gray-900">Obra Residencial</h4>
+            <p class="text-gray-600 text-sm mb-4">Urbanización completa con 5 sectores y 1.8 km de perímetro.</p>
+            <p class="font-600 text-green-600">+1.8 km</p>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition">
+          <div class="bg-gradient-to-br from-orange-400 to-orange-600 h-48 flex items-center justify-center text-white text-4xl">
+            🚜
+          </div>
+          <div class="p-6">
+            <h4 class="text-xl font-700 mb-2 text-gray-900">Proyecto Agrícola</h4>
+            <p class="text-gray-600 text-sm mb-4">Cercado de propiedad rural con instalación en terreno irregular.</p>
+            <p class="font-600 text-green-600">+3.2 km</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIOS -->
+  <section class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-6">
+      <h2 class="section-title text-center mb-4 text-gray-900">CLIENTES SATISFECHOS</h2>
+      <p class="text-center text-gray-600 text-lg mb-16 max-w-2xl mx-auto">
+        Empresas líderes confían en nuestros productos y servicios.
+      </p>
+
+      <div class="grid md:grid-cols-3 gap-8">
+        <div class="bg-gray-50 rounded-xl p-8 border-l-4 border-green-500">
+          <p class="text-gray-700 mb-4 italic">"Excelente calidad y atención profesional. Completaron nuestro proyecto de 2.5km en tiempo récord."</p>
+          <p class="font-700 text-gray-900">Constructora ALFA</p>
+          <p class="text-sm text-gray-600">Buenos Aires</p>
+        </div>
+        <div class="bg-gray-50 rounded-xl p-8 border-l-4 border-green-500">
+          <p class="text-gray-700 mb-4 italic">"Los mejores precios del mercado sin sacrificar calidad. Recomendamos 100%."</p>
+          <p class="font-700 text-gray-900">Empresa Agrícola SRL</p>
+          <p class="text-sm text-gray-600">La Pampa</p>
+        </div>
+        <div class="bg-gray-50 rounded-xl p-8 border-l-4 border-green-500">
+          <p class="text-gray-700 mb-4 italic">"Consultoría técnica impecable. Nos asesoraron perfectamente para nuestra obra."</p>
+          <p class="font-700 text-gray-900">Desarrollista Inmobiliario</p>
+          <p class="text-sm text-gray-600">Mar del Plata</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACTO -->
+  <section id="contacto" class="gradient-hero text-white py-20">
+    <div class="max-w-7xl mx-auto px-6 text-center">
+      <h2 class="text-4xl font-800 mb-6">¿Listo para tu Proyecto?</h2>
+      <p class="text-xl text-gray-200 mb-8 max-w-2xl mx-auto">
+        Contacta con nuestro equipo para una consultoría gratuita y presupuesto personalizado.
+      </p>
+
+      <div class="flex flex-col md:flex-row gap-6 justify-center items-center mb-12">
+        <button onclick="abrirWhatsApp()" class="bg-green-500 hover:bg-green-600 text-white px-10 py-4 rounded-lg font-700 text-lg transition flex items-center gap-3">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.272-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.67-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.076 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421-7.403h-.004c-1.025 0-2.02-.315-2.884-.9l-.2-.128-2.06.501.51-1.996-.129-.207A4.754 4.754 0 0 1 6.654 2.889c1.196 0 2.329.465 3.176 1.311.847.847 1.312 1.98 1.312 3.176 0 .855-.203 1.683-.594 2.425z"/>
+          </svg>
+          WHATSAPP: 11-23713598
+        </button>
+        <a href="mailto:info@greengardenlobos.com.ar" class="border-2 border-white text-white hover:bg-white hover:text-green-600 px-10 py-4 rounded-lg font-700 text-lg transition">
+          info@greengardenlobos.com.ar
+        </a>
+      </div>
+
+      <p class="text-gray-200 text-sm">
+        Ubicación: Buenos Aires, Argentina | Envíos a todo el país
+      </p>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="bg-gray-900 text-gray-300 py-12">
+    <div class="max-w-7xl mx-auto px-6 text-center">
+      <p class="mb-4">© 2024 GREEN GARDEN LOBOS. Todos los derechos reservados.</p>
+      <p class="text-sm text-gray-500">
+        Especialistas en malla romboidal galvanizada | Obras de gran escala | Garantía certificada
+      </p>
+    </div>
+  </footer>
+
+  <script>
+    function abrirWhatsApp() {
+      const numero = "5491123713598";
+      const mensaje = encodeURIComponent("Hola, quisiera más información sobre vuestros productos y servicios para un proyecto de gran escala.");
+      window.open(`https://wa.me/${numero}?text=${mensaje}`, '_blank');
+    }
+
+    // Cargar imágenes del admin en la galería
+    window.addEventListener('load', () => {
+      const slots = ['rafias', 'postes', 'alambre', 'hardware'];
+      slots.forEach(slot => {
+        const stored = localStorage.getItem(`gg-gallery-${slot}`);
+        if (stored) {
+          const cardIndex = slots.indexOf(slot) + 2; // +2 porque logo está en 1
+          const card = document.querySelectorAll('[class*="gallery"]')[cardIndex];
+          if (card) {
+            card.style.backgroundImage = `url('${stored}'), linear-gradient(180deg, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.5) 100%)`;
+            card.style.backgroundSize = 'cover';
+            card.style.backgroundPosition = 'center';
+          }
+        }
+      });
+    });
+  </script>
+
+</body>
+</html>

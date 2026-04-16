@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - GREEN GARDEN LOBOS | Gestionar Galería</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap');
+    body { font-family: 'Poppins', sans-serif; }
+    .drag-over { background-color: #dcfce7; border-color: #16a34a; }
+    .preview-img { max-width: 100%; max-height: 400px; object-fit: contain; }
+    .gallery-slot { aspect-ratio: 9/16; }
+  </style>
+</head>
+<body class="bg-gray-100">
+
+  <!-- NAVBAR -->
+  <nav class="fixed w-full z-50 bg-white shadow-lg">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center text-white font-800 text-sm">GG</div>
+        <p class="text-lg font-800 text-gray-900">GREEN GARDEN LOBOS</p>
+      </div>
+      <div class="flex gap-4">
+        <a href="index.html" target="_blank" class="text-sm font-600 text-gray-600 hover:text-green-600">Ver Web</a>
+        <button onclick="logout()" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-600 transition text-sm">Salir</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="pt-24 pb-12">
+    <div class="max-w-7xl mx-auto px-6">
+      <h1 class="text-4xl font-800 mb-2 text-gray-900">Panel de Administración</h1>
+      <p class="text-gray-600 mb-8">Gestiona las fotos de la galería de productos. Redimensiona a 540x960px (9:16 ratio).</p>
+
+      <!-- INSTRUCCIONES -->
+      <div class="bg-blue-50 border-l-4 border-blue-500 p-6 rounded-lg mb-12">
+        <h2 class="font-700 text-blue-900 mb-3">📋 Instrucciones</h2>
+        <ul class="text-sm text-blue-800 space-y-2">
+          <li>✓ <strong>Tamaño recomendado:</strong> 540px de ancho × 960px de alto (formato story Instagram)</li>
+          <li>✓ <strong>Formatos:</strong> JPG, PNG, WebP</li>
+          <li>✓ <strong>Drag & Drop:</strong> Arrastra las fotos a los recuadros o haz clic para seleccionar</li>
+          <li>✓ <strong>Vista previa:</strong> Puedes ver cómo se vería cada foto antes de guardar</li>
+          <li>✓ <strong>Almacenamiento:</strong> Se guarda en tu navegador (localStorage)</li>
+          <li>✓ <strong>Eliminar:</strong> Haz clic en la X roja para quitar una foto</li>
+        </ul>
+      </div>
+
+      <!-- GALERÍA DE ADMIN -->
+      <div class="grid md:grid-cols-5 gap-6">
+
+        <!-- Slot 1: Logo Oficial -->
+        <div class="bg-white rounded-xl shadow-lg p-4">
+          <label for="img-logo" class="block mb-4">
+            <p class="font-700 text-gray-900 text-center mb-2">Logo Oficial</p>
+            <p class="text-xs text-gray-500 text-center mb-3">GG - Identificador marca</p>
+            <div id="drop-logo" class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:border-green-500 hover:bg-green-50 transition gallery-slot flex items-center justify-center relative">
+              <div id="preview-logo" class="w-full h-full flex items-center justify-center">
+                <p class="text-gray-400 text-sm">Haz clic o arrastra</p>
+              </div>
+              <input type="file" id="img-logo" accept="image/*" class="hidden" onchange="handleImage(this, 'logo')">
+            </div>
+          </label>
+          <div class="mt-4 flex gap-2">
+            <button onclick="viewPreview('logo')" class="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded text-xs font-600">Vista Previa</button>
+            <button onclick="deleteImage('logo')" class="flex-1 bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded text-xs font-600">Eliminar</button>
+          </div>
+        </div>
+
+        <!-- Slot 2: Rafias -->
+        <div class="bg-white rounded-xl shadow-lg p-4">
+          <label for="img-rafias" class="block mb-4">
+            <p class="font-700 text-gray-900 text-center mb-2">Rafias Media Sombra</p>
+            <p class="text-xs text-gray-500 text-center mb-3">En stock - Cinta Cubrecerc</p>
+            <div id="drop-rafias" class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:border-green-500 hover:bg-green-50 transition gallery-slot flex items-center justify-center relative">
+              <div id="preview-rafias" class="w-full h-full flex items-center justify-center">
+                <p class="text-gray-400 text-sm">Haz clic o arrastra</p>
+              </div>
+              <input type="file" id="img-rafias" accept="image/*" class="hidden" onchange="handleImage(this, 'rafias')">
+            </div>
+          </label>
+          <div class="mt-4 flex gap-2">
+            <button onclick="viewPreview('rafias')" class="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded text-xs font-600">Vista Previa</button>
+            <button onclick="deleteImage('rafias')" class="flex-1 bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded text-xs font-600">Eliminar</button>
+          </div>
+        </div>
+
+        <!-- Slot 3: Postes -->
+        <div class="bg-white rounded-xl shadow-lg p-4">
+          <label for="img-postes" class="block mb-4">
+            <p class="font-700 text-gray-900 text-center mb-2">Postes Hormigón</p>
+            <p class="text-xs text-gray-500 text-center mb-3">Rectos & Olímpicos</p>
+            <div id="drop-postes" class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:border-green-500 hover:bg-green-50 transition gallery-slot flex items-center justify-center relative">
+              <div id="preview-postes" class="w-full h-full flex items-center justify-center">
+                <p class="text-gray-400 text-sm">Haz clic o arrastra</p>
+              </div>
+              <input type="file" id="img-postes" accept="image/*" class="hidden" onchange="handleImage(this, 'postes')">
+            </div>
+          </label>
+          <div class="mt-4 flex gap-2">
+            <button onclick="viewPreview('postes')" class="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded text-xs font-600">Vista Previa</button>
+            <button onclick="deleteImage('postes')" class="flex-1 bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded text-xs font-600">Eliminar</button>
+          </div>
+        </div>
+
+        <!-- Slot 4: Alambre -->
+        <div class="bg-white rounded-xl shadow-lg p-4">
+          <label for="img-alambre" class="block mb-4">
+            <p class="font-700 text-gray-900 text-center mb-2">Alambre Tejido</p>
+            <p class="text-xs text-gray-500 text-center mb-3">x Rollo | Púa & Liso</p>
+            <div id="drop-alambre" class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:border-green-500 hover:bg-green-50 transition gallery-slot flex items-center justify-center relative">
+              <div id="preview-alambre" class="w-full h-full flex items-center justify-center">
+                <p class="text-gray-400 text-sm">Haz clic o arrastra</p>
+              </div>
+              <input type="file" id="img-alambre" accept="image/*" class="hidden" onchange="handleImage(this, 'alambre')">
+            </div>
+          </label>
+          <div class="mt-4 flex gap-2">
+            <button onclick="viewPreview('alambre')" class="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded text-xs font-600">Vista Previa</button>
+            <button onclick="deleteImage('alambre')" class="flex-1 bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded text-xs font-600">Eliminar</button>
+          </div>
+        </div>
+
+        <!-- Slot 5: Hardware -->
+        <div class="bg-white rounded-xl shadow-lg p-4">
+          <label for="img-hardware" class="block mb-4">
+            <p class="font-700 text-gray-900 text-center mb-2">Hardware Premium</p>
+            <p class="text-xs text-gray-500 text-center mb-3">Torniquete, Gancho J</p>
+            <div id="drop-hardware" class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:border-green-500 hover:bg-green-50 transition gallery-slot flex items-center justify-center relative">
+              <div id="preview-hardware" class="w-full h-full flex items-center justify-center">
+                <p class="text-gray-400 text-sm">Haz clic o arrastra</p>
+              </div>
+              <input type="file" id="img-hardware" accept="image/*" class="hidden" onchange="handleImage(this, 'hardware')">
+            </div>
+          </label>
+          <div class="mt-4 flex gap-2">
+            <button onclick="viewPreview('hardware')" class="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded text-xs font-600">Vista Previa</button>
+            <button onclick="deleteImage('hardware')" class="flex-1 bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded text-xs font-600">Eliminar</button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ESTADO -->
+      <div class="mt-12 bg-green-50 border-l-4 border-green-500 p-6 rounded-lg">
+        <p class="font-700 text-green-900 mb-2">✓ Sistema listo</p>
+        <p class="text-sm text-green-800">Las fotos se guardan automáticamente en tu navegador. Cada vez que cargues esta página, verás las imágenes que subiste.</p>
+        <p class="text-xs text-green-600 mt-2">Usa esta URL para acceder: <code class="bg-white px-2 py-1 rounded text-green-700 font-600">/admin.html</code></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL VISTA PREVIA -->
+  <div id="modal-preview" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6">
+      <h2 id="modal-title" class="text-xl font-700 mb-4 text-gray-900">Vista Previa</h2>
+      <div class="bg-gray-100 rounded-lg p-4 gallery-slot flex items-center justify-center">
+        <img id="modal-img" src="" alt="Preview" class="preview-img">
+      </div>
+      <div class="mt-6 text-center text-sm text-gray-600 mb-6">
+        <p><strong>Tamaño ideal:</strong> 540px × 960px</p>
+        <p id="actual-size" class="text-xs text-gray-500 mt-1"></p>
+      </div>
+      <button onclick="closePreview()" class="w-full bg-gray-300 hover:bg-gray-400 text-gray-900 px-4 py-2 rounded-lg font-600 transition">Cerrar</button>
+    </div>
+  </div>
+
+  <script>
+    // Slots disponibles
+    const slots = ['logo', 'rafias', 'postes', 'alambre', 'hardware'];
+
+    // Cargar imágenes al iniciar
+    window.addEventListener('load', () => {
+      slots.forEach(slot => {
+        const stored = localStorage.getItem(`gg-gallery-${slot}`);
+        if (stored) {
+          const img = new Image();
+          img.src = stored;
+          img.className = 'w-full h-full object-cover rounded-lg';
+          const preview = document.getElementById(`preview-${slot}`);
+          preview.innerHTML = '';
+          preview.appendChild(img);
+
+          // Agregar botón X
+          const deleteBtn = document.createElement('button');
+          deleteBtn.className = 'absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold opacity-0 hover:opacity-100 transition';
+          deleteBtn.innerHTML = '×';
+          deleteBtn.onclick = (e) => { e.preventDefault(); deleteImage(slot); };
+          const dropZone = document.getElementById(`drop-${slot}`);
+          dropZone.appendChild(deleteBtn);
+        }
+      });
+      setupDragDrop();
+    });
+
+    // Drag & Drop
+    function setupDragDrop() {
+      slots.forEach(slot => {
+        const dropZone = document.getElementById(`drop-${slot}`);
+        dropZone.addEventListener('click', () => document.getElementById(`img-${slot}`).click());
+
+        dropZone.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          dropZone.classList.add('drag-over');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+          dropZone.classList.remove('drag-over');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+          e.preventDefault();
+          dropZone.classList.remove('drag-over');
+          const files = e.dataTransfer.files;
+          if (files.length > 0) {
+            const input = document.getElementById(`img-${slot}`);
+            input.files = files;
+            handleImage(input, slot);
+          }
+        });
+      });
+    }
+
+    // Manejar carga de imagen
+    function handleImage(input, slot) {
+      const file = input.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const base64 = e.target.result;
+        localStorage.setItem(`gg-gallery-${slot}`, base64);
+
+        const img = new Image();
+        img.src = base64;
+        img.className = 'w-full h-full object-cover rounded-lg';
+
+        const preview = document.getElementById(`preview-${slot}`);
+        preview.innerHTML = '';
+        preview.appendChild(img);
+
+        // Agregar botón X
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold opacity-0 hover:opacity-100 transition';
+        deleteBtn.innerHTML = '×';
+        deleteBtn.onclick = (e) => { e.preventDefault(); deleteImage(slot); };
+        const dropZone = document.getElementById(`drop-${slot}`);
+        dropZone.appendChild(deleteBtn);
+
+        alert(`✓ Imagen guardada: ${slot}`);
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // Vista previa
+    function viewPreview(slot) {
+      const stored = localStorage.getItem(`gg-gallery-${slot}`);
+      if (!stored) {
+        alert('No hay imagen cargada aún');
+        return;
+      }
+
+      const img = new Image();
+      img.onload = function() {
+        document.getElementById('modal-title').textContent = `Vista Previa - ${slot.charAt(0).toUpperCase() + slot.slice(1)}`;
+        document.getElementById('modal-img').src = stored;
+        document.getElementById('actual-size').textContent = `Tamaño actual: ${this.width}px × ${this.height}px`;
+        document.getElementById('modal-preview').classList.remove('hidden');
+      };
+      img.src = stored;
+    }
+
+    function closePreview() {
+      document.getElementById('modal-preview').classList.add('hidden');
+    }
+
+    // Eliminar imagen
+    function deleteImage(slot) {
+      if (!confirm(`¿Eliminar imagen de ${slot}?`)) return;
+
+      localStorage.removeItem(`gg-gallery-${slot}`);
+      const preview = document.getElementById(`preview-${slot}`);
+      preview.innerHTML = '<p class="text-gray-400 text-sm">Haz clic o arrastra</p>';
+      document.getElementById(`img-${slot}`).value = '';
+      alert('✓ Imagen eliminada');
+    }
+
+    // Logout
+    function logout() {
+      if (confirm('¿Salir del panel de administración?')) {
+        sessionStorage.removeItem('gg-admin-logged');
+        window.location.href = 'index.html';
+      }
+    }
+  </script>
+
+</body>
+</html>
