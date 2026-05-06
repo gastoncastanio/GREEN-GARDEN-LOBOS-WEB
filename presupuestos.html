@@ -1,0 +1,1983 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Presupuestos | Green Garden Lobos</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            verde: {
+              oscuro: '#2d5a27',
+              medio: '#4a7c59',
+              claro: '#6fa87a',
+              bg: '#f0f7ee',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+    /* Permitir selección solo en inputs y textareas (para que se pueda escribir) */
+    input, textarea, select {
+      -webkit-user-select: text;
+      -moz-user-select: text;
+      -ms-user-select: text;
+      user-select: text;
+    }
+    .input-field {
+      @apply w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-verde-medio focus:border-transparent transition;
+    }
+    .label { @apply block text-xs font-semibold text-gray-600 mb-1 uppercase tracking-wide; }
+    @media print { .no-print { display: none !important; } }
+    /* Pantalla de bloqueo cuando se detecta DevTools */
+    #devtoolsBloqueo {
+      position: fixed; inset: 0; background: #2d5a27; color: white;
+      display: none; align-items: center; justify-content: center;
+      flex-direction: column; z-index: 999999; padding: 20px; text-align: center;
+    }
+    #devtoolsBloqueo.activo { display: flex; }
+  </style>
+  <script>
+    // ========================================
+    // PROTECCIÓN BÁSICA — DESACTIVADA
+    // ----------------------------------------
+    // Para activar antes del deploy: cambiar PROTECCION_ACTIVA a true
+    // ========================================
+    const PROTECCION_ACTIVA = false;
+
+    if (PROTECCION_ACTIVA) (function() {
+      document.addEventListener('contextmenu', e => { e.preventDefault(); return false; });
+      document.addEventListener('keydown', e => {
+        const k = e.key;
+        if (k === 'F12') { e.preventDefault(); return false; }
+        if ((e.ctrlKey || e.metaKey) && k === 'u') { e.preventDefault(); return false; }
+        if ((e.ctrlKey || e.metaKey) && k === 's') { e.preventDefault(); return false; }
+        if ((e.ctrlKey || e.metaKey) && e.shiftKey && (k === 'I' || k === 'i')) { e.preventDefault(); return false; }
+        if ((e.ctrlKey || e.metaKey) && e.shiftKey && (k === 'J' || k === 'j')) { e.preventDefault(); return false; }
+        if ((e.ctrlKey || e.metaKey) && e.shiftKey && (k === 'C' || k === 'c')) { e.preventDefault(); return false; }
+      });
+      let alertado = false;
+      setInterval(() => {
+        const ancho = window.outerWidth - window.innerWidth;
+        const alto  = window.outerHeight - window.innerHeight;
+        if ((ancho > 200 || alto > 200) && !alertado) {
+          alertado = true;
+          const div = document.getElementById('devtoolsBloqueo');
+          if (div) div.classList.add('activo');
+        } else if (ancho <= 200 && alto <= 200 && alertado) {
+          alertado = false;
+          const div = document.getElementById('devtoolsBloqueo');
+          if (div) div.classList.remove('activo');
+        }
+      }, 1000);
+      setInterval(() => { try { console.clear(); } catch(e) {} }, 2000);
+      console.log('%c⛔ ACCESO RESTRINGIDO', 'color: red; font-size: 32px; font-weight: bold;');
+      console.log('%cEsta aplicación es propiedad de Green Garden Lobos.', 'color: #2d5a27; font-size: 14px;');
+    })();
+  </script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+<!-- Pantalla de bloqueo cuando se detectan herramientas de desarrollador -->
+<div id="devtoolsBloqueo">
+  <svg width="80" height="80" fill="none" stroke="white" viewBox="0 0 24 24" style="margin-bottom: 20px;">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+  </svg>
+  <h1 style="font-size: 28px; font-weight: bold; margin-bottom: 12px;">Acceso restringido</h1>
+  <p style="font-size: 16px; opacity: 0.9; max-width: 500px;">
+    Esta aplicación es propiedad de <strong>Green Garden Lobos</strong>.<br>
+    Por favor cerrá las herramientas de desarrollador para continuar usando el sistema.
+  </p>
+</div>
+
+<!-- ============================================================
+     HEADER
+============================================================ -->
+<header class="bg-verde-oscuro text-white shadow-lg no-print">
+  <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+    <div class="flex items-center gap-4">
+      <a href="admin.html" class="text-white/70 hover:text-white text-sm flex items-center gap-1 transition">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+        </svg>
+        Volver al Admin
+      </a>
+      <div class="w-px h-6 bg-white/30"></div>
+      <div>
+        <h1 class="text-xl font-bold tracking-wide">GREEN GARDEN LOBOS</h1>
+        <p class="text-xs text-white/70">Alambrados · Lobos, Buenos Aires</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-3">
+      <button onclick="abrirHistorial()" class="flex items-center gap-2 bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg text-sm font-medium transition">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        Historial
+      </button>
+      <span class="bg-verde-medio px-3 py-1 rounded-full text-xs font-bold">PRESUPUESTOS</span>
+    </div>
+  </div>
+</header>
+
+<!-- ============================================================
+     CONTENIDO PRINCIPAL
+============================================================ -->
+<main class="max-w-6xl mx-auto px-4 py-8">
+
+  <!-- FORMULARIO DE CÁLCULO -->
+  <div id="seccionFormulario" class="space-y-6">
+
+    <!-- TÍTULO -->
+    <div class="flex items-center justify-between">
+      <div>
+        <h2 class="text-2xl font-bold text-verde-oscuro">Nuevo Presupuesto</h2>
+        <p class="text-gray-500 text-sm mt-1">Completá los datos para calcular materiales automáticamente</p>
+      </div>
+      <div class="text-right">
+        <div class="text-xs text-gray-500 uppercase tracking-wide">Número de presupuesto</div>
+        <div id="numPresupuesto" class="text-lg font-mono font-bold text-verde-oscuro"></div>
+      </div>
+    </div>
+
+    <!-- DATOS DEL CLIENTE -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+      <h3 class="text-sm font-bold text-verde-oscuro uppercase tracking-wider mb-4 flex items-center gap-2">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+        </svg>
+        Datos del Cliente
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div class="md:col-span-2">
+          <label class="label">Nombre completo</label>
+          <input type="text" id="clienteNombre" class="input-field" placeholder="Juan García" />
+        </div>
+        <div>
+          <label class="label">Localidad</label>
+          <input type="text" id="clienteLocalidad" class="input-field" placeholder="Lobos" />
+        </div>
+        <div>
+          <label class="label">Teléfono</label>
+          <input type="text" id="clienteTelefono" class="input-field" placeholder="2227-XXXXXX" />
+        </div>
+        <div>
+          <label class="label">Fecha</label>
+          <input type="date" id="fechaPresupuesto" class="input-field" />
+        </div>
+        <div class="md:col-span-3">
+          <label class="label">Observaciones</label>
+          <textarea id="observaciones" class="input-field resize-none" rows="2" placeholder="Notas adicionales, condiciones especiales, referencias del terreno..."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- MEDIDAS DEL TERRENO -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+      <h3 class="text-sm font-bold text-verde-oscuro uppercase tracking-wider mb-4 flex items-center gap-2">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
+        </svg>
+        Medidas del Terreno
+      </h3>
+      <div class="mb-4">
+        <label class="label">Forma del terreno</label>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+          <label class="cursor-pointer">
+            <input type="radio" name="formaTerreno" value="recta" class="peer sr-only" onchange="cambiarForma()" />
+            <div class="border-2 border-gray-200 peer-checked:border-verde-oscuro peer-checked:bg-verde-bg rounded-xl p-3 text-center transition">
+              <div class="text-2xl mb-1">━</div>
+              <div class="text-xs font-semibold">Recta (1 lado)</div>
+            </div>
+          </label>
+          <label class="cursor-pointer">
+            <input type="radio" name="formaTerreno" value="L" class="peer sr-only" onchange="cambiarForma()" />
+            <div class="border-2 border-gray-200 peer-checked:border-verde-oscuro peer-checked:bg-verde-bg rounded-xl p-3 text-center transition">
+              <div class="text-2xl mb-1">└</div>
+              <div class="text-xs font-semibold">"L" (2 lados)</div>
+            </div>
+          </label>
+          <label class="cursor-pointer">
+            <input type="radio" name="formaTerreno" value="C" class="peer sr-only" onchange="cambiarForma()" />
+            <div class="border-2 border-gray-200 peer-checked:border-verde-oscuro peer-checked:bg-verde-bg rounded-xl p-3 text-center transition">
+              <div class="text-2xl mb-1">⊏</div>
+              <div class="text-xs font-semibold">"C" (3 lados)</div>
+            </div>
+          </label>
+          <label class="cursor-pointer">
+            <input type="radio" name="formaTerreno" value="cerrado" class="peer sr-only" onchange="cambiarForma()" checked />
+            <div class="border-2 border-gray-200 peer-checked:border-verde-oscuro peer-checked:bg-verde-bg rounded-xl p-3 text-center transition">
+              <div class="text-2xl mb-1">▭</div>
+              <div class="text-xs font-semibold">Cerrado (4 lados)</div>
+            </div>
+          </label>
+        </div>
+      </div>
+      <div class="grid grid-cols-2 md:grid-cols-5 gap-4 items-end">
+        <div id="boxLadoA">
+          <label class="label">Lado A (m)</label>
+          <input type="number" id="ladoA" class="input-field" placeholder="0" min="0" step="0.5" oninput="actualizarPerimetro()" />
+        </div>
+        <div id="boxLadoB">
+          <label class="label">Lado B (m)</label>
+          <input type="number" id="ladoB" class="input-field" placeholder="0" min="0" step="0.5" oninput="actualizarPerimetro()" />
+        </div>
+        <div id="boxLadoC">
+          <label class="label">Lado C (m)</label>
+          <input type="number" id="ladoC" class="input-field" placeholder="0" min="0" step="0.5" oninput="actualizarPerimetro()" />
+        </div>
+        <div id="boxLadoD">
+          <label class="label">Lado D (m)</label>
+          <input type="number" id="ladoD" class="input-field" placeholder="0" min="0" step="0.5" oninput="actualizarPerimetro()" />
+        </div>
+        <div class="bg-verde-bg rounded-xl p-3 text-center border-2 border-verde-medio">
+          <div class="text-xs text-verde-oscuro font-semibold uppercase">Perímetro Total</div>
+          <div id="perimetroDisplay" class="text-2xl font-bold text-verde-oscuro">0 m</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ESPECIFICACIONES DEL ALAMBRADO -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+      <h3 class="text-sm font-bold text-verde-oscuro uppercase tracking-wider mb-4 flex items-center gap-2">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+        </svg>
+        Especificaciones del Alambrado
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
+          <label class="label">Altura del tejido</label>
+          <select id="alturaTejido" class="input-field" onchange="aplicarRestricciones()">
+            <option value="1.00">1.00 m</option>
+            <option value="1.20">1.20 m</option>
+            <option value="1.50">1.50 m</option>
+            <option value="1.80" selected>1.80 m</option>
+            <option value="2.00">2.00 m</option>
+          </select>
+          <p id="avisoAltura" class="hidden text-xs text-amber-600 mt-1"></p>
+        </div>
+        <div>
+          <label class="label">Tipo de tejido</label>
+          <select id="tipoTejido" class="input-field">
+            <option value="economico">Económico (3" cal16)</option>
+            <option value="intermedio" selected>Intermedio (3" cal14)</option>
+            <option value="interm_ref">Interm. Reforzado (2.5" cal14)</option>
+            <option value="reforzado">Reforzado (2" cal14)</option>
+            <option value="avicola">Avícola (1" cal16)</option>
+          </select>
+        </div>
+        <div>
+          <label class="label">Tipo de poste</label>
+          <select id="tipoPoste" class="input-field" onchange="toggleRedondoReforzado(); aplicarRestricciones();">
+            <option value="olimpico" selected>Hormigón Olímpico</option>
+            <option value="recto">Hormigón Recto</option>
+            <option value="quebracho_redondo">Quebracho Colorado Redondo</option>
+            <option value="quebracho_cuadrado">Quebracho Colorado Cuadrado</option>
+          </select>
+          <label id="opcionEsquinerosReforzados" class="hidden flex items-center gap-2 mt-2 text-sm text-gray-700 cursor-pointer">
+            <input type="checkbox" id="esquinerosReforzados" class="w-4 h-4 accent-verde-oscuro" />
+            Esquineros reforzados (tipo viga)
+          </label>
+        </div>
+        <div>
+          <label class="label">Líneas de alambre de púa</label>
+          <select id="lineasPua" class="input-field" onchange="aplicarRestricciones()">
+            <option value="0" selected>Sin púa</option>
+            <option value="1">1 línea</option>
+            <option value="2">2 líneas</option>
+            <option value="3">3 líneas</option>
+          </select>
+          <p id="avisoPua" class="hidden text-xs text-amber-600 mt-1"></p>
+        </div>
+        <div>
+          <label class="label">Lista de precios</label>
+          <div class="flex gap-2 mt-1">
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="radio" name="lista" value="minorista" checked class="accent-verde-oscuro" onchange="actualizarListaInfo()" />
+              <span class="text-sm font-medium">Minorista</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="radio" name="lista" value="mayorista" class="accent-verde-oscuro" onchange="actualizarListaInfo()" />
+              <span class="text-sm font-medium">Mayorista</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="radio" name="lista" value="minorista_iva" class="accent-verde-oscuro" onchange="actualizarListaInfo()" />
+              <span class="text-sm font-medium">Minorista + IVA</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="radio" name="lista" value="mayorista_iva" class="accent-verde-oscuro" onchange="actualizarListaInfo()" />
+              <span class="text-sm font-medium">Mayorista + IVA</span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PORTÓN Y PUERTA -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+      <h3 class="text-sm font-bold text-verde-oscuro uppercase tracking-wider mb-4 flex items-center gap-2">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"/>
+        </svg>
+        Portón y Accesos
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+        <!-- PORTÓN VEHICULAR -->
+        <div class="border border-gray-200 rounded-xl p-4">
+          <label class="flex items-center gap-3 cursor-pointer mb-3">
+            <input type="checkbox" id="incluyePorton" class="w-4 h-4 accent-verde-oscuro" onchange="togglePorton()" />
+            <span class="font-semibold text-gray-700">Incluir portón vehicular</span>
+          </label>
+          <div id="opcionesPorton" class="hidden space-y-3">
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="label">Ancho</label>
+                <select id="anchoPorton" class="input-field">
+                  <option value="1.5">1.5 m</option>
+                  <option value="2">2 m</option>
+                  <option value="3" selected>3 m</option>
+                  <option value="4">4 m</option>
+                </select>
+              </div>
+              <div>
+                <label class="label">Tipo</label>
+                <select id="tipoPorton" class="input-field">
+                  <option value="cano">Caño redondo</option>
+                  <option value="tranquera">Tranquera</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <label class="label">Ubicación del portón</label>
+              <select id="ubicacionPorton" class="input-field">
+                <option value="punta" selected>En la punta (esquina)</option>
+                <option value="medio">En el medio del lado</option>
+              </select>
+            </div>
+            <div>
+              <label class="label">¿En qué lado va el portón?</label>
+              <select id="ladoPorton" class="input-field">
+                <option value="A" selected>Lado A</option>
+                <option value="B">Lado B</option>
+                <option value="C">Lado C</option>
+                <option value="D">Lado D</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- PUERTA PEATONAL -->
+        <div class="border border-gray-200 rounded-xl p-4">
+          <label class="flex items-center gap-3 cursor-pointer mb-3">
+            <input type="checkbox" id="incluyePuerta" class="w-4 h-4 accent-verde-oscuro" onchange="togglePuerta()" />
+            <span class="font-semibold text-gray-700">Incluir puerta peatonal</span>
+          </label>
+          <div id="opcionesPuerta" class="hidden space-y-3">
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="label">Ancho</label>
+                <div class="input-field bg-gray-100 text-gray-500 cursor-not-allowed">0.90 m (fijo)</div>
+              </div>
+              <div>
+                <label class="label">Altura</label>
+                <select id="alturaPuerta" class="input-field">
+                  <option value="1.00">1.00 m</option>
+                  <option value="1.20">1.20 m</option>
+                  <option value="1.50">1.50 m</option>
+                  <option value="1.80" selected>1.80 m</option>
+                  <option value="2.00">2.00 m</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <label class="label">Ubicación de la puerta</label>
+              <select id="ubicacionPuerta" class="input-field">
+                <option value="medio" selected>En el medio del lado</option>
+                <option value="punta">En la punta (esquina)</option>
+              </select>
+            </div>
+            <div>
+              <label class="label">¿En qué lado va la puerta?</label>
+              <select id="ladoPuerta" class="input-field">
+                <option value="A" selected>Lado A</option>
+                <option value="B">Lado B</option>
+                <option value="C">Lado C</option>
+                <option value="D">Lado D</option>
+              </select>
+            </div>
+            <p class="text-xs text-gray-500">Puerta de caño redondo, apertura simple</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BOTÓN CALCULAR -->
+    <div class="flex justify-center">
+      <button onclick="calcularPresupuesto()" class="bg-verde-oscuro hover:bg-verde-medio text-white font-bold px-10 py-4 rounded-2xl shadow-lg text-lg transition-all transform hover:scale-105 flex items-center gap-3">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 11h.01M12 11h.01M15 11h.01M4 19h16a2 2 0 002-2V7a2 2 0 00-2-2H4a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+        </svg>
+        Calcular Presupuesto
+      </button>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       RESULTADO DEL PRESUPUESTO
+  ============================================================ -->
+  <div id="seccionResultado" class="hidden space-y-6 mt-8">
+
+    <!-- CABECERA DEL RESULTADO -->
+    <div class="bg-verde-oscuro text-white rounded-2xl p-6 shadow-lg">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h2 class="text-2xl font-bold">PRESUPUESTO</h2>
+          <p id="resNumero" class="text-white/80 font-mono text-sm"></p>
+          <p id="resCliente" class="text-xl font-semibold mt-1"></p>
+          <p id="resDatos" class="text-white/70 text-sm"></p>
+        </div>
+        <div class="text-right">
+          <div class="text-white/60 text-xs uppercase tracking-wide">Fecha</div>
+          <div id="resFecha" class="text-lg font-semibold"></div>
+          <div id="resLista" class="mt-1 bg-white/20 px-3 py-1 rounded-full text-xs font-bold inline-block"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RESUMEN TÉCNICO -->
+    <div class="bg-verde-bg border border-verde-medio/30 rounded-xl p-4">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+        <div>
+          <div class="text-xs text-verde-oscuro/70 uppercase font-semibold">Perímetro</div>
+          <div id="resPerimetro" class="text-xl font-bold text-verde-oscuro"></div>
+        </div>
+        <div>
+          <div class="text-xs text-verde-oscuro/70 uppercase font-semibold">Altura</div>
+          <div id="resAltura" class="text-xl font-bold text-verde-oscuro"></div>
+        </div>
+        <div>
+          <div class="text-xs text-verde-oscuro/70 uppercase font-semibold">Tipo Tejido</div>
+          <div id="resTejido" class="text-base font-bold text-verde-oscuro"></div>
+        </div>
+        <div>
+          <div class="text-xs text-verde-oscuro/70 uppercase font-semibold">Tipo Poste</div>
+          <div id="resPoste" class="text-base font-bold text-verde-oscuro"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TABLA DE MATERIALES -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      <div class="p-4 bg-gray-50 border-b border-gray-100 flex items-center justify-between">
+        <h3 class="font-bold text-gray-700 uppercase text-sm tracking-wide">Detalle de Materiales <span class="text-xs text-gray-400 font-normal normal-case ml-2">(editable)</span></h3>
+        <button onclick="agregarItemManual()" class="no-print bg-verde-medio hover:bg-verde-oscuro text-white text-xs font-semibold px-3 py-1.5 rounded-lg shadow transition flex items-center gap-1">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+          Agregar línea
+        </button>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="bg-verde-oscuro text-white text-xs uppercase tracking-wide">
+              <th class="px-3 py-3 text-left font-semibold w-8">#</th>
+              <th class="px-3 py-3 text-left font-semibold">Producto</th>
+              <th class="px-3 py-3 text-left font-semibold w-28">Código</th>
+              <th class="px-3 py-3 text-right font-semibold w-32">Cant.</th>
+              <th class="px-3 py-3 text-right font-semibold w-36">Precio Unit.</th>
+              <th class="px-3 py-3 text-right font-semibold w-32">Subtotal</th>
+              <th class="px-2 py-3 w-8 no-print"></th>
+            </tr>
+          </thead>
+          <tbody id="tablaItems">
+            <!-- Se llena dinámicamente -->
+          </tbody>
+          <tfoot>
+            <tr class="bg-gray-50 border-t-2 border-gray-200">
+              <td colspan="5" class="px-4 py-3 text-right font-bold text-gray-700">TOTAL MATERIALES</td>
+              <td class="px-4 py-3 text-right font-bold text-lg text-verde-oscuro" id="totalMateriales">$0</td>
+              <td class="no-print"></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+
+    <!-- MANO DE OBRA -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+      <h3 class="text-sm font-bold text-verde-oscuro uppercase tracking-wider mb-4">Mano de Obra</h3>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="bg-red-600 text-white text-xs uppercase tracking-wide">
+              <th class="px-3 py-2 text-left">Concepto</th>
+              <th class="px-3 py-2 text-right w-32">Precio Unit.</th>
+              <th class="px-3 py-2 text-center w-28">Cantidad</th>
+              <th class="px-3 py-2 text-right w-36">Subtotal</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            <tr>
+              <td class="px-3 py-2 font-medium">ESQ <span class="text-gray-400 text-xs">(plantada esquinero)</span></td>
+              <td class="px-3 py-2">
+                <div class="flex items-center justify-end gap-1">
+                  <span class="text-gray-400">$</span>
+                  <input type="number" id="mdoEsqPrecio" value="25000" min="0" step="500"
+                    class="w-24 border border-gray-200 rounded px-2 py-1 text-right text-sm" oninput="recalcularMDO()" />
+                </div>
+              </td>
+              <td class="px-3 py-2 text-center">
+                <input type="number" id="mdoEsqCant" value="0" min="0" step="1"
+                  class="w-20 border border-gray-200 rounded px-2 py-1 text-center text-sm" oninput="recalcularMDO()" />
+              </td>
+              <td class="px-3 py-2 text-right font-semibold" id="mdoEsqSub">$0</td>
+            </tr>
+            <tr>
+              <td class="px-3 py-2 font-medium">Colgada portón <span class="text-gray-400 text-xs">(c/u)</span></td>
+              <td class="px-3 py-2">
+                <div class="flex items-center justify-end gap-1">
+                  <span class="text-gray-400">$</span>
+                  <input type="number" id="mdoPortonPrecio" value="35000" min="0" step="500"
+                    class="w-24 border border-gray-200 rounded px-2 py-1 text-right text-sm" oninput="recalcularMDO()" />
+                </div>
+              </td>
+              <td class="px-3 py-2 text-center">
+                <input type="number" id="mdoPortonCant" value="0" min="0" step="1"
+                  class="w-20 border border-gray-200 rounded px-2 py-1 text-center text-sm" oninput="recalcularMDO()" />
+              </td>
+              <td class="px-3 py-2 text-right font-semibold" id="mdoPortonSub">$0</td>
+            </tr>
+            <tr>
+              <td class="px-3 py-2 font-medium">Mts tejido <span class="text-gray-400 text-xs">(por metro instalado)</span></td>
+              <td class="px-3 py-2">
+                <div class="flex items-center justify-end gap-1">
+                  <span class="text-gray-400">$</span>
+                  <input type="number" id="mdoTejidoPrecio" value="8000" min="0" step="100"
+                    class="w-24 border border-gray-200 rounded px-2 py-1 text-right text-sm" oninput="recalcularMDO()" />
+                </div>
+              </td>
+              <td class="px-3 py-2 text-center">
+                <input type="number" id="mdoTejidoCant" value="0" min="0" step="1"
+                  class="w-20 border border-gray-200 rounded px-2 py-1 text-center text-sm" oninput="recalcularMDO()" />
+              </td>
+              <td class="px-3 py-2 text-right font-semibold" id="mdoTejidoSub">$0</td>
+            </tr>
+            <tr>
+              <td class="px-3 py-2 font-medium">KM <span class="text-gray-400 text-xs">(traslado ida desde Lobos)</span></td>
+              <td class="px-3 py-2">
+                <div class="flex items-center justify-end gap-1">
+                  <span class="text-gray-400">$</span>
+                  <input type="number" id="mdoKmPrecio" value="3000" min="0" step="100"
+                    class="w-24 border border-gray-200 rounded px-2 py-1 text-right text-sm" oninput="recalcularMDO()" />
+                </div>
+              </td>
+              <td class="px-3 py-2 text-center">
+                <input type="number" id="mdoKmCant" value="0" min="0" step="1"
+                  class="w-20 border border-gray-200 rounded px-2 py-1 text-center text-sm" oninput="recalcularMDO()" />
+              </td>
+              <td class="px-3 py-2 text-right font-semibold" id="mdoKmSub">$0</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr class="bg-gray-100 border-t-2 border-gray-300">
+              <td colspan="3" class="px-3 py-2 text-right font-bold uppercase text-xs tracking-wider">Total Mano de Obra</td>
+              <td class="px-3 py-2 text-right font-bold text-verde-oscuro" id="mdoTotal">$0</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <p class="text-xs text-gray-400 mt-3">
+        Las cantidades se autocompletan según el cálculo (esquineros, portones, perímetro). El KM se ingresa manualmente. Todos los valores son editables.
+      </p>
+
+      <!-- Total Final -->
+      <div class="mt-6 flex justify-end">
+        <div class="bg-verde-bg border-2 border-verde-medio rounded-xl p-5 text-center min-w-[260px]">
+          <div class="text-xs text-verde-oscuro/70 uppercase font-semibold mb-1">TOTAL FINAL</div>
+          <div id="totalFinal" class="text-3xl font-bold text-verde-oscuro">$0</div>
+          <div id="totalFinalDesglose" class="text-xs text-gray-500 mt-1"></div>
+        </div>
+      </div>
+
+      <!-- Hidden compat: campo legacy mantiene el total de MDO -->
+      <input type="hidden" id="manoDeObra" value="0" />
+    </div>
+
+    <!-- OBSERVACIONES DEL PRESUPUESTO -->
+    <div id="resObservacionesBloque" class="hidden bg-yellow-50 border border-yellow-200 rounded-xl p-4">
+      <h4 class="text-sm font-bold text-yellow-800 mb-1">Observaciones</h4>
+      <p id="resObservaciones" class="text-sm text-yellow-700"></p>
+    </div>
+
+    <!-- ACCIONES -->
+    <div class="flex flex-wrap gap-3 justify-center no-print">
+      <button onclick="generarPDF()" class="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white font-bold px-6 py-3 rounded-xl shadow transition">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+        </svg>
+        Generar PDF
+      </button>
+      <button onclick="guardarPresupuesto()" class="flex items-center gap-2 bg-verde-oscuro hover:bg-verde-medio text-white font-bold px-6 py-3 rounded-xl shadow transition">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/>
+        </svg>
+        Guardar
+      </button>
+      <button onclick="nuevaCotizacion()" class="flex items-center gap-2 bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold px-6 py-3 rounded-xl shadow transition">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+        </svg>
+        Nueva Cotización
+      </button>
+    </div>
+
+    <!-- AVISO VALIDEZ -->
+    <div class="text-center text-xs text-gray-400 no-print">
+      * Los precios son válidos por 7 días desde la fecha de emisión. Todos los precios en pesos argentinos (ARS).
+    </div>
+  </div>
+
+</main>
+
+<!-- ============================================================
+     MODAL HISTORIAL
+============================================================ -->
+<div id="modalHistorial" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 no-print">
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[80vh] flex flex-col">
+    <div class="flex items-center justify-between p-5 border-b border-gray-100">
+      <h2 class="text-lg font-bold text-verde-oscuro">Historial de Presupuestos</h2>
+      <button onclick="cerrarHistorial()" class="text-gray-400 hover:text-gray-600 transition">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+    <div id="listaHistorial" class="overflow-y-auto flex-1 p-5 space-y-3">
+      <!-- Se llena dinámicamente -->
+    </div>
+    <div class="p-4 border-t border-gray-100 flex justify-between items-center">
+      <span class="text-xs text-gray-400">Últimos 10 presupuestos guardados localmente</span>
+      <button onclick="limpiarHistorial()" class="text-red-500 hover:text-red-700 text-xs font-medium transition">Limpiar historial</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     JAVASCRIPT — CATÁLOGOS, CÁLCULO Y PDF
+============================================================ -->
+<script>
+// ========================================
+// CATÁLOGOS DE PRODUCTOS
+// ========================================
+
+// CATÁLOGO:
+//   precio    = precio MINORISTA final (lo que cobra Green Garden hoy) — viene del listado con códigos
+//   costoProv = precio que paga al PROVEEDOR (del listado de costos). Solo cargado donde se conoce.
+//   Si NO hay costoProv, el mayorista usa el precio minorista tal cual.
+
+const TEJIDOS = {
+  // 2.00m
+  '2316':   { nombre: 'Tejido Económico 3"×16 × 2m',             alto: 2.00, tipo: 'economico',  precio: 51721, costoProv: 32144 },
+  '2314':   { nombre: 'Tejido Intermedio 3"×14 × 2m',            alto: 2.00, tipo: 'intermedio', precio: 72227, costoProv: 44976 },
+  '22514':  { nombre: 'Tejido Interm. Reforzado 2.5"×14 × 2m',   alto: 2.00, tipo: 'interm_ref', precio: 77085, costoProv: 49732 },
+  '2214':   { nombre: 'Tejido Reforzado 2"×14 × 2m',             alto: 2.00, tipo: 'reforzado',  precio: 80771, costoProv: 52110 },
+  '2116':   { nombre: 'Avícola 1"×16 × 2m',                      alto: 2.00, tipo: 'avicola',    precio: 127000, costoProv: 85238 },
+  // 1.80m
+  '18316':  { nombre: 'Tejido Económico 3"×16 × 1.80m',          alto: 1.80, tipo: 'economico',  precio: 45934, costoProv: 29635 },
+  '18314':  { nombre: 'Tejido Intermedio 3"×14 × 1.80m',         alto: 1.80, tipo: 'intermedio', precio: 60498, costoProv: 39031 },
+  '182514': { nombre: 'Tejido Interm. Reforzado 2.5"×14 × 1.80m',alto: 1.80, tipo: 'interm_ref', precio: 68640, costoProv: 41647 },
+  '18214':  { nombre: 'Tejido Reforzado 2"×14 × 1.80m',          alto: 1.80, tipo: 'reforzado',  precio: 77085, costoProv: 49732 },
+  '18116':  { nombre: 'Avícola 1"×16 × 1.80m',                   alto: 1.80, tipo: 'avicola',    precio: 116500, costoProv: 77713 },
+  // 1.50m
+  '15316':  { nombre: 'Tejido Económico 3"×16 × 1.50m',          alto: 1.50, tipo: 'economico',  precio: 36214, costoProv: 23364 },
+  '15314':  { nombre: 'Tejido Intermedio 3"×14 × 1.50m',         alto: 1.50, tipo: 'intermedio', precio: 49449, costoProv: 31897 },
+  '152514': { nombre: 'Tejido Interm. Reforzado 2.5"×14 × 1.50m',alto: 1.50, tipo: 'interm_ref', precio: 58655, costoProv: 37842 },
+  '15214':  { nombre: 'Tejido Reforzado 2"×14 × 1.50m',          alto: 1.50, tipo: 'reforzado',  precio: 66027, costoProv: 42598 },
+  '15116':  { nombre: 'Avícola 1"×16 × 1.50m',                   alto: 1.50, tipo: 'avicola',    precio: 96425, costoProv: 67679 },
+  // 1.20m
+  '12316':  { nombre: 'Tejido Económico 3"×16 × 1.20m',          alto: 1.20, tipo: 'economico',  precio: 34271, costoProv: 22110 },
+  '12314':  { nombre: 'Tejido Intermedio 3"×14 × 1.20m',         alto: 1.20, tipo: 'intermedio', precio: 42069, costoProv: 27141 },
+  '122514': { nombre: 'Tejido Interm. Reforzado 2.5"×14 × 1.20m',alto: 1.20, tipo: 'interm_ref', precio: 52757, costoProv: 34037 },
+  '12214':  { nombre: 'Tejido Reforzado 2"×14 × 1.20m',          alto: 1.20, tipo: 'reforzado',  precio: 56812, costoProv: 36653 },
+  '12116':  { nombre: 'Avícola 1"×16 × 1.20m',                   alto: 1.20, tipo: 'avicola',    precio: 86467, costoProv: 57645 },
+  // 1.00m
+  '1316':   { nombre: 'Tejido Económico 3"×16 × 1m',             alto: 1.00, tipo: 'economico',  precio: 30382 },
+  '1314':   { nombre: 'Tejido Intermedio 3"×14 × 1m',            alto: 1.00, tipo: 'intermedio', precio: 36540 },
+  '12514':  { nombre: 'Tejido Interm. Reforzado 2.5"×14 × 1m',   alto: 1.00, tipo: 'interm_ref', precio: 42069 },
+  '1214':   { nombre: 'Tejido Reforzado 2"×14 × 1m',             alto: 1.00, tipo: 'reforzado',  precio: 47597 },
+  '1116':   { nombre: 'Avícola 1"×16 × 1m',                      alto: 1.00, tipo: 'avicola',    precio: 78941, costoProv: 52628 },
+};
+
+const POSTES_OLIMPICO = {
+  esq: { nombre: 'Esquinero Olímpico 3 púas',  precio: 45500, costoProv: 26000 },
+  ref: { nombre: 'Refuerzo Olímpico 3 púas',   precio: 36400, costoProv: 25000 },
+  int: { nombre: 'Intermedio Olímpico 3 púas', precio: 28000, costoProv: 16000 },
+  pun: { nombre: 'Puntal Olímpico',            precio: 20475, costoProv: 11700 },
+};
+
+const POSTES_RECTO = {
+  esq: { nombre: 'Esquinero Recto 2.60m',  precio: 29700, costoProv: 18000 },
+  ref: { nombre: 'Refuerzo Recto 2.60m',   precio: 27000, costoProv: 17000 },
+  int: { nombre: 'Intermedio Recto 2.60m', precio: 23100, costoProv: 14000 },
+  pun: { nombre: 'Puntal de Apoyo',        precio: 19305, costoProv: 11700 },
+};
+
+const POSTES_RECTO15 = {
+  esq: { nombre: 'Esquinero Reforzado 2.40m',   precio: 22500, costoProv: 15000 },
+  ref: { nombre: 'Refuerzo 2.40m',              precio: 22500, costoProv: 15000 },
+  int: { nombre: 'Intermedio Reforzado 2.40m',  precio: 18300, costoProv: 12200 },
+  pun: { nombre: 'Puntal de Apoyo',             precio: 16800, costoProv: 11200 },
+};
+
+// QUEBRACHO CUADRADO — esquineros 4x4 y intermedios/puntales 3x3
+const QC_4X4 = {
+  '1.80': { codigo: 'e44180', nombre: 'Esquinero 4x4 1.80m', precio: 32400,  costoProv: 24000 },
+  '2.00': { codigo: 'e442',   nombre: 'Esquinero 4x4 2m',    precio: 36450,  costoProv: 27000 },
+  '2.20': { codigo: 'e44220', nombre: 'Esquinero 4x4 2.20m', precio: 40500,  costoProv: 30000 },
+  '2.40': { codigo: 'e44240', nombre: 'Esquinero 4x4 2.40m', precio: 44550,  costoProv: 33000 },
+  '2.70': { codigo: 'e44270', nombre: 'Esquinero 4x4 2.70m', precio: 48600,  costoProv: 36000 },
+  '3.00': { codigo: 'e443',   nombre: 'Esquinero 4x4 3m',    precio: 55350,  costoProv: 41000 },
+};
+const QC_3X3 = {
+  '1.80': { codigo: 'i33180', nombre: 'Intermedio 3x3 1.80m', precio: 18225, costoProv: 13500 },
+  '2.00': { codigo: 'i332',   nombre: 'Intermedio 3x3 2m',    precio: 20250, costoProv: 15000 },
+  '2.20': { codigo: 'i33220', nombre: 'Intermedio 3x3 2.20m', precio: 22275, costoProv: 16500 },
+  '2.40': { codigo: 'i33240', nombre: 'Intermedio 3x3 2.40m', precio: 24300, costoProv: 18000 },
+  '2.70': { codigo: 'i33270', nombre: 'Intermedio 3x3 2.70m', precio: 27675, costoProv: 20500 },
+  '3.00': { codigo: 'i333',   nombre: 'Intermedio 3x3 3m',    precio: 31050, costoProv: 23000 },
+};
+
+// QUEBRACHO REDONDO — común y reforzado
+const QR_COMUN = {
+  '2.20': { codigo: 'pr220',  nombre: 'Poste Redondo 2.20m',       precio: 31050, costoProv: 23000 },
+  '2.40': { codigo: 'pr240',  nombre: 'Poste Redondo 2.40m',       precio: 37800, costoProv: 28000 },
+  '2.60': { codigo: 'per260', nombre: 'Esquinero Redondo 2.60m',   precio: 39825, costoProv: 29500 },
+  '3.00': { codigo: 'erf3',   nombre: 'Esquinero Redondo 3m',      precio: 49950, costoProv: 37000 },
+  'medio2.20': { codigo: 'mr220', nombre: 'Medio Reforzado 2.20m', precio: 26325, costoProv: 19500 },
+};
+const QR_REFORZADO = {
+  '2.20': { codigo: 'prr220',  nombre: 'Poste Redondo Reforzado 2.20m', precio: 31050, costoProv: 23000 },
+  '2.40': { codigo: 'prr240',  nombre: 'Poste Redondo Reforzado 2.40m', precio: 37800, costoProv: 28000 },
+  '2.60': { codigo: 'perr260', nombre: 'Esquinero Redondo Ref. 2.60m',  precio: 39825, costoProv: 29500 },
+  '3.00': { codigo: 'errf3',   nombre: 'Esquinero Reforzado 3m (viga)', precio: 49950, costoProv: 37000 },
+  'medio2.20': { codigo: 'mrr220', nombre: 'Medio Reforzado 2.20m',     precio: 26325, costoProv: 19500 },
+};
+
+// Tabla de medidas según altura del tejido (sin púa)
+//   [altoTejido]: { esq, int }
+const MEDIDAS_QC = {
+  '1.00': { esq: '2.00', int: '1.80' },
+  '1.20': { esq: '2.20', int: '2.00' },
+  '1.50': { esq: '2.40', int: '2.20' },
+  '1.80': { esq: '2.70', int: '2.40' },
+  '2.00': { esq: '3.00', int: '2.70' },
+};
+const MEDIDAS_QR = {
+  '1.00': { esq: '2.20', int: '2.20' },
+  '1.20': { esq: '2.40', int: '2.20' },
+  '1.50': { esq: '2.60', int: '2.20' },
+  '1.80': { esq: '2.60', int: '2.40' },
+  '2.00': { esq: '3.00', int: '2.60' },
+};
+
+const ACCESORIOS = {
+  // Códigos internos Green Garden:
+  //   GJG = Gancho J (estándar Green Garden)
+  //   TTV = Torniquete (estándar Green Garden)
+  //   ESP = Espárrago
+  //   CUNA = Cuña / California
+  //   PLANCHxxx = Planchuela según altura
+  ganchoGJG:      { nombre: 'Gancho J (GJG)',               precio: 1452,  costoProv: 560  },
+  tornTTV:        { nombre: 'Torniquete (TTV)',             precio: 1960,  costoProv: 1188 },
+  esparrago:      { nombre: 'Espárrago',                    precio: 1452,  costoProv: 540  },
+  cuna:           { nombre: 'Cuña / California',            precio: 3300,  costoProv: 3300 },
+  crucero:        { nombre: 'Crucero',                      precio: 3300,  costoProv: 3300 },
+  planch1:        { nombre: 'Planchuela 1m',                precio: 4620,  costoProv: 2800 },
+  planch120:      { nombre: 'Planchuela 1.20m',             precio: 5775,  costoProv: 3500 },
+  planch150:      { nombre: 'Planchuela 1.50m',             precio: 6930,  costoProv: 4200 },
+  planch180:      { nombre: 'Planchuela 1.80m',             precio: 8085,  costoProv: 4900 },
+  planch2:        { nombre: 'Planchuela 2m',                precio: 9240,  costoProv: 5600 },
+};
+
+const ALAMBRES = {
+  liso_metro:  { nombre: 'Acindar Fortín 17/15 × mt',      precio: 280    },
+  liso_rollo:  { nombre: 'Acindar Fortín 17/15 × 1000mt', precio: 250000, costoProv: 200000 },
+  pua_metro:   { nombre: 'Púa × metro',                    precio: 230    },
+  pua500:      { nombre: 'Púa 500 metros (PUXR)',          precio: 111750, costoProv: 74500  },
+};
+
+const CEMENTO = { nombre: 'Cemento Bolsa 25kg', precio: 8235, costoProv: 6100 };
+
+const PORTONES = {
+  p090x100: { nombre: 'Puerta Peatonal 0.90×1.0m',  precio: 76545,  costoProv: 56700 },
+  p090x120: { nombre: 'Puerta Peatonal 0.90×1.20m', precio: 84240,  costoProv: 62400 },
+  p090x150: { nombre: 'Puerta Peatonal 0.90×1.50m', precio: 91395,  costoProv: 67700 },
+  p090x180: { nombre: 'Puerta Peatonal 0.90×1.80m', precio: 95310,  costoProv: 70600 },
+  p090x200: { nombre: 'Puerta Peatonal 0.90×2.0m',  precio: 100035, costoProv: 74100 },
+  port3x150: { nombre: 'Portón Doble Hoja 3×1.50m', precio: 215325, costoProv: 159500 },
+  port3x180: { nombre: 'Portón Doble Hoja 3×1.80m', precio: 231390, costoProv: 171400 },
+  port3x200: { nombre: 'Portón Doble Hoja 3×2.0m',  precio: 244350, costoProv: 181000 },
+  port4x150: { nombre: 'Portón Doble Hoja 4×1.50m', precio: 254070, costoProv: 188200 },
+  port4x180: { nombre: 'Portón Doble Hoja 4×1.80m', precio: 277020, costoProv: 205200 },
+  port4x200: { nombre: 'Portón Doble Hoja 4×2.0m',  precio: 289170, costoProv: 214200 },
+  tranqSimple3:    { nombre: 'Tranquera Hoja Simple 3m',      precio: 285525, costoProv: 211500 },
+  tranqDoble3:     { nombre: 'Tranquera Doble Hoja 3m',       precio: 364500, costoProv: 270000 },
+  tranqSimple1x120:{ nombre: 'Tranquera Hoja Simple 1×1.20m', precio: 192375, costoProv: 142500 },
+};
+
+// ========================================
+// ESTADO GLOBAL
+// ========================================
+let presupuestoActual = null;
+
+// ========================================
+// INICIALIZACIÓN
+// ========================================
+document.addEventListener('DOMContentLoaded', () => {
+  // Fecha de hoy
+  const hoy = new Date();
+  document.getElementById('fechaPresupuesto').value = hoy.toISOString().split('T')[0];
+
+  // Número de presupuesto auto-generado
+  const num = generarNumeroPresupuesto();
+  document.getElementById('numPresupuesto').textContent = num;
+
+  // Inicializar forma del terreno (default cerrado)
+  cambiarForma();
+
+  // Aplicar restricciones cruzadas según poste por defecto
+  aplicarRestricciones();
+
+  // Restaurar último presupuesto si existe
+  const ultimo = localStorage.getItem('gg_ultimo_presupuesto');
+  if (ultimo) {
+    try {
+      const datos = JSON.parse(ultimo);
+      // Podrías pre-llenar el formulario, por ahora solo mostramos el número guardado
+    } catch(e) {}
+  }
+});
+
+function generarNumeroPresupuesto() {
+  const hoy = new Date();
+  const yyyy = hoy.getFullYear();
+  const mm = String(hoy.getMonth() + 1).padStart(2, '0');
+  const dd = String(hoy.getDate()).padStart(2, '0');
+  const rand = Math.floor(Math.random() * 9000) + 1000;
+  return `GG-PRES-${yyyy}${mm}${dd}-${rand}`;
+}
+
+// ========================================
+// UI HELPERS
+// ========================================
+function actualizarPerimetro() {
+  const a = parseFloat(document.getElementById('ladoA').value) || 0;
+  const b = parseFloat(document.getElementById('ladoB').value) || 0;
+  const c = parseFloat(document.getElementById('ladoC').value) || 0;
+  const d = parseFloat(document.getElementById('ladoD').value) || 0;
+  const total = a + b + c + d;
+  document.getElementById('perimetroDisplay').textContent = total.toFixed(1) + ' m';
+}
+
+function getForma() {
+  const sel = document.querySelector('input[name="formaTerreno"]:checked');
+  return sel ? sel.value : 'cerrado';
+}
+
+function cambiarForma() {
+  const forma = getForma();
+  // Cantidad de lados visibles
+  const visibles = forma === 'recta' ? 1 : forma === 'L' ? 2 : forma === 'C' ? 3 : 4;
+  ['boxLadoA','boxLadoB','boxLadoC','boxLadoD'].forEach((id, idx) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (idx < visibles) {
+      el.classList.remove('hidden');
+    } else {
+      el.classList.add('hidden');
+      const inp = el.querySelector('input');
+      if (inp) inp.value = '';
+    }
+  });
+  actualizarPerimetro();
+}
+
+function togglePorton() {
+  const checked = document.getElementById('incluyePorton').checked;
+  document.getElementById('opcionesPorton').classList.toggle('hidden', !checked);
+}
+
+function togglePuerta() {
+  const checked = document.getElementById('incluyePuerta').checked;
+  document.getElementById('opcionesPuerta').classList.toggle('hidden', !checked);
+}
+
+function toggleRedondoReforzado() {
+  const tipo = document.getElementById('tipoPoste').value;
+  const opt = document.getElementById('opcionEsquinerosReforzados');
+  if (!opt) return;
+  // Los esquineros reforzados (tipo viga) solo existen en Quebracho Redondo
+  if (tipo === 'quebracho_redondo') {
+    opt.classList.remove('hidden');
+  } else {
+    opt.classList.add('hidden');
+  }
+}
+
+// ========================================
+// RESTRICCIONES CRUZADAS ENTRE CAMPOS
+// ----------------------------------------
+//   - Hormigón Olímpico: mínimo 3 púas (no permite 0, 1, 2)
+//   - Hormigón Recto: máximo 1 púa (no permite 2, 3)
+//   - Quebracho Cuadrado + 2 púas: tejido máximo 1.80m
+// ========================================
+function aplicarRestricciones() {
+  const tipoPoste = document.getElementById('tipoPoste').value;
+  const lineasPuaSel = document.getElementById('lineasPua');
+  const alturaSel = document.getElementById('alturaTejido');
+  const avisoPua = document.getElementById('avisoPua');
+  const avisoAltura = document.getElementById('avisoAltura');
+
+  // Reset: habilitar todas las opciones
+  Array.from(lineasPuaSel.options).forEach(o => { o.disabled = false; });
+  Array.from(alturaSel.options).forEach(o => { o.disabled = false; });
+  avisoPua.classList.add('hidden');
+  avisoAltura.classList.add('hidden');
+
+  // 1. HORMIGÓN OLÍMPICO: mínimo 3 púas
+  if (tipoPoste === 'olimpico') {
+    Array.from(lineasPuaSel.options).forEach(o => {
+      if (parseInt(o.value) < 3) o.disabled = true;
+    });
+    if (parseInt(lineasPuaSel.value) < 3) {
+      lineasPuaSel.value = '3';
+    }
+    avisoPua.textContent = 'El poste olímpico requiere mínimo 3 líneas de púa.';
+    avisoPua.classList.remove('hidden');
+  }
+
+  // 2. HORMIGÓN RECTO: máximo 1 púa
+  if (tipoPoste === 'recto') {
+    Array.from(lineasPuaSel.options).forEach(o => {
+      if (parseInt(o.value) > 1) o.disabled = true;
+    });
+    if (parseInt(lineasPuaSel.value) > 1) {
+      lineasPuaSel.value = '1';
+    }
+    avisoPua.textContent = 'El poste recto admite máximo 1 línea de púa.';
+    avisoPua.classList.remove('hidden');
+  }
+
+  // 3. QUEBRACHO CUADRADO + 2 púas: tejido máximo 1.80m
+  const lineasPua = parseInt(lineasPuaSel.value);
+  if (tipoPoste === 'quebracho_cuadrado' && lineasPua >= 2) {
+    Array.from(alturaSel.options).forEach(o => {
+      if (parseFloat(o.value) > 1.80) o.disabled = true;
+    });
+    if (parseFloat(alturaSel.value) > 1.80) {
+      alturaSel.value = '1.80';
+    }
+    avisoAltura.textContent = 'Con quebracho colorado cuadrado y 2+ púas, el tejido máximo es 1.80m.';
+    avisoAltura.classList.remove('hidden');
+  }
+
+  // 4. HORMIGÓN RECTO + 1 púa: tejido máximo 1.80m (sin púa permite 2.00m)
+  if (tipoPoste === 'recto' && lineasPua >= 1) {
+    Array.from(alturaSel.options).forEach(o => {
+      if (parseFloat(o.value) > 1.80) o.disabled = true;
+    });
+    if (parseFloat(alturaSel.value) > 1.80) {
+      alturaSel.value = '1.80';
+    }
+    avisoAltura.textContent = 'Con poste recto y púa, el tejido máximo es 1.80m.';
+    avisoAltura.classList.remove('hidden');
+  }
+}
+
+function actualizarListaInfo() {
+  // Nada extra por ahora — el indicador se actualiza en el resultado
+}
+
+// ========================================
+// CÁLCULO DE PRECIO SEGÚN LISTA
+// ----------------------------------------
+// Reglas finales (confirmadas por Green Garden):
+//   MINORISTA       → precio del catálogo tal cual (campo "precio")
+//   MAYORISTA       → costoProv × 1.35 (costo proveedor + 35% ganancia).
+//                     Si el producto NO tiene costoProv cargado → usa el precio minorista.
+//   MINORISTA + IVA → MAYORISTA × 1.105 (factura A para clientes alto perfil)
+// ========================================
+const MARKUP_MAYORISTA = 1.35; // 35% sobre costo proveedor
+const FACTOR_IVA       = 1.105; // 10.5% IVA sobre mayorista
+
+// Devuelve el precio unitario final según el item del catálogo y la lista elegida.
+// item = { precio, costoProv? }
+function precioSegunLista(item, lista) {
+  const minorista = item.precio || 0;
+  const mayorista = item.costoProv != null
+    ? Math.round(item.costoProv * MARKUP_MAYORISTA)
+    : minorista;
+  if (lista === 'mayorista')     return mayorista;
+  if (lista === 'minorista_iva') return Math.round(minorista * FACTOR_IVA);
+  if (lista === 'mayorista_iva') return Math.round(mayorista * FACTOR_IVA);
+  return minorista; // minorista
+}
+
+function getListaLabel(lista) {
+  if (lista === 'mayorista')     return 'Precio Mayorista';
+  if (lista === 'minorista_iva') return 'Precio Minorista + IVA 10.5%';
+  if (lista === 'mayorista_iva') return 'Precio Mayorista + IVA 10.5%';
+  return 'Precio Minorista';
+}
+
+// ========================================
+// BUSCAR TEJIDO EN CATÁLOGO
+// ========================================
+function buscarTejido(alto, tipo) {
+  for (const [codigo, t] of Object.entries(TEJIDOS)) {
+    if (Math.abs(t.alto - alto) < 0.01 && t.tipo === tipo) {
+      return { codigo, ...t };
+    }
+  }
+  return null;
+}
+
+// ========================================
+// PLANCHUELA SEGÚN ALTURA
+// ========================================
+function getPlanchuela(alto) {
+  if (alto <= 1.00) return { codigo: 'PLANCH1',   ...ACCESORIOS.planch1   };
+  if (alto <= 1.20) return { codigo: 'PLANCH120', ...ACCESORIOS.planch120 };
+  if (alto <= 1.50) return { codigo: 'PLANCH150', ...ACCESORIOS.planch150 };
+  if (alto <= 1.80) return { codigo: 'PLANCH180', ...ACCESORIOS.planch180 };
+  return                    { codigo: 'PLANCH2',   ...ACCESORIOS.planch2   };
+}
+
+// ========================================
+// BUSCAR PORTÓN EN CATÁLOGO
+// ========================================
+function buscarPorton(ancho, alto, tipo) {
+  const anchoNum = parseFloat(ancho);
+  const altoStr = alto === 1.0 ? '100' : alto === 1.2 ? '120' : alto === 1.5 ? '150' : alto === 1.8 ? '180' : '200';
+
+  if (tipo === 'cano') {
+    const key = `port${anchoNum}x${altoStr}`;
+    if (PORTONES[key]) return { codigo: key.toUpperCase(), ...PORTONES[key] };
+    // Fallback: buscar el más cercano disponible para ese ancho
+    const posibles = Object.entries(PORTONES).filter(([k]) => k.startsWith(`port${anchoNum}x`));
+    if (posibles.length > 0) return { codigo: posibles[0][0].toUpperCase(), ...posibles[0][1] };
+  }
+
+  if (tipo === 'tranquera') {
+    // Solo tenemos tranquera de 3m
+    if (anchoNum <= 3) return { codigo: 'TRANQ_SIMPLE_3', ...PORTONES.tranqSimple3 };
+    return { codigo: 'TRANQ_DOBLE_3', ...PORTONES.tranqDoble3 };
+  }
+
+  return null;
+}
+
+function buscarPuerta(alto) {
+  const altoStr = alto === 1.0 ? '100' : alto === 1.2 ? '120' : alto === 1.5 ? '150' : alto === 1.8 ? '180' : '200';
+  const key = `p090x${altoStr}`;
+  if (PORTONES[key]) return { codigo: key.toUpperCase(), ...PORTONES[key] };
+  return { codigo: 'P090X180', ...PORTONES.p090x180 };
+}
+
+// ========================================
+// SELECCIONAR CATÁLOGO DE POSTES
+// ========================================
+function getCatalogoPostes(tipoPoste, alto, lineasPua, esquinerosReforzados) {
+  if (tipoPoste === 'olimpico') return POSTES_OLIMPICO;
+  if (tipoPoste === 'recto') {
+    return alto <= 1.50 ? POSTES_RECTO15 : POSTES_RECTO;
+  }
+
+  // QUEBRACHO CUADRADO
+  if (tipoPoste === 'quebracho_cuadrado') {
+    const altoStr = alto.toFixed(2);
+    const medidas = MEDIDAS_QC[altoStr] || MEDIDAS_QC['1.80'];
+    // Con púa: esquinero e intermedio van a la misma altura (la del esquinero)
+    const altoInt = lineasPua > 0 ? medidas.esq : medidas.int;
+    const esq = QC_4X4[medidas.esq];
+    const int = QC_3X3[altoInt];
+    const pun = QC_3X3['2.20'];
+    return { esq, ref: esq, int, pun };
+  }
+
+  // QUEBRACHO REDONDO
+  if (tipoPoste === 'quebracho_redondo') {
+    const altoStr = alto.toFixed(2);
+    const medidas = MEDIDAS_QR[altoStr] || MEDIDAS_QR['1.80'];
+    const altoInt = lineasPua > 0 ? medidas.esq : medidas.int;
+    const cat = esquinerosReforzados ? QR_REFORZADO : QR_COMUN;
+    const esq = cat[medidas.esq];
+    const int = cat[altoInt];
+    const pun = cat['medio2.20'];
+    return { esq, ref: esq, int, pun };
+  }
+
+  return POSTES_RECTO;
+}
+
+// ========================================
+// MOTOR DE CÁLCULO PRINCIPAL
+// ========================================
+function calcularPresupuesto() {
+  try {
+  // --- Leer inputs ---
+  const ladoA = parseFloat(document.getElementById('ladoA').value) || 0;
+  const ladoB = parseFloat(document.getElementById('ladoB').value) || 0;
+  const ladoC = parseFloat(document.getElementById('ladoC').value) || 0;
+  const ladoD = parseFloat(document.getElementById('ladoD').value) || 0;
+  const perimetro = ladoA + ladoB + ladoC + ladoD;
+
+  if (perimetro <= 0) {
+    alert('Por favor ingresá las medidas del terreno.');
+    return;
+  }
+
+  const alto        = parseFloat(document.getElementById('alturaTejido').value);
+  const tipoTejido  = document.getElementById('tipoTejido').value;
+  const tipoPoste   = document.getElementById('tipoPoste').value;
+  const lineasPua   = parseInt(document.getElementById('lineasPua').value);
+  const lista       = document.querySelector('input[name="lista"]:checked').value;
+
+  // Cliente
+  const cliente     = document.getElementById('clienteNombre').value || 'Sin nombre';
+  const localidad   = document.getElementById('clienteLocalidad').value;
+  const telefono    = document.getElementById('clienteTelefono').value;
+  const fecha       = document.getElementById('fechaPresupuesto').value;
+  const observ      = document.getElementById('observaciones').value;
+  const numPres     = document.getElementById('numPresupuesto').textContent;
+
+  // Portón
+  const conPorton       = document.getElementById('incluyePorton').checked;
+  const anchoPorton     = parseFloat(document.getElementById('anchoPorton').value) || 3;
+  const tipoPorton      = document.getElementById('tipoPorton').value;
+  const ubicacionPorton = document.getElementById('ubicacionPorton').value; // 'punta' | 'medio'
+  const ladoPorton      = document.getElementById('ladoPorton').value; // 'A' | 'B' | 'C' | 'D'
+
+  // Puerta peatonal
+  const conPuerta   = document.getElementById('incluyePuerta').checked;
+  const altoPuerta  = parseFloat(document.getElementById('alturaPuerta').value);
+  const ladoPuerta  = document.getElementById('ladoPuerta').value; // 'A' | 'B' | 'C' | 'D'
+
+  // ========================================
+  // CÁLCULOS
+  // ========================================
+
+  // TEJIDO
+  const tejido = buscarTejido(alto, tipoTejido);
+  const rollosTejido = Math.ceil(perimetro / 10);
+
+  const esquinerosReforzados = document.getElementById('esquinerosReforzados')?.checked || false;
+  const postes = getCatalogoPostes(tipoPoste, alto, lineasPua, esquinerosReforzados);
+  const forma  = getForma();
+  const cantLados = forma === 'recta' ? 1 : forma === 'L' ? 2 : forma === 'C' ? 3 : 4;
+  const cerrado   = forma === 'cerrado';
+  const esQuebracho = (tipoPoste === 'quebracho_cuadrado' || tipoPoste === 'quebracho_redondo');
+  const esHormigon  = !esQuebracho;
+
+  // Refuerzos por lado descontando aperturas
+  const anchoPortonNum = conPorton ? anchoPorton : 0;
+  const anchoPuertaNum = conPuerta ? 0.9 : 0;
+  const ladosArr = ['A', 'B', 'C', 'D'];
+  const medidasLados = [ladoA, ladoB, ladoC, ladoD];
+
+  const refuerzosLado = (largo, idx) => {
+    let largoEfectivo = largo;
+    if (conPorton && ladoPorton === ladosArr[idx]) largoEfectivo -= anchoPortonNum;
+    if (conPuerta  && ladoPuerta === ladosArr[idx]) largoEfectivo -= anchoPuertaNum;
+    if (largoEfectivo < 50) return 0;
+    return Math.floor(largoEfectivo / 50);
+  };
+
+  const lados = medidasLados.slice(0, cantLados);
+  const refuerzosTerreno = lados.reduce((s, L, i) => s + refuerzosLado(L, i), 0);
+
+  // Portón: al medio → 2 refuerzos, en esquina → 1
+  // Puerta: al medio → 2 refuerzos, en esquina → 1
+  const portonEnMedio = conPorton && ubicacionPorton === 'medio';
+  const extraRefPorton = conPorton ? (portonEnMedio ? 2 : 1) : 0;
+  const puertaUbicacion = document.getElementById('ubicacionPuerta')?.value || 'medio';
+  const puertaEnMedio = conPuerta && puertaUbicacion === 'medio';
+  const extraRefPuerta = conPuerta ? (puertaEnMedio ? 2 : 1) : 0;
+  const refuerzos = refuerzosTerreno + extraRefPorton + extraRefPuerta;
+
+  const esquineros = (cerrado ? 4 : cantLados + 1);
+
+  // En quebracho: esquineros y refuerzos son el mismo tipo de poste (4x4 o redondo)
+  // → se agrupan en un solo ítem "esquineros+refuerzos"
+  const totalEsqRefQuebracho = esquineros + refuerzos;
+
+  // Paneles con tejido
+  const aperturas = (conPorton ? 1 : 0) + (conPuerta ? 1 : 0);
+  const postesPrincipales = esquineros + refuerzos;
+  const paneles  = cerrado ? postesPrincipales - aperturas : Math.max(1, postesPrincipales - 1 - aperturas);
+  const puntales = paneles * 2;
+
+  // Intermedios: redondeo al 0.50
+  const perimetroTejido = perimetro - anchoPortonNum - anchoPuertaNum;
+  const divisionIntermedio = perimetroTejido / 4;
+  const fraccion = divisionIntermedio % 1;
+  const divisionRedondeada = fraccion < 0.5 ? Math.floor(divisionIntermedio) : Math.ceil(divisionIntermedio);
+  let intermedios = divisionRedondeada - (esquineros + refuerzos) + 1;
+  if (intermedios < 0) intermedios = 0;
+
+  // Líneas de alambre liso según altura (sobre perímetro de tejido, sin aperturas)
+  const lineasLiso = alto <= 1.50 ? 3 : 4;
+  const metrosLiso = Math.round(lineasLiso * perimetroTejido);
+
+  // Ganchos y torniquetes — solo hormigón
+  const multGanchos = alto <= 1.50 ? 3 : 4;
+  const ganchos     = esHormigon ? puntales * multGanchos : 0;
+  const torniquetes = esHormigon ? Math.ceil(ganchos / 2) + (paneles * lineasPua) : 0;
+
+  // Alambre de púa (sobre perímetro total)
+  let itemPua = null;
+  if (lineasPua > 0) {
+    const metrosPua = Math.ceil(lineasPua * perimetro);
+    const rollosPua = Math.floor(metrosPua / 500);
+    const restoMtsPua = metrosPua % 500;
+    itemPua = { rollos: rollosPua, restoMts: restoMtsPua };
+  }
+
+  // Cemento — media bolsa por poste (todos los tipos)
+  const totalPostesParaCemento = esquineros + refuerzos + intermedios + puntales;
+  const bolsasCemento = Math.ceil(totalPostesParaCemento * 0.5);
+
+  // Planchuela (solo hormigón)
+  const planchuela = esHormigon ? getPlanchuela(alto) : null;
+
+  // ========================================
+  // ARMAR LISTA DE ÍTEMS
+  // ========================================
+  const items = [];
+
+  // Helper: empuja un ítem aplicando la lista de precios
+  const pushItem = (codigo, item, cantidad, nombreOverride, unidad) => {
+    if (!item || cantidad <= 0) return;
+    const precioUnit = precioSegunLista(item, lista);
+    items.push({
+      nombre: nombreOverride || item.nombre,
+      codigo,
+      cantidad,
+      precioUnit,
+      subtotal: precioUnit * cantidad,
+      ...(unidad ? { unidad } : {}),
+    });
+  };
+
+  // 1. Tejido
+  if (tejido) pushItem(tejido.codigo, tejido, rollosTejido);
+
+  // 2-5. POSTES
+  if (esQuebracho) {
+    // QUEBRACHO: esquineros + refuerzos son el mismo tipo de poste → ítem unificado
+    const codEsq = postes.esq?.codigo || 'ESQ';
+    const codInt = postes.int?.codigo || 'INT';
+    const codPun = postes.pun?.codigo || 'PUN';
+    pushItem(codEsq, postes.esq, totalEsqRefQuebracho);
+    pushItem(codInt, postes.int, intermedios);
+    pushItem(codPun, postes.pun, puntales);
+  } else {
+    // HORMIGÓN: esquineros, refuerzos, intermedios y puntales por separado
+    const codEsq = postes.esq?.codigo || (tipoPoste === 'olimpico' ? 'ESQO' : 'ESQR');
+    const codRef = postes.ref?.codigo || (tipoPoste === 'olimpico' ? 'REFO' : 'REFR');
+    const codInt = postes.int?.codigo || (tipoPoste === 'olimpico' ? 'INTO' : 'INTR');
+    const codPun = postes.pun?.codigo || (tipoPoste === 'olimpico' ? 'PUNO' : 'PUNT');
+    pushItem(codEsq, postes.esq, esquineros);
+    pushItem(codRef, postes.ref, refuerzos);
+    pushItem(codInt, postes.int, intermedios);
+    pushItem(codPun, postes.pun, puntales);
+  }
+
+  // 6. Planchuela + Espárragos + Cuñas — solo hormigón
+  if (esHormigon && planchuela) {
+    pushItem(planchuela.codigo || 'PLANCH', planchuela, puntales);
+    pushItem('ESP',  ACCESORIOS.esparrago, puntales);
+    pushItem('CUNA', ACCESORIOS.cuna,      puntales);
+  }
+
+  // 7. Ganchos — solo hormigón
+  if (esHormigon) pushItem('GJG', ACCESORIOS.ganchoGJG, ganchos);
+
+  // 8. Torniquetes — solo hormigón
+  if (esHormigon) pushItem('TTV', ACCESORIOS.tornTTV, torniquetes);
+
+  // 9. Alambre liso — rollos de 1000m + metros sueltos
+  if (metrosLiso > 0) {
+    const rollosLiso = Math.floor(metrosLiso / 1000);
+    const restoLiso  = metrosLiso % 1000;
+    if (rollosLiso > 0) pushItem('ARXR', ALAMBRES.liso_rollo, rollosLiso, `Acindar 1715 rollo 1000mt`, 'u.');
+    if (restoLiso  > 0) pushItem('ARXM', ALAMBRES.liso_metro, restoLiso,  `Acindar 1715 × ${restoLiso}mt`, 'mt');
+  }
+
+  // 10. Alambre de púa — rollos de 500m + metros sueltos
+  if (itemPua) {
+    if (itemPua.rollos  > 0) pushItem('PUXR',  ALAMBRES.pua500,    itemPua.rollos,    `Púa 500mt (rollo)`);
+    if (itemPua.restoMts > 0) pushItem('PUAXM', ALAMBRES.pua_metro, itemPua.restoMts,  `Púa × ${itemPua.restoMts}mt`, 'mt');
+  }
+
+  // 11. Cruceros — solo hormigón
+  if (esHormigon) {
+    const cruceros = esquineros + refuerzos + puntales;
+    pushItem('CRU', ACCESORIOS.crucero, cruceros);
+  }
+
+  // 12. Cemento — todos los tipos de poste
+  if (bolsasCemento > 0) pushItem('CEM25', CEMENTO, bolsasCemento);
+
+  // 13. Portón vehicular
+  if (conPorton) {
+    const porton = buscarPorton(anchoPorton, alto, tipoPorton);
+    if (porton) pushItem(porton.codigo, porton, 1);
+  }
+
+  // 14. Puerta peatonal
+  if (conPuerta) {
+    const puerta = buscarPuerta(altoPuerta);
+    if (puerta) pushItem(puerta.codigo, puerta, 1);
+  }
+
+  // ========================================
+  // GUARDAR EN ESTADO GLOBAL
+  // ========================================
+  presupuestoActual = {
+    numero: numPres,
+    fecha,
+    cliente, localidad, telefono, observ,
+    perimetro, ladoA, ladoB, ladoC, ladoD,
+    alto, tipoTejido, tipoPoste, lineasPua,
+    lista,
+    items,
+    totalMateriales: items.reduce((s, i) => s + i.subtotal, 0),
+    manoDeObra: 0,
+    esquineros,
+    portonesCount: (conPorton ? 1 : 0) + (conPuerta ? 1 : 0),
+  };
+
+  // ========================================
+  // PRECARGAR CANTIDADES DE MANO DE OBRA
+  // ========================================
+  document.getElementById('mdoEsqCant').value    = esquineros + refuerzos;
+  document.getElementById('mdoPortonCant').value = (conPorton ? 1 : 0) + (conPuerta ? 1 : 0);
+  document.getElementById('mdoTejidoCant').value = Math.round(perimetro);
+  // KM: solo poner 0 si está vacío, no pisar lo que el usuario ya cargó
+  if (!document.getElementById('mdoKmCant').value) {
+    document.getElementById('mdoKmCant').value = 0;
+  }
+  recalcularMDO();
+
+  // ========================================
+  // RENDERIZAR RESULTADO
+  // ========================================
+  renderizarResultado(presupuestoActual);
+  } catch (err) {
+    console.error('[calcularPresupuesto] ERROR:', err);
+    alert('Error al calcular presupuesto:\n\n' + err.message + '\n\n(revisá la consola del navegador para más detalle)');
+  }
+}
+
+function renderizarResultado(p) {
+  // Cabecera
+  document.getElementById('resNumero').textContent = p.numero;
+  document.getElementById('resCliente').textContent = p.cliente;
+  document.getElementById('resDatos').textContent =
+    [p.localidad, p.telefono].filter(Boolean).join(' · ');
+  document.getElementById('resFecha').textContent = formatearFecha(p.fecha);
+  document.getElementById('resLista').textContent = getListaLabel(p.lista);
+
+  // Resumen técnico
+  document.getElementById('resPerimetro').textContent = p.perimetro.toFixed(1) + ' m';
+  document.getElementById('resAltura').textContent = p.alto.toFixed(2) + ' m';
+  document.getElementById('resTejido').textContent = getTipoLabel(p.tipoTejido);
+  document.getElementById('resPoste').textContent = getPosteLabel(p.tipoPoste);
+
+  // Tabla editable
+  renderTablaItems(p);
+
+  // Totales
+  document.getElementById('totalMateriales').textContent = formatPeso(p.totalMateriales);
+  document.getElementById('manoDeObra').value = p.manoDeObra || '';
+  recalcularTotal();
+
+  // Observaciones
+  if (p.observ) {
+    document.getElementById('resObservacionesBloque').classList.remove('hidden');
+    document.getElementById('resObservaciones').textContent = p.observ;
+  } else {
+    document.getElementById('resObservacionesBloque').classList.add('hidden');
+  }
+
+  // Mostrar sección resultado
+  document.getElementById('seccionResultado').classList.remove('hidden');
+  document.getElementById('seccionResultado').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ========================================
+// TABLA DE ÍTEMS EDITABLE
+// ========================================
+function renderTablaItems(p) {
+  const tbody = document.getElementById('tablaItems');
+  tbody.innerHTML = '';
+  p.items.forEach((item, idx) => {
+    const tr = document.createElement('tr');
+    tr.className = idx % 2 === 0 ? 'bg-white' : 'bg-gray-50';
+    tr.innerHTML = `
+      <td class="px-3 py-2 text-gray-400 text-xs">${idx + 1}</td>
+      <td class="px-3 py-2">
+        <input type="text" value="${escHtml(item.nombre)}" oninput="actualizarItem(${idx},'nombre',this.value)"
+          class="w-full bg-transparent text-sm font-medium text-gray-800 border-0 border-b border-transparent hover:border-gray-300 focus:border-verde-medio focus:outline-none px-1 py-1" />
+      </td>
+      <td class="px-3 py-2">
+        <input type="text" value="${escHtml(item.codigo || '')}" oninput="actualizarItem(${idx},'codigo',this.value)"
+          class="w-24 bg-transparent text-xs font-mono text-gray-500 border-0 border-b border-transparent hover:border-gray-300 focus:border-verde-medio focus:outline-none px-1 py-1" />
+      </td>
+      <td class="px-3 py-2 text-right">
+        <div class="flex items-center justify-end gap-1">
+          <input type="number" value="${item.cantidad}" min="0" step="1" oninput="actualizarItem(${idx},'cantidad',this.value)"
+            class="w-20 text-right bg-transparent border border-gray-200 rounded px-2 py-1 text-sm font-semibold focus:outline-none focus:ring-1 focus:ring-verde-medio" />
+          <span class="text-xs text-gray-400 w-6">${item.unidad || 'u.'}</span>
+        </div>
+      </td>
+      <td class="px-3 py-2 text-right">
+        <div class="flex items-center justify-end gap-1">
+          <span class="text-gray-400 text-xs">$</span>
+          <input type="number" value="${item.precioUnit}" min="0" step="1" oninput="actualizarItem(${idx},'precioUnit',this.value)"
+            class="w-28 text-right bg-transparent border border-gray-200 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-verde-medio" />
+        </div>
+      </td>
+      <td class="px-3 py-2 text-right font-bold text-verde-oscuro" id="subtotal-${idx}">${formatPeso(item.subtotal)}</td>
+      <td class="px-2 py-2 text-center no-print">
+        <button onclick="eliminarItem(${idx})" title="Eliminar línea"
+          class="text-red-400 hover:text-red-600 transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1 7h22M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3"/>
+          </svg>
+        </button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+  // Totales
+  p.totalMateriales = p.items.reduce((s, i) => s + (i.subtotal || 0), 0);
+  document.getElementById('totalMateriales').textContent = formatPeso(p.totalMateriales);
+  recalcularTotal();
+}
+
+function actualizarItem(idx, campo, valor) {
+  if (!presupuestoActual || !presupuestoActual.items[idx]) return;
+  const item = presupuestoActual.items[idx];
+  if (campo === 'cantidad' || campo === 'precioUnit') {
+    item[campo] = parseFloat(valor) || 0;
+    item.subtotal = (item.cantidad || 0) * (item.precioUnit || 0);
+    const cell = document.getElementById('subtotal-' + idx);
+    if (cell) cell.textContent = formatPeso(item.subtotal);
+    presupuestoActual.totalMateriales = presupuestoActual.items.reduce((s, i) => s + (i.subtotal || 0), 0);
+    document.getElementById('totalMateriales').textContent = formatPeso(presupuestoActual.totalMateriales);
+    recalcularTotal();
+  } else {
+    item[campo] = valor;
+  }
+}
+
+function eliminarItem(idx) {
+  if (!presupuestoActual || !presupuestoActual.items[idx]) return;
+  if (!confirm('¿Eliminar esta línea del presupuesto?')) return;
+  presupuestoActual.items.splice(idx, 1);
+  renderTablaItems(presupuestoActual);
+}
+
+function agregarItemManual() {
+  if (!presupuestoActual) return;
+  presupuestoActual.items.push({
+    nombre: 'Nuevo ítem',
+    codigo: '',
+    cantidad: 1,
+    precioUnit: 0,
+    subtotal: 0,
+    unidad: 'u.',
+  });
+  renderTablaItems(presupuestoActual);
+}
+
+function escHtml(s) {
+  return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function recalcularMDO() {
+  const esqP   = parseFloat(document.getElementById('mdoEsqPrecio').value)   || 0;
+  const esqC   = parseFloat(document.getElementById('mdoEsqCant').value)     || 0;
+  const porP   = parseFloat(document.getElementById('mdoPortonPrecio').value)|| 0;
+  const porC   = parseFloat(document.getElementById('mdoPortonCant').value)  || 0;
+  const tejP   = parseFloat(document.getElementById('mdoTejidoPrecio').value)|| 0;
+  const tejC   = parseFloat(document.getElementById('mdoTejidoCant').value)  || 0;
+  const kmP    = parseFloat(document.getElementById('mdoKmPrecio').value)    || 0;
+  const kmC    = parseFloat(document.getElementById('mdoKmCant').value)      || 0;
+
+  const esqSub = esqP * esqC;
+  const porSub = porP * porC;
+  const tejSub = tejP * tejC;
+  const kmSub  = kmP  * kmC;
+  const totalMDO = esqSub + porSub + tejSub + kmSub;
+
+  document.getElementById('mdoEsqSub').textContent    = formatPeso(esqSub);
+  document.getElementById('mdoPortonSub').textContent = formatPeso(porSub);
+  document.getElementById('mdoTejidoSub').textContent = formatPeso(tejSub);
+  document.getElementById('mdoKmSub').textContent     = formatPeso(kmSub);
+  document.getElementById('mdoTotal').textContent     = formatPeso(totalMDO);
+
+  // Mantener campo legacy
+  document.getElementById('manoDeObra').value = totalMDO;
+
+  // Persistir en estado
+  if (presupuestoActual) {
+    presupuestoActual.manoDeObraDetalle = {
+      esq:    { precio: esqP, cantidad: esqC, subtotal: esqSub },
+      porton: { precio: porP, cantidad: porC, subtotal: porSub },
+      tejido: { precio: tejP, cantidad: tejC, subtotal: tejSub },
+      km:     { precio: kmP,  cantidad: kmC,  subtotal: kmSub  },
+    };
+  }
+  recalcularTotal();
+}
+
+function recalcularTotal() {
+  if (!presupuestoActual) return;
+  const mdo = parseFloat(document.getElementById('manoDeObra').value) || 0;
+  presupuestoActual.manoDeObra = mdo;
+  const total = presupuestoActual.totalMateriales + mdo;
+  document.getElementById('totalFinal').textContent = formatPeso(total);
+  const desg = document.getElementById('totalFinalDesglose');
+  if (desg) {
+    desg.textContent = `Materiales ${formatPeso(presupuestoActual.totalMateriales)} + M.O. ${formatPeso(mdo)}`;
+  }
+  presupuestoActual.totalFinal = total;
+}
+
+// ========================================
+// LABELS
+// ========================================
+function getTipoLabel(tipo) {
+  const m = { economico:'Económico', intermedio:'Intermedio', interm_ref:'Interm. Reforzado', reforzado:'Reforzado', avicola:'Avícola' };
+  return m[tipo] || tipo;
+}
+function getPosteLabel(tipo) {
+  const m = { olimpico:'H. Olímpico', recto:'H. Recto', quebracho_redondo:'Qco. Colorado Rd.', quebracho_cuadrado:'Qco. Colorado Cd.' };
+  return m[tipo] || tipo;
+}
+
+// ========================================
+// FORMATEO
+// ========================================
+function formatPeso(n) {
+  return '$' + Math.round(n).toLocaleString('es-AR');
+}
+function formatNum(n) {
+  return n.toLocaleString('es-AR');
+}
+function formatearFecha(str) {
+  if (!str) return '';
+  const [y,m,d] = str.split('-');
+  return `${d}/${m}/${y}`;
+}
+
+// ========================================
+// NUEVA COTIZACIÓN
+// ========================================
+function nuevaCotizacion() {
+  document.getElementById('seccionResultado').classList.add('hidden');
+  document.getElementById('numPresupuesto').textContent = generarNumeroPresupuesto();
+
+  // Limpiar datos del cliente
+  ['clienteNombre','clienteLocalidad','clienteTelefono','observaciones'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('fechaPresupuesto').value = new Date().toISOString().split('T')[0];
+
+  // Limpiar medidas
+  ['ladoA','ladoB','ladoC','ladoD'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  actualizarPerimetro();
+
+  // Reset especificaciones a valores por defecto
+  document.getElementById('alturaTejido').value = '1.80';
+  document.getElementById('tipoTejido').value   = 'intermedio';
+  document.getElementById('tipoPoste').value    = 'olimpico';
+  document.getElementById('lineasPua').value    = '0';
+  document.querySelector('input[name="lista"][value="minorista"]').checked = true;
+
+  // Reset portón y puerta
+  document.getElementById('incluyePorton').checked = false;
+  document.getElementById('opcionesPorton').classList.add('hidden');
+  document.getElementById('anchoPorton').value = '3';
+  document.getElementById('tipoPorton').value = 'cano';
+  document.getElementById('ubicacionPorton').value = 'punta';
+  document.getElementById('incluyePuerta').checked = false;
+  document.getElementById('opcionesPuerta').classList.add('hidden');
+  document.getElementById('ubicacionPuerta').value = 'medio';
+
+  // Reset forma terreno
+  document.querySelector('input[name="formaTerreno"][value="cerrado"]').checked = true;
+  cambiarForma();
+
+  // Reset checkbox esquineros reforzados
+  document.getElementById('esquinerosReforzados').checked = false;
+  toggleRedondoReforzado();
+
+  // Aplicar restricciones del poste por defecto (olímpico)
+  aplicarRestricciones();
+
+  presupuestoActual = null;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ========================================
+// GUARDAR EN LOCALSTORAGE
+// ========================================
+function guardarPresupuesto() {
+  if (!presupuestoActual) return;
+  recalcularTotal();
+
+  // Guardar último
+  localStorage.setItem('gg_ultimo_presupuesto', JSON.stringify(presupuestoActual));
+
+  // Historial (máx 10)
+  let historial = [];
+  try { historial = JSON.parse(localStorage.getItem('gg_historial') || '[]'); } catch(e) {}
+  // Evitar duplicados por número
+  historial = historial.filter(h => h.numero !== presupuestoActual.numero);
+  historial.unshift({ ...presupuestoActual, savedAt: new Date().toISOString() });
+  if (historial.length > 10) historial = historial.slice(0, 10);
+  localStorage.setItem('gg_historial', JSON.stringify(historial));
+
+  mostrarToast('Presupuesto guardado correctamente');
+}
+
+// ========================================
+// HISTORIAL
+// ========================================
+function abrirHistorial() {
+  let historial = [];
+  try { historial = JSON.parse(localStorage.getItem('gg_historial') || '[]'); } catch(e) {}
+
+  const lista = document.getElementById('listaHistorial');
+  lista.innerHTML = '';
+
+  if (historial.length === 0) {
+    lista.innerHTML = '<p class="text-center text-gray-400 py-8">No hay presupuestos guardados</p>';
+  } else {
+    historial.forEach(p => {
+      const div = document.createElement('div');
+      div.className = 'border border-gray-200 rounded-xl p-4 hover:border-verde-medio cursor-pointer transition';
+      div.innerHTML = `
+        <div class="flex items-start justify-between">
+          <div>
+            <div class="font-bold text-verde-oscuro text-sm">${p.numero}</div>
+            <div class="text-gray-700 font-medium">${p.cliente}</div>
+            <div class="text-xs text-gray-500 mt-1">${p.perimetro?.toFixed(1) || '?'}m · ${getPosteLabel(p.tipoPoste)} · Alt ${p.alto}m</div>
+          </div>
+          <div class="text-right">
+            <div class="font-bold text-verde-oscuro">${formatPeso(p.totalFinal || p.totalMateriales)}</div>
+            <div class="text-xs text-gray-400">${formatearFecha(p.fecha)}</div>
+          </div>
+        </div>
+      `;
+      div.addEventListener('click', () => {
+        presupuestoActual = p;
+        renderizarResultado(p);
+        // Restaurar mano de obra
+        const d = p.manoDeObraDetalle;
+        if (d) {
+          document.getElementById('mdoEsqPrecio').value    = d.esq?.precio    ?? 25000;
+          document.getElementById('mdoEsqCant').value      = d.esq?.cantidad  ?? 0;
+          document.getElementById('mdoPortonPrecio').value = d.porton?.precio ?? 35000;
+          document.getElementById('mdoPortonCant').value   = d.porton?.cantidad ?? 0;
+          document.getElementById('mdoTejidoPrecio').value = d.tejido?.precio ?? 8000;
+          document.getElementById('mdoTejidoCant').value   = d.tejido?.cantidad ?? 0;
+          document.getElementById('mdoKmPrecio').value     = d.km?.precio    ?? 3000;
+          document.getElementById('mdoKmCant').value       = d.km?.cantidad  ?? 0;
+        } else {
+          document.getElementById('mdoEsqCant').value      = p.esquineros ?? 0;
+          document.getElementById('mdoPortonCant').value   = p.portonesCount ?? 0;
+          document.getElementById('mdoTejidoCant').value   = Math.round(p.perimetro || 0);
+        }
+        recalcularMDO();
+        cerrarHistorial();
+      });
+      lista.appendChild(div);
+    });
+  }
+
+  document.getElementById('modalHistorial').classList.remove('hidden');
+}
+
+function cerrarHistorial() {
+  document.getElementById('modalHistorial').classList.add('hidden');
+}
+
+function limpiarHistorial() {
+  if (!confirm('¿Borrar todo el historial?')) return;
+  localStorage.removeItem('gg_historial');
+  localStorage.removeItem('gg_ultimo_presupuesto');
+  document.getElementById('listaHistorial').innerHTML = '<p class="text-center text-gray-400 py-8">Historial borrado</p>';
+}
+
+// Cerrar modal al hacer click fuera
+document.getElementById('modalHistorial').addEventListener('click', function(e) {
+  if (e.target === this) cerrarHistorial();
+});
+
+// ========================================
+// TOAST
+// ========================================
+function mostrarToast(msg) {
+  const t = document.createElement('div');
+  t.className = 'fixed bottom-6 right-6 bg-verde-oscuro text-white px-5 py-3 rounded-xl shadow-xl z-50 text-sm font-medium transition-all';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3000);
+}
+
+// ========================================
+// GENERAR PDF con jsPDF
+// ========================================
+function generarPDF() {
+  if (!presupuestoActual) return;
+  recalcularTotal();
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+
+  const verde = [45, 90, 39];       // #2d5a27
+  const verdeMedio = [74, 124, 89]; // #4a7c59
+  const blanco = [255, 255, 255];
+  const negro = [30, 30, 30];
+  const gris = [120, 120, 120];
+  const grisClaro = [240, 245, 240];
+
+  const margenIzq = 14;
+  const margenDer = 196;
+  const anchoUtil = margenDer - margenIzq;
+  let y = 0;
+
+  // ---- HEADER ----
+  doc.setFillColor(...verde);
+  doc.rect(0, 0, 210, 40, 'F');
+
+  // Logo texto
+  doc.setTextColor(...blanco);
+  doc.setFontSize(22);
+  doc.setFont('helvetica', 'bold');
+  doc.text('GREEN GARDEN LOBOS', margenIzq, 17);
+
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'normal');
+  doc.text('Alambrados · Lobos, Buenos Aires', margenIzq, 25);
+
+  // Número y fecha en header
+  doc.setFontSize(9);
+  doc.setTextColor(200, 235, 200);
+  doc.text(`N° ${presupuestoActual.numero}`, margenDer, 14, { align: 'right' });
+  doc.text(`Fecha: ${formatearFecha(presupuestoActual.fecha)}`, margenDer, 21, { align: 'right' });
+  doc.text(getListaLabel(presupuestoActual.lista), margenDer, 28, { align: 'right' });
+
+  y = 50;
+
+  // ---- DATOS DEL CLIENTE ----
+  doc.setFillColor(...grisClaro);
+  doc.rect(margenIzq, y - 4, anchoUtil, 22, 'F');
+  doc.setDrawColor(...verdeMedio);
+  doc.setLineWidth(0.5);
+  doc.rect(margenIzq, y - 4, anchoUtil, 22, 'S');
+
+  doc.setTextColor(...negro);
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'bold');
+  doc.text('CLIENTE:', margenIzq + 3, y + 2);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(11);
+  doc.text(presupuestoActual.cliente, margenIzq + 3, y + 9);
+  doc.setFontSize(9);
+  doc.setTextColor(...gris);
+  const datosExtra = [presupuestoActual.localidad, presupuestoActual.telefono].filter(Boolean).join('  |  ');
+  if (datosExtra) doc.text(datosExtra, margenIzq + 3, y + 15);
+
+  y += 30;
+
+  // ---- RESUMEN TÉCNICO ----
+  doc.setFillColor(...verde);
+  doc.rect(margenIzq, y, anchoUtil, 8, 'F');
+  doc.setTextColor(...blanco);
+  doc.setFontSize(8);
+  doc.setFont('helvetica', 'bold');
+  doc.text('ESPECIFICACIONES DEL TRABAJO', margenIzq + 3, y + 5.5);
+  y += 12;
+
+  doc.setTextColor(...negro);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  const p = presupuestoActual;
+  const especLine1 = `Perímetro: ${p.perimetro.toFixed(1)} m   (A:${p.ladoA}m  B:${p.ladoB}m  C:${p.ladoC}m  D:${p.ladoD}m)`;
+  const especLine2 = `Tejido: ${getTipoLabel(p.tipoTejido)} × ${p.alto}m   |   Postes: ${getPosteLabel(p.tipoPoste)}   |   Púas: ${p.lineasPua} líneas`;
+  doc.text(especLine1, margenIzq, y);
+  y += 6;
+  doc.text(especLine2, margenIzq, y);
+  y += 10;
+
+  // ---- TABLA MATERIALES ----
+  // Encabezado tabla
+  doc.setFillColor(...verde);
+  doc.rect(margenIzq, y, anchoUtil, 8, 'F');
+  doc.setTextColor(...blanco);
+  doc.setFontSize(8);
+  doc.setFont('helvetica', 'bold');
+  const cols = [margenIzq + 3, margenIzq + 8, 95, 135, 158, 182];
+  const headers = ['#', 'Producto', 'Código', 'Cant.', 'P. Unit.', 'Subtotal'];
+  const aligns = ['left', 'left', 'left', 'right', 'right', 'right'];
+  headers.forEach((h, i) => {
+    doc.text(h, cols[i], y + 5.5, { align: aligns[i] });
+  });
+  y += 8;
+
+  // Filas
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8);
+  p.items.forEach((item, idx) => {
+    if (y > 260) {
+      doc.addPage();
+      y = 20;
+    }
+    const bg = idx % 2 === 0 ? [255,255,255] : [245, 250, 245];
+    doc.setFillColor(...bg);
+    doc.rect(margenIzq, y, anchoUtil, 7, 'F');
+
+    doc.setTextColor(...gris);
+    doc.text(String(idx + 1), cols[0], y + 5);
+
+    doc.setTextColor(...negro);
+    // truncar nombre si es muy largo
+    const nomTrunc = item.nombre.length > 45 ? item.nombre.substring(0, 44) + '…' : item.nombre;
+    doc.text(nomTrunc, cols[1], y + 5);
+
+    doc.setTextColor(...gris);
+    doc.text(item.codigo || '', cols[2], y + 5);
+
+    doc.setTextColor(...negro);
+    doc.text(`${formatNum(item.cantidad)} ${item.unidad || 'u.'}`, cols[3], y + 5, { align: 'right' });
+    doc.text(formatPeso(item.precioUnit), cols[4], y + 5, { align: 'right' });
+
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...verde);
+    doc.text(formatPeso(item.subtotal), cols[5], y + 5, { align: 'right' });
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(...negro);
+
+    // línea separadora
+    doc.setDrawColor(220, 220, 220);
+    doc.setLineWidth(0.1);
+    doc.line(margenIzq, y + 7, margenDer, y + 7);
+
+    y += 7;
+  });
+
+  // ---- TOTALES ----
+  y += 4;
+  doc.setDrawColor(...verde);
+  doc.setLineWidth(0.5);
+  doc.line(margenIzq, y, margenDer, y);
+  y += 5;
+
+  // Total materiales
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(9);
+  doc.setTextColor(...negro);
+  doc.text('TOTAL MATERIALES:', 140, y, { align: 'right' });
+  doc.setTextColor(...[45,90,39]);
+  doc.text(formatPeso(p.totalMateriales), margenDer, y, { align: 'right' });
+  y += 7;
+
+  // Mano de obra (con desglose si hay detalle)
+  if (p.manoDeObra > 0) {
+    {
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(9);
+      doc.setTextColor(...negro);
+      doc.text('MANO DE OBRA / ENVÍO:', 140, y, { align: 'right' });
+      doc.setTextColor(...[45,90,39]);
+      doc.text(formatPeso(p.manoDeObra), margenDer, y, { align: 'right' });
+      y += 7;
+    }
+  }
+
+  // Total final
+  if (y > 260) { doc.addPage(); y = 20; }
+  doc.setFillColor(...verde);
+  doc.rect(120, y - 4, 76, 12, 'F');
+  doc.setTextColor(...blanco);
+  doc.setFontSize(11);
+  doc.text('TOTAL FINAL:', 140, y + 4, { align: 'right' });
+  doc.setFontSize(13);
+  doc.text(formatPeso(p.totalFinal || p.totalMateriales + (p.manoDeObra || 0)), margenDer, y + 4, { align: 'right' });
+  y += 18;
+
+  // Observaciones
+  if (p.observ) {
+    doc.setFontSize(8);
+    doc.setTextColor(...negro);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Observaciones:', margenIzq, y);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(...gris);
+    const lines = doc.splitTextToSize(p.observ, anchoUtil - 40);
+    doc.text(lines, margenIzq + 35, y);
+    y += lines.length * 5 + 4;
+  }
+
+  // ---- FOOTER ----
+  const pageCount = doc.internal.getNumberOfPages();
+  for (let i = 1; i <= pageCount; i++) {
+    doc.setPage(i);
+    doc.setFillColor(...verde);
+    doc.rect(0, 282, 210, 15, 'F');
+    doc.setTextColor(...blanco);
+    doc.setFontSize(7);
+    doc.setFont('helvetica', 'normal');
+    doc.text('Válido por 7 días desde la fecha de emisión · Precios en pesos argentinos (ARS)', 105, 289, { align: 'center' });
+    doc.text('GREEN GARDEN LOBOS · Lobos, Buenos Aires', 105, 293.5, { align: 'center' });
+    if (pageCount > 1) {
+      doc.text(`Página ${i} de ${pageCount}`, margenDer, 289, { align: 'right' });
+    }
+  }
+
+  // Guardar el PDF
+  const nombreArchivo = `presupuesto_${presupuestoActual.numero}_${presupuestoActual.cliente.replace(/\s+/g, '_')}.pdf`;
+  doc.save(nombreArchivo);
+
+  // Auto-guardar en historial al generar PDF
+  guardarPresupuesto();
+}
+
+</script>
+</body>
+</html>
