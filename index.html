@@ -849,16 +849,19 @@ let cart = JSON.parse(localStorage.getItem('gg_cart') || '[]');
 
 /* ====== WhatsApp ====== */
 function abrirWhatsAppGenerico(){
+  fbq('track','Contact');
   const n='549'+cachedWhatsapp.replace(/[^0-9]/g,'');
   const m=encodeURIComponent("Hola Green Garden! Quería consultar por sus productos y precios.");
   window.open('https://wa.me/'+n+'?text='+m,'_blank');
 }
 function abrirWhatsAppProducto(nombre){
+  fbq('track','Contact');
   const n='549'+cachedWhatsapp.replace(/[^0-9]/g,'');
   const m=encodeURIComponent(`Hola Green Garden! Me interesa el producto: *${nombre}*. ¿Podrían enviarme más información y precio? Gracias!`);
   window.open('https://wa.me/'+n+'?text='+m,'_blank');
 }
 function solicitarMayorista(){
+  fbq('track','Lead');
   const n='549'+cachedWhatsapp.replace(/[^0-9]/g,'');
   const m=encodeURIComponent("Hola Green Garden! Soy revendedor/distribuidor y me interesa la lista de precios mayorista. ¿Podrían enviármela?");
   window.open('https://wa.me/'+n+'?text='+m,'_blank');
@@ -1039,6 +1042,7 @@ function toggleCart(open){
 }
 function enviarPresupuestoWA(){
   if(cart.length === 0) return;
+  fbq('track','InitiateCheckout');
   const nombre = document.getElementById('cart-cliente-nombre').value.trim();
   const extra = document.getElementById('cart-mensaje-extra').value.trim();
   let msg = `*Hola Green Garden!* 🪴\nQuería pedir presupuesto por estos productos:\n\n`;
