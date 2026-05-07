@@ -482,27 +482,8 @@
       </div>
     </div>
 
-    <!-- SELECTOR TIPO PRESUPUESTO -->
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 no-print">
-      <h3 class="text-sm font-bold text-verde-oscuro uppercase tracking-wider mb-3">Tipo de Presupuesto</h3>
-      <div class="flex flex-wrap gap-3">
-        <label class="flex items-center gap-2 cursor-pointer">
-          <input type="radio" name="tipoPresupuesto" value="materiales" checked onchange="actualizarTipoPresupuesto()" class="accent-verde-oscuro w-4 h-4">
-          <span class="text-sm font-semibold text-gray-700">Solo Materiales</span>
-        </label>
-        <label class="flex items-center gap-2 cursor-pointer">
-          <input type="radio" name="tipoPresupuesto" value="mdo" onchange="actualizarTipoPresupuesto()" class="accent-red-600 w-4 h-4">
-          <span class="text-sm font-semibold text-gray-700">Solo Mano de Obra</span>
-        </label>
-        <label class="flex items-center gap-2 cursor-pointer">
-          <input type="radio" name="tipoPresupuesto" value="completo" onchange="actualizarTipoPresupuesto()" class="accent-verde-oscuro w-4 h-4">
-          <span class="text-sm font-semibold text-gray-700">Materiales + Mano de Obra</span>
-        </label>
-      </div>
-    </div>
-
     <!-- TABLA DE MATERIALES -->
-    <div id="bloqueMateriales" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
       <div class="p-4 bg-gray-50 border-b border-gray-100 flex items-center justify-between">
         <h3 class="font-bold text-gray-700 uppercase text-sm tracking-wide">Detalle de Materiales <span class="text-xs text-gray-400 font-normal normal-case ml-2">(editable)</span></h3>
         <button onclick="agregarItemManual()" class="no-print bg-verde-medio hover:bg-verde-oscuro text-white text-xs font-semibold px-3 py-1.5 rounded-lg shadow transition flex items-center gap-1">
@@ -538,7 +519,7 @@
     </div>
 
     <!-- MANO DE OBRA -->
-    <div id="bloqueMDO" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
       <h3 class="text-sm font-bold text-verde-oscuro uppercase tracking-wider mb-4">Mano de Obra</h3>
 
       <div class="overflow-x-auto">
@@ -851,7 +832,7 @@ const PORTONES = {
   p090x180: { nombre: 'Puerta Peatonal 0.90×1.80m', precio: 95310,  costoProv: 70600 },
   p090x200: { nombre: 'Puerta Peatonal 0.90×2.0m',  precio: 100035, costoProv: 74100 },
   port3x150: { nombre: 'Portón Doble Hoja 3×1.50m', precio: 215325, costoProv: 159500 },
-  port3x180: { nombre: 'Portón Doble Hoja 3×1.80m', precio: 282900, costoProv: 171400 },
+  port3x180: { nombre: 'Portón Doble Hoja 3×1.80m', precio: 231390, costoProv: 171400 },
   port3x200: { nombre: 'Portón Doble Hoja 3×2.0m',  precio: 244350, costoProv: 181000 },
   port4x150: { nombre: 'Portón Doble Hoja 4×1.50m', precio: 254070, costoProv: 188200 },
   port4x180: { nombre: 'Portón Doble Hoja 4×1.80m', precio: 277020, costoProv: 205200 },
@@ -1356,9 +1337,9 @@ function calcularPresupuesto() {
     if (itemPua.restoMts > 0) pushItem('PUAXM', ALAMBRES.pua_metro, itemPua.restoMts,  `Púa × ${itemPua.restoMts}mt`, 'mt');
   }
 
-  // 11. Cruceros — solo hormigón (esquineros + puntales, sin refuerzos)
+  // 11. Cruceros — solo hormigón
   if (esHormigon) {
-    const cruceros = esquineros + puntales;
+    const cruceros = esquineros + refuerzos + puntales;
     pushItem('CRU', ACCESORIOS.crucero, cruceros);
   }
 
@@ -1580,44 +1561,17 @@ function recalcularMDO() {
   recalcularTotal();
 }
 
-function getTipoPresupuesto() {
-  const sel = document.querySelector('input[name="tipoPresupuesto"]:checked');
-  return sel ? sel.value : 'completo';
-}
-
-function actualizarTipoPresupuesto() {
-  const tipo = getTipoPresupuesto();
-  const bloqueMat = document.getElementById('bloqueMateriales');
-  const bloqueMDO = document.getElementById('bloqueMDO');
-  if (bloqueMat) bloqueMat.style.display = (tipo === 'mdo') ? 'none' : '';
-  if (bloqueMDO) bloqueMDO.style.display = (tipo === 'materiales') ? 'none' : '';
-  recalcularTotal();
-}
-
 function recalcularTotal() {
   if (!presupuestoActual) return;
-  const tipo = getTipoPresupuesto();
   const mdo = parseFloat(document.getElementById('manoDeObra').value) || 0;
   presupuestoActual.manoDeObra = mdo;
-
-  let total = 0;
-  let desglose = '';
-  if (tipo === 'materiales') {
-    total = presupuestoActual.totalMateriales;
-    desglose = `Solo materiales`;
-  } else if (tipo === 'mdo') {
-    total = mdo;
-    desglose = `Solo mano de obra`;
-  } else {
-    total = presupuestoActual.totalMateriales + mdo;
-    desglose = `Materiales ${formatPeso(presupuestoActual.totalMateriales)} + M.O. ${formatPeso(mdo)}`;
-  }
-
+  const total = presupuestoActual.totalMateriales + mdo;
   document.getElementById('totalFinal').textContent = formatPeso(total);
   const desg = document.getElementById('totalFinalDesglose');
-  if (desg) desg.textContent = desglose;
+  if (desg) {
+    desg.textContent = `Materiales ${formatPeso(presupuestoActual.totalMateriales)} + M.O. ${formatPeso(mdo)}`;
+  }
   presupuestoActual.totalFinal = total;
-  presupuestoActual.tipoPresupuesto = tipo;
 }
 
 // ========================================
