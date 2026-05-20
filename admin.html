@@ -223,9 +223,12 @@
           <p class="text-white/40 text-sm">Materiales requeridos para los pedidos pendientes vs. lo que tenés en stock real.</p>
         </div>
         <div class="flex gap-2">
+          <button onclick="sincronizarStockDesdeCatalogo()" class="btn-pri" title="Trae todos los productos del listado de precios y los agrega al stock con cantidad 0">🔄 Sincronizar desde Listas Precios</button>
+          <button onclick="abrirModalNuevoProductoStock()" class="btn-sec">+ Nuevo Producto</button>
           <button onclick="loadStock()" class="btn-sec">↻ Actualizar</button>
         </div>
       </div>
+      <p id="stock-sync-status" class="text-xs text-white/50 mb-3"></p>
 
       <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6" id="stock-kpis"></div>
 
@@ -1398,6 +1401,120 @@ async function loadStock(silent){
   // Recargar después de crear faltantes
   allStock = await supabase.getStock();
   renderStock();
+}
+
+// ============ SINCRONIZAR PRODUCTOS DESDE LISTAS DE PRECIOS ============
+async function sincronizarStockDesdeCatalogo(){
+  const statusEl = document.getElementById('stock-sync-status');
+  if(!confirm('Esto va a traer todos los productos del listado de precios al stock con cantidad 0. Los productos que ya existan NO se duplican. ¿Continuar?')) return;
+
+  statusEl.innerHTML = '<span class="text-brass-400">⏳ Buscando productos en el listado de precios...</span>';
+  try {
+    // 1. Traer todo el catálogo nuevo (activos)
+    const catalogo = await supabase.getCatalogo({ activo: true });
+    if(!catalogo || catalogo.length === 0){
+      statusEl.innerHTML = '<span class="text-orange-400">⚠️ No hay productos en el listado de precios.</span>';
+      return;
+    }
+
+    // 2. Traer productos actuales para no duplicar
+    if(!allProductos || allProductos.length === 0){
+      allProductos = await supabase.getProductos();
+    }
+    const existentesPorCodigo = new Set(allProductos.map(p => (p.codigo || '').toLowerCase()).filter(Boolean));
+    const existentesPorNombre = new Set(allProductos.map(p => (p.nombre || '').toLowerCase().trim()));
+
+    // 3. Filtrar lo que NO existe todavía
+    const aImportar = catalogo.filter(c => {
+      const codLower = (c.codigo || '').toLowerCase();
+      const nomLower = (c.nombre || '').toLowerCase().trim();
+      if(codLower && existentesPorCodigo.has(codLower)) return false;
+      if(nomLower && existentesPorNombre.has(nomLower)) return false;
+      return true;
+    });
+
+    if(aImportar.length === 0){
+      statusEl.innerHTML = '<span class="text-green-400">✓ Todos los productos del listado de precios ya están en stock. Nada para sincronizar.</span>';
+      return;
+    }
+
+    statusEl.innerHTML = `<span class="text-brass-400">⏳ Importando ${aImportar.length} productos nuevos al stock...</span>`;
+
+    // 4. Crear cada producto en la tabla productos + crear fila de stock con 0
+    let creados = 0, errores = 0;
+    for(const c of aImportar){
+      try {
+        // Crear producto (sin precios — solo nombre/código/categoría/unidad)
+        const nuevoProd = {
+          codigo: c.codigo || null,
+          nombre: c.nombre,
+          descripcion: c.descripcion || null,
+          categoria: (c.categoria && c.categoria.nombre) || 'General',
+          unidad: c.unidad || 'unidad',
+          activo: true
+        };
+        const creado = await supabase.createProducto(nuevoProd);
+        if(creado && creado.id){
+          // Crear fila en stock con cantidad 0
+          await supabase.setStockProducto(creado.id, { stock_actual: 0, unidad: nuevoProd.unidad, stock_minimo: 0 });
+          allProductos.push(creado);
+          creados++;
+        } else {
+          errores++;
+        }
+      } catch(e) {
+        console.error('Error al importar producto', c.codigo, e);
+        errores++;
+      }
+    }
+
+    statusEl.innerHTML = `<span class="text-green-400">✓ Sincronización completa. ${creados} productos nuevos importados${errores > 0 ? `, ${errores} con error` : ''}.</span>`;
+    toast(`✓ ${creados} productos importados al stock`);
+
+    // 5. Recargar la vista
+    await loadStock();
+  } catch(e) {
+    console.error(e);
+    statusEl.innerHTML = `<span class="text-red-400">❌ Error: ${e.message}</span>`;
+  }
+}
+
+// ============ MODAL: NUEVO PRODUCTO MANUAL EN STOCK ============
+function abrirModalNuevoProductoStock(){
+  const nombre = prompt('Nombre del producto:');
+  if(!nombre || !nombre.trim()) return;
+  const codigo = prompt('Código (opcional, dejar vacío si no tiene):') || '';
+  const categoria = prompt('Categoría (ej: Tejidos, Postes, Accesorios):', 'General') || 'General';
+  const unidad = prompt('Unidad (unidad, mt, kg, bolsa):', 'unidad') || 'unidad';
+  const stockInicial = parseFloat(prompt('Stock inicial (cantidad):', '0')) || 0;
+  const stockMinimo = parseFloat(prompt('Stock mínimo (alerta cuando baja de):', '0')) || 0;
+
+  (async () => {
+    try {
+      const nuevo = await supabase.createProducto({
+        codigo: codigo.trim() || null,
+        nombre: nombre.trim(),
+        categoria: categoria.trim(),
+        unidad: unidad.trim(),
+        activo: true
+      });
+      if(!nuevo || !nuevo.id){
+        toast('❌ Error al crear el producto');
+        return;
+      }
+      await supabase.setStockProducto(nuevo.id, {
+        stock_actual: stockInicial,
+        unidad: unidad.trim(),
+        stock_minimo: stockMinimo
+      });
+      allProductos.push(nuevo);
+      toast(`✓ Producto "${nombre}" agregado al stock`);
+      await loadStock();
+    } catch(e) {
+      console.error(e);
+      toast('❌ Error: ' + e.message);
+    }
+  })();
 }
 
 function calcularStockNecesario(){
