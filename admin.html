@@ -1442,6 +1442,7 @@ async function sincronizarStockDesdeCatalogo(){
 
     // 4. Crear cada producto en la tabla productos + crear fila de stock con 0
     let creados = 0, errores = 0;
+    const detallesError = [];
     for(const c of aImportar){
       try {
         // Crear producto (sin precios — solo nombre/código/categoría/unidad)
@@ -1453,22 +1454,48 @@ async function sincronizarStockDesdeCatalogo(){
           unidad: c.unidad || 'unidad',
           activo: true
         };
-        const creado = await supabase.createProducto(nuevoProd);
-        if(creado && creado.id){
-          // Crear fila en stock con cantidad 0
-          await supabase.setStockProducto(creado.id, { stock_actual: 0, unidad: nuevoProd.unidad, stock_minimo: 0 });
-          allProductos.push(creado);
-          creados++;
+        // Llamar directo a fetch para capturar el error exacto
+        const resp = await fetch(`${SUPABASE_URL}/rest/v1/productos`, {
+          method: 'POST',
+          headers: {
+            'apikey': SUPABASE_KEY,
+            'Authorization': `Bearer ${SUPABASE_KEY}`,
+            'Content-Type': 'application/json',
+            'Prefer': 'return=representation'
+          },
+          body: JSON.stringify(nuevoProd)
+        }).catch(e => null);
+        if(resp && resp.ok){
+          const arr = await resp.json();
+          const creado = arr[0];
+          if(creado && creado.id){
+            await supabase.setStockProducto(creado.id, { stock_actual: 0, unidad: nuevoProd.unidad, stock_minimo: 0 });
+            allProductos.push(creado);
+            creados++;
+            continue;
+          }
+        }
+        // Si llegamos acá, falló
+        errores++;
+        if(resp){
+          const errTxt = await resp.text();
+          console.error(`❌ Error producto ${c.codigo || c.nombre}:`, resp.status, errTxt);
+          if(detallesError.length < 3) detallesError.push(`${c.codigo || c.nombre}: ${resp.status} - ${errTxt.slice(0,150)}`);
         } else {
-          errores++;
+          console.error(`❌ Error red producto ${c.codigo || c.nombre}`);
         }
       } catch(e) {
         console.error('Error al importar producto', c.codigo, e);
         errores++;
+        if(detallesError.length < 3) detallesError.push(`${c.codigo || c.nombre}: ${e.message}`);
       }
     }
 
-    statusEl.innerHTML = `<span class="text-green-400">✓ Sincronización completa. ${creados} productos nuevos importados${errores > 0 ? `, ${errores} con error` : ''}.</span>`;
+    if(creados === 0 && errores > 0){
+      statusEl.innerHTML = `<span class="text-red-400">❌ Falló la importación de ${errores} productos. Primer error: <br><code class="text-[10px]">${detallesError[0] || 'desconocido'}</code><br>Abrí la consola (Cmd+Option+J) para ver todos los errores.</span>`;
+      return;
+    }
+    statusEl.innerHTML = `<span class="text-green-400">✓ Sincronización completa. ${creados} productos nuevos importados${errores > 0 ? `, ${errores} con error (ver consola)` : ''}.</span>`;
     toast(`✓ ${creados} productos importados al stock`);
 
     // 5. Recargar la vista
