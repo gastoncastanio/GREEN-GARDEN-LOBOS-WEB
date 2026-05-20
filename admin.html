@@ -2,298 +2,3061 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin - GREEN GARDEN LOBOS | Gestionar Galería</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <!-- PWA -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#0f1a11">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Green Garden Admin">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="/icons/icon-192.png">
+  <title>Panel Admin · GREEN GARDEN LOBOS</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" type="image/png" href="logo-oficial.png">
   <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = { theme:{ extend:{
+      colors:{
+        forest:{50:'#f3f6f3',100:'#e3ebe3',200:'#c7d6c7',300:'#9eb89e',400:'#6f9170',500:'#4d7250',600:'#3a5a3d',700:'#2f4732',800:'#273a2a',900:'#1f2f22',950:'#0f1a11'},
+        brass:{300:'#e8c97a',400:'#d4a85a',500:'#b8923f',600:'#9a7a32'}
+      },
+      fontFamily:{display:['Playfair Display','serif'],sans:['Inter','sans-serif']}
+    }}}
+  </script>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap');
-    body { font-family: 'Poppins', sans-serif; }
-    .drag-over { background-color: #dcfce7; border-color: #16a34a; }
-    .preview-img { max-width: 100%; max-height: 400px; object-fit: contain; }
-    .gallery-slot { aspect-ratio: 9/16; }
+    body{font-family:'Inter',sans-serif;background:#0f1a11;color:white;}
+    h1,h2,h3{font-family:'Playfair Display',serif;}
+    .tab-btn.active{background:#b8923f;color:#0f1a11;border-color:#b8923f;}
+    .modal{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:100;display:none;align-items:center;justify-content:center;padding:1rem;}
+    .modal.open{display:flex;}
+    input,select,textarea{background:#1f2f22;border:1px solid #2f4732;color:white;padding:.6rem .85rem;font-size:.875rem;outline:none;width:100%;}
+    input:focus,select:focus,textarea:focus{border-color:#b8923f;}
+    label{display:block;font-size:.65rem;letter-spacing:.18em;text-transform:uppercase;color:#9eb89e;margin-bottom:.4rem;font-weight:600;}
+    .btn-pri{background:#b8923f;color:#0f1a11;padding:.7rem 1.2rem;font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;font-weight:700;cursor:pointer;border:none;}
+    .btn-pri:hover{background:#d4a85a;}
+    .btn-sec{background:transparent;color:white;padding:.55rem 1rem;font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;font-weight:600;cursor:pointer;border:1px solid #4d7250;}
+    .btn-sec:hover{border-color:#b8923f;color:#d4a85a;}
+    .btn-sec.active{background:#b8923f;color:#0f1a11;border-color:#b8923f;}
+    .btn-danger{background:transparent;color:#fca5a5;padding:.5rem .9rem;font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;font-weight:600;cursor:pointer;border:1px solid rgba(252,165,165,.3);}
+    .btn-danger:hover{background:rgba(252,165,165,.1);}
+    .estado-pill{display:inline-block;padding:.25rem .75rem;font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;font-weight:700;border-radius:3px;border:1px solid transparent;}
+    /* Flujo cromático gradual: azul → naranja → ámbar → cian → violeta → coral → verde */
+    .e-recibido      {background:#1e40af40;color:#93c5fd;border-color:#3b82f680;}      /* 1. Azul */
+    .e-fabricacion   {background:#ea580c40;color:#fdba74;border-color:#f9731680;}      /* 2. Naranja */
+    .e-listo         {background:#ca8a0440;color:#fde047;border-color:#eab30880;}      /* 3. Ámbar/dorado */
+    .e-despacho      {background:#7c3aed40;color:#c4b5fd;border-color:#8b5cf680;}      /* 4. Violeta */
+    .e-enviado       {background:#0891b240;color:#67e8f9;border-color:#06b6d480;}      /* 5. Cian */
+    .e-retiro_listo  {background:#db277740;color:#f9a8d4;border-color:#ec489980;}      /* 6. Rosa/coral */
+    .e-entregado     {background:#16a34a60;color:#86efac;border-color:#22c55e;font-weight:800;}  /* 7. Verde fuerte (final) */
   </style>
 </head>
-<body class="bg-gray-100">
+<body>
 
-  <!-- NAVBAR -->
-  <nav class="fixed w-full z-50 bg-white shadow-lg">
-    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+<!-- Login -->
+<div id="login-gate" class="min-h-screen flex items-center justify-center p-5">
+  <div class="bg-forest-900 border border-forest-800 p-8 md:p-12 max-w-md w-full">
+    <img src="logo-oficial.png" class="w-16 h-16 mx-auto mb-6 opacity-80">
+    <p class="text-brass-400 text-[10px] font-bold tracking-[0.25em] uppercase text-center mb-2">Panel Administrador</p>
+    <h1 class="text-2xl font-display font-bold text-center mb-8">Green Garden Lobos</h1>
+    <form onsubmit="doLogin(event)">
+      <label>Clave de acceso</label>
+      <input type="password" id="admin-pwd" autocomplete="current-password" placeholder="••••••" autofocus>
+      <button class="btn-pri w-full mt-6">Ingresar</button>
+      <p id="login-err" class="text-red-400 text-xs mt-3 text-center hidden">Clave incorrecta.</p>
+    </form>
+  </div>
+</div>
+
+<!-- App -->
+<div id="app" class="hidden">
+  <header class="bg-forest-950 border-b border-forest-800 sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-5 md:px-8 py-4 flex items-center justify-between">
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center text-white font-800 text-sm">GG</div>
-        <p class="text-lg font-800 text-gray-900">GREEN GARDEN LOBOS</p>
+        <img src="logo-oficial.png" class="w-9 h-9 object-contain">
+        <div>
+          <p class="text-sm font-bold tracking-[0.15em] uppercase">Green Garden</p>
+          <p class="text-brass-400 text-[9px] tracking-[0.3em] uppercase">Panel Administrador</p>
+        </div>
       </div>
-      <div class="flex gap-4">
-        <a href="index.html" target="_blank" class="text-sm font-600 text-gray-600 hover:text-green-600">Ver Web</a>
-        <button onclick="logout()" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-600 transition text-sm">Salir</button>
+      <div class="flex items-center gap-3">
+        <a href="/" class="text-white/60 hover:text-white text-[10px] tracking-widest uppercase">Ver web</a>
+        <button onclick="logout()" class="btn-sec">Salir</button>
       </div>
     </div>
-  </nav>
+    <nav class="max-w-7xl mx-auto px-5 md:px-8 flex gap-1 overflow-x-auto">
+      <button class="tab-btn active px-2.5 py-2.5 text-[10px] tracking-wider uppercase font-semibold border-b-2 border-transparent whitespace-nowrap" data-tab="analitica" onclick="showTab('analitica',this)">📊 Analítica</button>
+      <button class="tab-btn px-2.5 py-2.5 text-[10px] tracking-wider uppercase font-semibold border-b-2 border-transparent whitespace-nowrap" data-tab="cotizador" onclick="showTab('cotizador',this)">🧮 Cotizador</button>
+      <button class="tab-btn px-2.5 py-2.5 text-[10px] tracking-wider uppercase font-semibold border-b-2 border-transparent whitespace-nowrap" data-tab="pedidos-mat" onclick="showTab('pedidos-mat',this)">Ped. Materiales</button>
+      <button class="tab-btn px-2.5 py-2.5 text-[10px] tracking-wider uppercase font-semibold border-b-2 border-transparent whitespace-nowrap" data-tab="pedidos-mo" onclick="showTab('pedidos-mo',this)">Ped. + M.Obra</button>
+      <button class="tab-btn px-2.5 py-2.5 text-[10px] tracking-wider uppercase font-semibold border-b-2 border-transparent whitespace-nowrap" data-tab="stock" onclick="showTab('stock',this)">Stock</button>
+      <button class="tab-btn px-2.5 py-2.5 text-[10px] tracking-wider uppercase font-semibold border-b-2 border-transparent whitespace-nowrap" data-tab="productos" onclick="showTab('productos',this)">Productos</button>
+      <button class="tab-btn px-2.5 py-2.5 text-[10px] tracking-wider uppercase font-semibold border-b-2 border-transparent whitespace-nowrap" data-tab="proveedores" onclick="showTab('proveedores',this)">🏭 Proveedores</button>
+      <button class="tab-btn px-2.5 py-2.5 text-[10px] tracking-wider uppercase font-semibold border-b-2 border-transparent whitespace-nowrap" data-tab="listas" onclick="showTab('listas',this)">💰 Listas Precios</button>
+      <button class="tab-btn px-2.5 py-2.5 text-[10px] tracking-wider uppercase font-semibold border-b-2 border-transparent whitespace-nowrap" data-tab="historial" onclick="showTab('historial',this)">📈 Historial</button>
+      <button class="tab-btn px-2.5 py-2.5 text-[10px] tracking-wider uppercase font-semibold border-b-2 border-transparent whitespace-nowrap" data-tab="tareas" onclick="showTab('tareas',this)">📋 Tareas</button>
+      <button class="tab-btn px-2.5 py-2.5 text-[10px] tracking-wider uppercase font-semibold border-b-2 border-transparent whitespace-nowrap" data-tab="empleados" onclick="showTab('empleados',this)">Empleados</button>
+      <button class="tab-btn px-2.5 py-2.5 text-[10px] tracking-wider uppercase font-semibold border-b-2 border-transparent whitespace-nowrap" data-tab="contenido" onclick="showTab('contenido',this)">Contenido</button>
+    </nav>
+  </header>
 
-  <div class="pt-24 pb-12">
-    <div class="max-w-7xl mx-auto px-6">
-      <h1 class="text-4xl font-800 mb-2 text-gray-900">Panel de Administración</h1>
-      <p class="text-gray-600 mb-8">Gestiona las fotos de la galería de productos. Redimensiona a 540x960px (9:16 ratio).</p>
+  <main class="max-w-7xl mx-auto px-5 md:px-8 py-8">
 
-      <!-- INSTRUCCIONES -->
-      <div class="bg-blue-50 border-l-4 border-blue-500 p-6 rounded-lg mb-12">
-        <h2 class="font-700 text-blue-900 mb-3">📋 Instrucciones</h2>
-        <ul class="text-sm text-blue-800 space-y-2">
-          <li>✓ <strong>Tamaño recomendado:</strong> 540px de ancho × 960px de alto (formato story Instagram)</li>
-          <li>✓ <strong>Formatos:</strong> JPG, PNG, WebP</li>
-          <li>✓ <strong>Drag & Drop:</strong> Arrastra las fotos a los recuadros o haz clic para seleccionar</li>
-          <li>✓ <strong>Vista previa:</strong> Puedes ver cómo se vería cada foto antes de guardar</li>
-          <li>✓ <strong>Almacenamiento:</strong> Se guarda en tu navegador (localStorage)</li>
-          <li>✓ <strong>Eliminar:</strong> Haz clic en la X roja para quitar una foto</li>
-        </ul>
+    <!-- TAB: ANALÍTICA -->
+    <section id="tab-analitica">
+      <div class="flex flex-wrap items-end justify-between gap-4 mb-6">
+        <div>
+          <h2 class="text-2xl font-display font-bold">📊 Analítica del negocio</h2>
+          <p class="text-white/40 text-sm">Métricas de ventas, stock y obras en tiempo real.</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <select id="ana-rango" class="bg-forest-900 border border-forest-700 text-white text-xs px-3 py-2" onchange="cargarAnalitica()">
+            <option value="7">Últimos 7 días</option>
+            <option value="30" selected>Últimos 30 días</option>
+            <option value="90">Últimos 90 días</option>
+            <option value="365">Último año</option>
+            <option value="all">Todo el tiempo</option>
+          </select>
+          <button onclick="cargarAnalitica()" class="bg-forest-800 hover:bg-forest-700 border border-forest-700 text-white text-xs px-3 py-2 transition">↻ Actualizar</button>
+        </div>
       </div>
 
-      <!-- GALERÍA DE ADMIN -->
-      <div class="grid md:grid-cols-5 gap-6">
-
-        <!-- Slot 1: Logo Oficial -->
-        <div class="bg-white rounded-xl shadow-lg p-4">
-          <label for="img-logo" class="block mb-4">
-            <p class="font-700 text-gray-900 text-center mb-2">Logo Oficial</p>
-            <p class="text-xs text-gray-500 text-center mb-3">GG - Identificador marca</p>
-            <div id="drop-logo" class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:border-green-500 hover:bg-green-50 transition gallery-slot flex items-center justify-center relative">
-              <div id="preview-logo" class="w-full h-full flex items-center justify-center">
-                <p class="text-gray-400 text-sm">Haz clic o arrastra</p>
-              </div>
-              <input type="file" id="img-logo" accept="image/*" class="hidden" onchange="handleImage(this, 'logo')">
-            </div>
-          </label>
-          <div class="mt-4 flex gap-2">
-            <button onclick="viewPreview('logo')" class="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded text-xs font-600">Vista Previa</button>
-            <button onclick="deleteImage('logo')" class="flex-1 bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded text-xs font-600">Eliminar</button>
-          </div>
-        </div>
-
-        <!-- Slot 2: Rafias -->
-        <div class="bg-white rounded-xl shadow-lg p-4">
-          <label for="img-rafias" class="block mb-4">
-            <p class="font-700 text-gray-900 text-center mb-2">Rafias Media Sombra</p>
-            <p class="text-xs text-gray-500 text-center mb-3">En stock - Cinta Cubrecerc</p>
-            <div id="drop-rafias" class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:border-green-500 hover:bg-green-50 transition gallery-slot flex items-center justify-center relative">
-              <div id="preview-rafias" class="w-full h-full flex items-center justify-center">
-                <p class="text-gray-400 text-sm">Haz clic o arrastra</p>
-              </div>
-              <input type="file" id="img-rafias" accept="image/*" class="hidden" onchange="handleImage(this, 'rafias')">
-            </div>
-          </label>
-          <div class="mt-4 flex gap-2">
-            <button onclick="viewPreview('rafias')" class="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded text-xs font-600">Vista Previa</button>
-            <button onclick="deleteImage('rafias')" class="flex-1 bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded text-xs font-600">Eliminar</button>
-          </div>
-        </div>
-
-        <!-- Slot 3: Postes -->
-        <div class="bg-white rounded-xl shadow-lg p-4">
-          <label for="img-postes" class="block mb-4">
-            <p class="font-700 text-gray-900 text-center mb-2">Postes Hormigón</p>
-            <p class="text-xs text-gray-500 text-center mb-3">Rectos & Olímpicos</p>
-            <div id="drop-postes" class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:border-green-500 hover:bg-green-50 transition gallery-slot flex items-center justify-center relative">
-              <div id="preview-postes" class="w-full h-full flex items-center justify-center">
-                <p class="text-gray-400 text-sm">Haz clic o arrastra</p>
-              </div>
-              <input type="file" id="img-postes" accept="image/*" class="hidden" onchange="handleImage(this, 'postes')">
-            </div>
-          </label>
-          <div class="mt-4 flex gap-2">
-            <button onclick="viewPreview('postes')" class="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded text-xs font-600">Vista Previa</button>
-            <button onclick="deleteImage('postes')" class="flex-1 bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded text-xs font-600">Eliminar</button>
-          </div>
-        </div>
-
-        <!-- Slot 4: Alambre -->
-        <div class="bg-white rounded-xl shadow-lg p-4">
-          <label for="img-alambre" class="block mb-4">
-            <p class="font-700 text-gray-900 text-center mb-2">Alambre Tejido</p>
-            <p class="text-xs text-gray-500 text-center mb-3">x Rollo | Púa & Liso</p>
-            <div id="drop-alambre" class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:border-green-500 hover:bg-green-50 transition gallery-slot flex items-center justify-center relative">
-              <div id="preview-alambre" class="w-full h-full flex items-center justify-center">
-                <p class="text-gray-400 text-sm">Haz clic o arrastra</p>
-              </div>
-              <input type="file" id="img-alambre" accept="image/*" class="hidden" onchange="handleImage(this, 'alambre')">
-            </div>
-          </label>
-          <div class="mt-4 flex gap-2">
-            <button onclick="viewPreview('alambre')" class="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded text-xs font-600">Vista Previa</button>
-            <button onclick="deleteImage('alambre')" class="flex-1 bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded text-xs font-600">Eliminar</button>
-          </div>
-        </div>
-
-        <!-- Slot 5: Hardware -->
-        <div class="bg-white rounded-xl shadow-lg p-4">
-          <label for="img-hardware" class="block mb-4">
-            <p class="font-700 text-gray-900 text-center mb-2">Hardware Premium</p>
-            <p class="text-xs text-gray-500 text-center mb-3">Torniquete, Gancho J</p>
-            <div id="drop-hardware" class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:border-green-500 hover:bg-green-50 transition gallery-slot flex items-center justify-center relative">
-              <div id="preview-hardware" class="w-full h-full flex items-center justify-center">
-                <p class="text-gray-400 text-sm">Haz clic o arrastra</p>
-              </div>
-              <input type="file" id="img-hardware" accept="image/*" class="hidden" onchange="handleImage(this, 'hardware')">
-            </div>
-          </label>
-          <div class="mt-4 flex gap-2">
-            <button onclick="viewPreview('hardware')" class="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded text-xs font-600">Vista Previa</button>
-            <button onclick="deleteImage('hardware')" class="flex-1 bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded text-xs font-600">Eliminar</button>
-          </div>
-        </div>
-
+      <!-- KPIs principales -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6" id="ana-kpis-principales">
+        <!-- Cards generadas por JS -->
       </div>
 
-      <!-- ESTADO -->
-      <div class="mt-12 bg-green-50 border-l-4 border-green-500 p-6 rounded-lg">
-        <p class="font-700 text-green-900 mb-2">✓ Sistema listo</p>
-        <p class="text-sm text-green-800">Las fotos se guardan automáticamente en tu navegador. Cada vez que cargues esta página, verás las imágenes que subiste.</p>
-        <p class="text-xs text-green-600 mt-2">Usa esta URL para acceder: <code class="bg-white px-2 py-1 rounded text-green-700 font-600">/admin.html</code></p>
+      <!-- Bloque ventas: solo materiales vs obra -->
+      <div class="grid md:grid-cols-2 gap-4 mb-6">
+        <div class="bg-forest-900 border-l-4 border-forest-500 p-5">
+          <p class="text-[10px] tracking-widest uppercase text-forest-400 font-bold mb-2">📦 Pedidos solo materiales</p>
+          <div id="ana-solo-mat" class="space-y-1 text-sm"></div>
+        </div>
+        <div class="bg-forest-900 border-l-4 border-brass-500 p-5">
+          <p class="text-[10px] tracking-widest uppercase text-brass-400 font-bold mb-2">🏗️ Obras (materiales + mano de obra)</p>
+          <div id="ana-obras" class="space-y-1 text-sm"></div>
+        </div>
       </div>
+
+      <!-- Stock crítico + Productos parados -->
+      <div class="grid md:grid-cols-2 gap-4 mb-6">
+        <div class="bg-forest-900 border border-red-500/30 p-5">
+          <p class="text-[10px] tracking-widest uppercase text-red-400 font-bold mb-3">🚨 Stock crítico (debajo del mínimo)</p>
+          <div id="ana-stock-critico" class="space-y-2 text-sm">Cargando...</div>
+        </div>
+        <div class="bg-forest-900 border border-orange-500/30 p-5">
+          <p class="text-[10px] tracking-widest uppercase text-orange-400 font-bold mb-3">😴 Productos parados (sin venta en 60+ días)</p>
+          <div id="ana-parados" class="space-y-2 text-sm">Cargando...</div>
+        </div>
+      </div>
+
+      <!-- Ranking productos -->
+      <div class="bg-forest-900 border border-forest-800 p-5 mb-6">
+        <div class="flex items-center justify-between mb-3">
+          <p class="text-[10px] tracking-widest uppercase text-brass-400 font-bold">🏆 Ranking de productos vendidos</p>
+          <p class="text-[10px] text-white/40">Solo pedidos entregados</p>
+        </div>
+        <div id="ana-ranking" class="space-y-2">Cargando...</div>
+      </div>
+
+      <!-- Obras detalladas -->
+      <div class="bg-forest-900 border border-forest-800 p-5 mb-6">
+        <p class="text-[10px] tracking-widest uppercase text-brass-400 font-bold mb-3">🏗️ Detalle de obras realizadas (entregadas)</p>
+        <div id="ana-obras-detalle" class="space-y-2">Cargando...</div>
+      </div>
+    </section>
+
+    <!-- TAB: COTIZADOR AUTOMÁTICO -->
+    <section id="tab-cotizador" class="hidden">
+      <div class="mb-4 flex items-center justify-between flex-wrap gap-3">
+        <div>
+          <h2 class="text-2xl font-display font-bold">🧮 Cotizador Automático</h2>
+          <p class="text-white/40 text-sm">Armá presupuestos completos con cálculo automático de materiales.</p>
+        </div>
+        <a href="presupuestos.html" target="_blank" class="btn-sec text-xs">
+          ↗ Abrir en pestaña nueva
+        </a>
+      </div>
+      <div class="bg-white" style="height: calc(100vh - 220px); min-height: 600px; border-radius: 4px; overflow: hidden;">
+        <iframe
+          src="presupuestos.html"
+          style="width: 100%; height: 100%; border: none; display: block;"
+          title="Cotizador Green Garden Lobos">
+        </iframe>
+      </div>
+    </section>
+
+    <!-- TAB: PEDIDOS · SOLO MATERIALES -->
+    <section id="tab-pedidos-mat" class="hidden">
+      <div class="flex flex-wrap items-end justify-between gap-4 mb-6">
+        <div>
+          <h2 class="text-2xl font-display font-bold">Pedidos · Solo Materiales</h2>
+          <p class="text-white/40 text-sm">Pedidos donde solo entregamos productos, sin instalación.</p>
+        </div>
+        <button onclick="openPedidoModal('solo_materiales')" class="btn-pri">+ Nuevo Pedido</button>
+      </div>
+      <div class="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6" id="pedidos-mat-kpis"></div>
+      <div class="flex gap-2 flex-wrap mb-4" id="pedidos-mat-filters"></div>
+      <div class="bg-forest-900 border border-forest-800" id="pedidos-mat-table"></div>
+    </section>
+
+    <!-- TAB: PEDIDOS · MATERIALES + MANO DE OBRA -->
+    <section id="tab-pedidos-mo" class="hidden">
+      <div class="flex flex-wrap items-end justify-between gap-4 mb-6">
+        <div>
+          <h2 class="text-2xl font-display font-bold">Pedidos · Materiales + Mano de Obra</h2>
+          <p class="text-white/40 text-sm">Pedidos que incluyen instalación profesional.</p>
+        </div>
+        <button onclick="openPedidoModal('materiales_mano_obra')" class="btn-pri">+ Nuevo Pedido</button>
+      </div>
+      <div class="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6" id="pedidos-mo-kpis"></div>
+      <div class="flex gap-2 flex-wrap mb-4" id="pedidos-mo-filters"></div>
+      <div class="bg-forest-900 border border-forest-800" id="pedidos-mo-table"></div>
+    </section>
+
+    <!-- TAB: STOCK -->
+    <section id="tab-stock" class="hidden">
+      <div class="flex flex-wrap items-end justify-between gap-4 mb-6">
+        <div>
+          <h2 class="text-2xl font-display font-bold">Control de Stock</h2>
+          <p class="text-white/40 text-sm">Materiales requeridos para los pedidos pendientes vs. lo que tenés en stock real.</p>
+        </div>
+        <div class="flex gap-2">
+          <button onclick="loadStock()" class="btn-sec">↻ Actualizar</button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6" id="stock-kpis"></div>
+
+      <div class="flex gap-2 flex-wrap mb-4">
+        <button class="btn-sec stock-filter active" data-f="todos"     onclick="filterStock('todos',this)">Todos</button>
+        <button class="btn-sec stock-filter" data-f="faltante"  onclick="filterStock('faltante',this)">⚠ Faltante</button>
+        <button class="btn-sec stock-filter" data-f="suficiente" onclick="filterStock('suficiente',this)">✓ Suficiente</button>
+      </div>
+
+      <div class="bg-forest-900 border border-forest-800" id="stock-table"></div>
+    </section>
+
+    <!-- TAB: PRODUCTOS -->
+    <section id="tab-productos" class="hidden">
+      <div class="flex flex-wrap items-end justify-between gap-4 mb-6">
+        <div>
+          <h2 class="text-2xl font-display font-bold">Catálogo de productos</h2>
+          <p class="text-white/40 text-sm">Editá nombre, descripción, foto y orden de cada producto.</p>
+        </div>
+        <button onclick="openProductoModal()" class="btn-pri">+ Nuevo producto</button>
+      </div>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="productos-grid-admin"></div>
+    </section>
+
+    <!-- ============================================ -->
+    <!-- TAB: PROVEEDORES                              -->
+    <!-- ============================================ -->
+    <section id="tab-proveedores" class="hidden">
+      <div class="flex flex-wrap items-end justify-between gap-4 mb-6">
+        <div>
+          <h2 class="text-2xl font-display font-bold">🏭 Proveedores</h2>
+          <p class="text-white/40 text-sm">Gestioná los proveedores de Green Garden. Un producto puede tener varios.</p>
+        </div>
+        <button onclick="openProveedorModal()" class="btn-pri">+ Nuevo proveedor</button>
+      </div>
+      <div class="bg-forest-900 border border-forest-800" id="proveedores-table"></div>
+    </section>
+
+    <!-- ============================================ -->
+    <!-- TAB: LISTAS DE PRECIOS                        -->
+    <!-- ============================================ -->
+    <section id="tab-listas" class="hidden">
+      <div class="flex flex-wrap items-end justify-between gap-4 mb-6">
+        <div>
+          <h2 class="text-2xl font-display font-bold">💰 Listas de Precios</h2>
+          <p class="text-white/40 text-sm">
+            Configurá costos, márgenes y precios minoristas. Los precios con IVA y mayoristas se calculan automáticamente.
+          </p>
+        </div>
+        <div class="flex items-center gap-2">
+          <select id="listas-filtro-categoria" onchange="loadListasPrecios()" class="text-xs">
+            <option value="">Todas las categorías</option>
+          </select>
+          <input type="text" id="listas-filtro-buscar" oninput="loadListasPrecios()" placeholder="🔍 Buscar..." class="text-xs">
+        </div>
+      </div>
+
+      <!-- Resumen alertas -->
+      <div id="listas-alertas" class="mb-4 hidden"></div>
+
+      <div class="bg-forest-900 border border-forest-800 overflow-x-auto" id="listas-table"></div>
+    </section>
+
+    <!-- ============================================ -->
+    <!-- TAB: HISTORIAL DE PRECIOS                     -->
+    <!-- ============================================ -->
+    <section id="tab-historial" class="hidden">
+      <div class="flex flex-wrap items-end justify-between gap-4 mb-6">
+        <div>
+          <h2 class="text-2xl font-display font-bold">📈 Historial de Precios</h2>
+          <p class="text-white/40 text-sm">Cambios de costos y precios minoristas filtrados por trimestre.</p>
+        </div>
+        <div class="flex gap-2">
+          <select id="historial-trimestre" onchange="loadHistorialPrecios()" class="text-xs">
+            <option value="">Todos los trimestres</option>
+          </select>
+          <select id="historial-tipo" onchange="loadHistorialPrecios()" class="text-xs">
+            <option value="">Todos los cambios</option>
+            <option value="costo">Solo costos</option>
+            <option value="minorista_sin_iva">Solo minoristas</option>
+          </select>
+        </div>
+      </div>
+      <div class="bg-forest-900 border border-forest-800 overflow-x-auto" id="historial-table"></div>
+    </section>
+
+    <!-- ============================================ -->
+    <!-- TAB: TAREAS                                   -->
+    <!-- ============================================ -->
+    <section id="tab-tareas" class="hidden">
+      <div class="flex flex-wrap items-end justify-between gap-4 mb-6">
+        <div>
+          <h2 class="text-2xl font-display font-bold">📋 Tareas</h2>
+          <p class="text-white/40 text-sm">Asigná tareas a empleados con prioridad y fecha límite. Incluye recurrentes.</p>
+        </div>
+        <div class="flex gap-2 items-center">
+          <select id="tareas-filtro-empleado" onchange="loadTareas()" class="text-xs">
+            <option value="">Todos los empleados</option>
+          </select>
+          <select id="tareas-filtro-prioridad" onchange="loadTareas()" class="text-xs">
+            <option value="">Todas las prioridades</option>
+            <option value="urgente">🔴 Urgente</option>
+            <option value="alta">🟠 Alta</option>
+            <option value="media">🟡 Media</option>
+            <option value="baja">🟢 Baja</option>
+          </select>
+          <button onclick="openTareaModal()" class="btn-pri">+ Nueva tarea</button>
+        </div>
+      </div>
+
+      <!-- Resumen rápido -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+        <div class="bg-forest-900 border border-forest-800 p-4 text-center">
+          <p class="text-white/40 text-[10px] uppercase">Pendientes</p>
+          <p class="text-yellow-400 text-2xl font-bold" id="tareas-cnt-pendientes">0</p>
+        </div>
+        <div class="bg-forest-900 border border-forest-800 p-4 text-center">
+          <p class="text-white/40 text-[10px] uppercase">En progreso</p>
+          <p class="text-cyan-400 text-2xl font-bold" id="tareas-cnt-progreso">0</p>
+        </div>
+        <div class="bg-forest-900 border border-forest-800 p-4 text-center">
+          <p class="text-white/40 text-[10px] uppercase">Completadas (mes)</p>
+          <p class="text-green-400 text-2xl font-bold" id="tareas-cnt-completadas">0</p>
+        </div>
+        <div class="bg-forest-900 border border-forest-800 p-4 text-center">
+          <p class="text-white/40 text-[10px] uppercase">Atrasadas</p>
+          <p class="text-red-400 text-2xl font-bold" id="tareas-cnt-atrasadas">0</p>
+        </div>
+      </div>
+
+      <!-- Vista Kanban -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="tareas-kanban">
+        <!-- Columnas se llenan dinámicamente -->
+      </div>
+    </section>
+
+    <!-- TAB: EMPLEADOS -->
+    <section id="tab-empleados" class="hidden">
+      <div class="flex flex-wrap items-end justify-between gap-4 mb-6">
+        <div>
+          <h2 class="text-2xl font-display font-bold">Empleados</h2>
+          <p class="text-white/40 text-sm">Cada empleado entra al panel operativo con su PIN.</p>
+        </div>
+        <button onclick="openEmpleadoModal()" class="btn-pri">+ Nuevo empleado</button>
+      </div>
+      <div class="bg-forest-900 border border-forest-800" id="empleados-table"></div>
+    </section>
+
+    <!-- TAB: CONTENIDO -->
+    <section id="tab-contenido" class="hidden">
+      <h2 class="text-2xl font-display font-bold mb-2">Textos editables</h2>
+      <p class="text-white/40 text-sm mb-6">Estos campos aparecen en la home pública.</p>
+      <div class="bg-forest-900 border border-forest-800 p-6 max-w-2xl space-y-5">
+        <div>
+          <label>Título principal del hero (HTML permitido)</label>
+          <textarea id="c-hero-title" rows="3"></textarea>
+        </div>
+        <div>
+          <label>Descripción del hero</label>
+          <textarea id="c-hero-desc" rows="3"></textarea>
+        </div>
+        <div>
+          <label>WhatsApp (formato 11-23713598)</label>
+          <input id="c-whatsapp">
+        </div>
+        <div>
+          <label>Email de contacto</label>
+          <input id="c-email">
+        </div>
+        <button onclick="saveContenido()" class="btn-pri">Guardar cambios</button>
+      </div>
+
+      <h2 class="text-2xl font-display font-bold mt-10 mb-2">🤖 Configuración IA (lectura de boletas)</h2>
+      <p class="text-white/40 text-sm mb-6">API Key de Google Gemini para que la IA lea las boletas automáticamente. <a href="https://aistudio.google.com/apikey" target="_blank" class="text-brass-400 underline">Obtener gratis →</a></p>
+      <div class="bg-forest-900 border border-forest-800 p-6 max-w-2xl space-y-5">
+        <div>
+          <label>API Key de Gemini (gratis)</label>
+          <input id="c-gemini-key" type="password" placeholder="AIzaSy...">
+          <p class="text-white/40 text-[10px] mt-2">Se guarda solo en tu navegador. Conseguila en aistudio.google.com/apikey (gratis hasta 1.500 boletas/mes).</p>
+        </div>
+        <button onclick="saveGeminiKey()" class="btn-pri">Guardar API Key</button>
+        <p id="gemini-key-status" class="text-xs"></p>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- Modal Pedido -->
+<div class="modal" id="modal-pedido">
+  <div class="bg-forest-900 border border-forest-800 max-w-2xl w-full max-h-[92vh] overflow-y-auto">
+    <header class="bg-forest-950 px-6 py-4 flex items-center justify-between sticky top-0 border-b border-forest-800 z-10">
+      <h3 class="text-lg font-display font-bold" id="modal-pedido-titulo">Nuevo pedido</h3>
+      <button onclick="closeModal('modal-pedido')" class="text-white/60 hover:text-white text-2xl leading-none">×</button>
+    </header>
+    <form onsubmit="savePedido(event)" class="p-6 space-y-4" id="form-pedido">
+      <input type="hidden" id="ped-id">
+      <input type="hidden" id="ped-codigo">
+
+      <!-- Tipo de pedido -->
+      <div>
+        <label>Tipo de pedido *</label>
+        <div class="grid grid-cols-2 gap-2">
+          <label class="flex items-center gap-2 bg-forest-800 border border-forest-700 p-3 cursor-pointer hover:border-brass-500">
+            <input type="radio" name="ped-tipo" value="solo_materiales" checked class="w-auto" onchange="togglePedTipo()">
+            <span class="text-sm">Solo materiales</span>
+          </label>
+          <label class="flex items-center gap-2 bg-forest-800 border border-forest-700 p-3 cursor-pointer hover:border-brass-500">
+            <input type="radio" name="ped-tipo" value="materiales_mano_obra" class="w-auto" onchange="togglePedTipo()">
+            <span class="text-sm">+ Mano de obra</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-4">
+        <div><label>Nombre del cliente *</label><input id="ped-cliente" required></div>
+        <div><label>Teléfono</label><input id="ped-tel" placeholder="11-..."></div>
+      </div>
+      <div class="grid md:grid-cols-2 gap-4">
+        <div><label>Email (opcional)</label><input id="ped-email" type="email"></div>
+        <div><label>Total general $ </label><input id="ped-total" type="number" step="0.01" placeholder="0"></div>
+      </div>
+      <div class="grid md:grid-cols-2 gap-4">
+        <div><label>Método de entrega</label>
+          <select id="ped-metodo"><option value="envio">Envío a domicilio</option><option value="retiro">Retiro en local</option></select>
+        </div>
+        <div></div>
+      </div>
+
+      <div class="bg-forest-800 border border-forest-700 p-4 grid md:grid-cols-2 gap-4">
+        <div>
+          <label>👷 Operario de producción</label>
+          <select id="ped-empleado"><option value="">— Sin asignar —</option></select>
+          <p class="text-white/40 text-[10px] mt-1">Maneja: Fabricación → Producto listo</p>
+        </div>
+        <div>
+          <label>🚚 Empleado de logística</label>
+          <select id="ped-logistica"><option value="">— Sin asignar —</option></select>
+          <p class="text-white/40 text-[10px] mt-1">Maneja: Despacho → Entregado</p>
+        </div>
+      </div>
+      <div><label>Dirección de entrega / obra</label><input id="ped-direccion" placeholder="Calle, número, localidad"></div>
+
+      <!-- Boleta -->
+      <div class="bg-forest-800 border border-forest-700 p-4">
+        <label>📎 Boleta del pedido (PDF, foto o imagen)</label>
+        <input type="file" id="ped-boleta-file" accept=".pdf,image/*" onchange="onBoletaSelected()">
+        <div id="ped-boleta-actual" class="mt-2 hidden">
+          <p class="text-[10px] tracking-widest uppercase text-brass-400 mb-1">Boleta actual:</p>
+          <a id="ped-boleta-link" href="#" target="_blank" class="text-xs text-brass-400 hover:text-brass-300 underline break-all">Ver boleta cargada</a>
+        </div>
+        <p class="text-white/40 text-[10px] mt-2">Si subís un archivo, reemplaza la boleta anterior.</p>
+
+        <!-- OCR con IA -->
+        <div id="ped-ocr-box" class="mt-3 bg-forest-900 border border-brass-500/30 p-3 hidden">
+          <div class="flex items-center justify-between gap-2 mb-2">
+            <p class="text-[10px] tracking-widest uppercase text-brass-400 font-bold">🤖 Lectura automática (IA)</p>
+            <button type="button" id="ped-ocr-btn" onclick="leerBoletaConIA()" class="bg-brass-500 hover:bg-brass-400 text-forest-950 text-[10px] font-bold tracking-widest uppercase px-3 py-1.5 transition">📋 Leer y autocompletar</button>
+          </div>
+          <p class="text-white/50 text-[10px]">Detecta automáticamente productos y cantidades de la boleta. Después podés revisar antes de guardar.</p>
+          <div id="ped-ocr-status" class="text-xs mt-2 hidden"></div>
+        </div>
+      </div>
+
+      <div>
+        <label>Productos / materiales del pedido</label>
+        <div id="ped-productos" class="space-y-2"></div>
+        <button type="button" onclick="addItemToPedido()" class="btn-sec mt-2">+ Agregar producto</button>
+      </div>
+
+      <!-- Mano de obra (solo si aplica) -->
+      <div id="ped-mo-section" class="bg-forest-800 border border-forest-700 p-4 space-y-3 hidden">
+        <p class="text-brass-400 text-[10px] tracking-widest uppercase font-bold">Detalles de mano de obra</p>
+        <div>
+          <label>Descripción del trabajo</label>
+          <textarea id="ped-mo-desc" rows="3" placeholder="Ej: Instalación de 80m de tejido perimetral..."></textarea>
+        </div>
+        <div>
+          <label>Costo de mano de obra $</label>
+          <input id="ped-mo-costo" type="number" step="0.01" placeholder="0">
+        </div>
+      </div>
+
+      <!-- PANEL DE ANÁLISIS DEL PEDIDO -->
+      <div id="ped-analisis-section" class="bg-gradient-to-br from-forest-800 to-forest-900 border border-brass-500/30 p-5 space-y-4 hidden">
+        <div class="flex items-center justify-between">
+          <p class="text-brass-400 text-[10px] tracking-widest uppercase font-bold">📊 Análisis del pedido</p>
+          <button type="button" onclick="recalcularAnalisis()" class="btn-sec text-[10px] py-1 px-3">↻ Recalcular</button>
+        </div>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
+          <div class="bg-forest-950 p-3 rounded">
+            <p class="text-white/40 text-[9px] uppercase tracking-wider">Peso total</p>
+            <p class="text-white text-base font-bold" id="ana-peso-total">— kg</p>
+          </div>
+          <div class="bg-forest-950 p-3 rounded">
+            <p class="text-white/40 text-[9px] uppercase tracking-wider">Costo total</p>
+            <p class="text-amber-400 text-base font-bold" id="ana-costo-total">$0</p>
+          </div>
+          <div class="bg-forest-950 p-3 rounded">
+            <p class="text-white/40 text-[9px] uppercase tracking-wider">Ingreso (venta)</p>
+            <p class="text-white text-base font-bold" id="ana-ingreso-total">$0</p>
+          </div>
+          <div class="bg-forest-950 p-3 rounded">
+            <p class="text-white/40 text-[9px] uppercase tracking-wider">Ganancia neta</p>
+            <p class="text-base font-bold" id="ana-ganancia-total">$0</p>
+          </div>
+        </div>
+        <details class="text-white/70 text-xs">
+          <summary class="cursor-pointer text-brass-400 font-semibold">Ver detalle por item</summary>
+          <div class="mt-3 max-h-80 overflow-y-auto" id="ana-detalle-items"></div>
+        </details>
+      </div>
+
+      <div><label>Estado inicial</label>
+        <select id="ped-estado">
+          <option value="recibido">Recibido</option>
+          <option value="fabricacion">En fabricación</option>
+          <option value="listo">Producto listo</option>
+          <option value="despacho">Preparando despacho</option>
+          <option value="enviado">En camino</option>
+          <option value="retiro_listo">Listo para retirar</option>
+          <option value="entregado">Entregado</option>
+        </select>
+      </div>
+      <div><label>Observaciones</label><textarea id="ped-obs" rows="2"></textarea></div>
+      <div class="flex gap-3 pt-4 border-t border-forest-800">
+        <button type="submit" class="btn-pri flex-1">Guardar pedido</button>
+        <button type="button" onclick="closeModal('modal-pedido')" class="btn-sec">Cancelar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal Stock -->
+<div class="modal" id="modal-stock">
+  <div class="bg-forest-900 border border-forest-800 max-w-md w-full">
+    <header class="bg-forest-950 px-6 py-4 flex items-center justify-between border-b border-forest-800">
+      <h3 class="text-lg font-display font-bold" id="modal-stock-titulo">Stock</h3>
+      <button onclick="closeModal('modal-stock')" class="text-white/60 hover:text-white text-2xl leading-none">×</button>
+    </header>
+    <form onsubmit="saveStock(event)" class="p-6 space-y-4">
+      <input type="hidden" id="stock-prod-id">
+      <p id="stock-prod-nombre" class="font-semibold text-white"></p>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label>Stock actual</label>
+          <input id="stock-actual" type="number" step="0.01" required>
+        </div>
+        <div>
+          <label>Unidad</label>
+          <select id="stock-unidad">
+            <option value="unidad">unidad</option>
+            <option value="metro">metro</option>
+            <option value="rollo">rollo</option>
+            <option value="kg">kg</option>
+            <option value="bolsa">bolsa</option>
+            <option value="m2">m²</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <label>Stock mínimo (alerta)</label>
+        <input id="stock-minimo" type="number" step="0.01" value="0">
+      </div>
+      <div>
+        <label>Notas</label>
+        <textarea id="stock-notas" rows="2" placeholder="Ej: ubicación, proveedor..."></textarea>
+      </div>
+      <div class="flex gap-3 pt-4 border-t border-forest-800">
+        <button type="submit" class="btn-pri flex-1">Guardar</button>
+        <button type="button" onclick="closeModal('modal-stock')" class="btn-sec">Cancelar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal Ingreso de stock -->
+<div class="modal" id="modal-ingreso">
+  <div class="bg-forest-900 border border-forest-800 max-w-md w-full">
+    <header class="bg-forest-950 px-6 py-4 flex items-center justify-between border-b border-forest-800">
+      <h3 class="text-lg font-display font-bold">Registrar ingreso</h3>
+      <button onclick="closeModal('modal-ingreso')" class="text-white/60 hover:text-white text-2xl leading-none">×</button>
+    </header>
+    <form onsubmit="saveIngreso(event)" class="p-6 space-y-4">
+      <input type="hidden" id="ing-prod-id">
+      <p id="ing-prod-nombre" class="font-semibold text-white"></p>
+      <div>
+        <label>Cantidad ingresada</label>
+        <input id="ing-cantidad" type="number" step="0.01" required>
+      </div>
+      <div>
+        <label>Motivo / Proveedor</label>
+        <input id="ing-motivo" placeholder="Ej: Compra a proveedor X">
+      </div>
+      <div class="flex gap-3 pt-4 border-t border-forest-800">
+        <button type="submit" class="btn-pri flex-1">+ Sumar al stock</button>
+        <button type="button" onclick="closeModal('modal-ingreso')" class="btn-sec">Cancelar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal Producto -->
+<div class="modal" id="modal-producto">
+  <div class="bg-forest-900 border border-forest-800 max-w-lg w-full max-h-[90vh] overflow-y-auto">
+    <header class="bg-forest-950 px-6 py-4 flex items-center justify-between sticky top-0 border-b border-forest-800">
+      <h3 class="text-lg font-display font-bold" id="modal-prod-titulo">Producto</h3>
+      <button onclick="closeModal('modal-producto')" class="text-white/60 hover:text-white text-2xl leading-none">×</button>
+    </header>
+    <form onsubmit="saveProducto(event)" class="p-6 space-y-4">
+      <input type="hidden" id="prod-id-actual">
+      <div class="grid grid-cols-2 gap-3">
+        <div><label>ID (slug, sin espacios)</label><input id="prod-id" required pattern="[a-z0-9-]+"></div>
+        <div><label>Código interno</label><input id="prod-codigo" placeholder="I33220, E443, pl15..."></div>
+      </div>
+      <div><label>Categoría</label>
+        <select id="prod-cat" required>
+          <option value="tejidos">Tejidos</option>
+          <option value="postes">Postes</option>
+          <option value="portones">Portones</option>
+          <option value="accesorios">Accesorios</option>
+          <option value="general">General</option>
+        </select>
+      </div>
+      <div><label>Nombre</label><input id="prod-nombre" required></div>
+      <div><label>Descripción</label><textarea id="prod-desc" rows="2"></textarea></div>
+      <div><label>Precio unitario $</label><input id="prod-precio" type="number" step="0.01" value="0"></div>
+      <div>
+        <label>Imagen actual</label>
+        <img id="prod-img-preview" class="w-full max-h-48 object-cover bg-forest-800 mb-2" style="display:none;">
+        <input type="file" id="prod-img-file" accept="image/*">
+        <p class="text-white/40 text-[10px] mt-1">Si subís una nueva imagen, reemplaza la actual.</p>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div><label>Orden</label><input id="prod-orden" type="number" value="0"></div>
+        <div class="flex items-end">
+          <label class="flex items-center gap-2 text-white"><input type="checkbox" id="prod-destacado" class="w-auto"> <span class="text-xs uppercase tracking-widest">Destacado</span></label>
+        </div>
+      </div>
+      <div class="flex gap-3 pt-4 border-t border-forest-800">
+        <button type="submit" class="btn-pri flex-1">Guardar</button>
+        <button type="button" onclick="closeModal('modal-producto')" class="btn-sec">Cancelar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal Empleado -->
+<div class="modal" id="modal-empleado">
+  <div class="bg-forest-900 border border-forest-800 max-w-md w-full">
+    <header class="bg-forest-950 px-6 py-4 flex items-center justify-between border-b border-forest-800">
+      <h3 class="text-lg font-display font-bold">Nuevo empleado</h3>
+      <button onclick="closeModal('modal-empleado')" class="text-white/60 hover:text-white text-2xl leading-none">×</button>
+    </header>
+    <form onsubmit="saveEmpleado(event)" class="p-6 space-y-4">
+      <div><label>Nombre</label><input id="emp-nombre" required></div>
+      <div><label>PIN (4-6 dígitos)</label><input id="emp-pin" required pattern="[0-9]{4,6}"></div>
+      <div><label>Rol</label>
+        <select id="emp-rol">
+          <option value="operario">Operario (fábrica)</option>
+          <option value="logistica">Logística (envíos)</option>
+          <option value="supervisor">Supervisor</option>
+        </select>
+      </div>
+      <div class="flex gap-3 pt-4 border-t border-forest-800">
+        <button type="submit" class="btn-pri flex-1">Guardar</button>
+        <button type="button" onclick="closeModal('modal-empleado')" class="btn-sec">Cancelar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal Proveedor -->
+<div class="modal" id="modal-proveedor">
+  <div class="bg-forest-900 border border-forest-800 max-w-lg w-full">
+    <header class="bg-forest-950 px-6 py-4 flex items-center justify-between border-b border-forest-800">
+      <h3 class="text-lg font-display font-bold" id="modal-prov-titulo">Nuevo proveedor</h3>
+      <button onclick="closeModal('modal-proveedor')" class="text-white/60 hover:text-white text-2xl leading-none">×</button>
+    </header>
+    <form onsubmit="saveProveedor(event)" class="p-6 space-y-4">
+      <input type="hidden" id="prov-id">
+      <div><label>Nombre *</label><input id="prov-nombre" required></div>
+      <div class="grid grid-cols-2 gap-3">
+        <div><label>Teléfono</label><input id="prov-tel"></div>
+        <div><label>Email</label><input id="prov-email" type="email"></div>
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div><label>CUIT</label><input id="prov-cuit"></div>
+        <div><label>Dirección</label><input id="prov-dir"></div>
+      </div>
+      <div><label>Condiciones de pago</label><input id="prov-pago" placeholder="ej: 30 días, contado, etc."></div>
+      <div><label>Notas internas</label><textarea id="prov-notas" rows="2"></textarea></div>
+      <div class="flex gap-3 pt-4 border-t border-forest-800">
+        <button type="submit" class="btn-pri flex-1">Guardar</button>
+        <button type="button" onclick="closeModal('modal-proveedor')" class="btn-sec">Cancelar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal Tarea -->
+<div class="modal" id="modal-tarea">
+  <div class="bg-forest-900 border border-forest-800 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+    <header class="bg-forest-950 px-6 py-4 flex items-center justify-between border-b border-forest-800 sticky top-0 z-10">
+      <h3 class="text-lg font-display font-bold" id="modal-tarea-titulo">Nueva tarea</h3>
+      <button onclick="closeModal('modal-tarea')" class="text-white/60 hover:text-white text-2xl leading-none">×</button>
+    </header>
+    <form onsubmit="saveTarea(event)" class="p-6 space-y-4">
+      <input type="hidden" id="tar-id">
+
+      <div>
+        <label>Título *</label>
+        <input id="tar-titulo" required placeholder="Ej: Cortar 50m de tejido reforzado">
+      </div>
+
+      <div>
+        <label>Descripción / detalles</label>
+        <textarea id="tar-desc" rows="3" placeholder="Información adicional, herramientas necesarias, ubicación..."></textarea>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label>Categoría</label>
+          <select id="tar-categoria">
+            <option value="general">📌 General</option>
+            <option value="fabrica">🏭 Fábrica</option>
+            <option value="administrativa">📊 Administrativa</option>
+            <option value="logistica">🚚 Logística</option>
+            <option value="mantenimiento">🛠 Mantenimiento</option>
+          </select>
+        </div>
+        <div>
+          <label>Prioridad</label>
+          <select id="tar-prioridad">
+            <option value="baja">🟢 Baja</option>
+            <option value="media" selected>🟡 Media</option>
+            <option value="alta">🟠 Alta</option>
+            <option value="urgente">🔴 Urgente</option>
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <label>Asignar a (uno o más empleados)</label>
+        <div id="tar-asignados-list" class="bg-forest-800 border border-forest-700 p-3 space-y-2 max-h-48 overflow-y-auto">
+          <!-- Se llena con checkboxes de empleados -->
+        </div>
+        <p class="text-[10px] text-white/40 mt-1">Tocá para asignar. Podés elegir varios.</p>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label>Fecha límite (opcional)</label>
+          <input id="tar-fecha-limite" type="datetime-local">
+        </div>
+        <div>
+          <label>Tiempo estimado (min)</label>
+          <input id="tar-tiempo" type="number" min="0" step="5" placeholder="0">
+        </div>
+      </div>
+
+      <!-- Recurrencia -->
+      <div class="bg-forest-800 border border-forest-700 p-3 space-y-3">
+        <label class="flex items-center gap-2 cursor-pointer">
+          <input type="checkbox" id="tar-recurrente" onchange="toggleRecurrencia()" class="w-4 h-4">
+          <span class="text-sm font-semibold">🔁 Tarea recurrente</span>
+        </label>
+        <div id="tar-recurrencia-opts" class="hidden grid grid-cols-2 gap-3">
+          <div>
+            <label>Frecuencia</label>
+            <select id="tar-recurrencia-tipo">
+              <option value="diaria">Cada día</option>
+              <option value="semanal">Cada semana</option>
+              <option value="mensual">Cada mes</option>
+            </select>
+          </div>
+          <div>
+            <label>Próxima generación</label>
+            <input id="tar-recurrencia-proxima" type="datetime-local">
+          </div>
+        </div>
+      </div>
+
+      <!-- Vincular a pedido (opcional) -->
+      <div>
+        <label>Vincular a pedido (opcional)</label>
+        <select id="tar-pedido">
+          <option value="">— No vincular —</option>
+        </select>
+      </div>
+
+      <div>
+        <label>Notas internas</label>
+        <textarea id="tar-notas" rows="2"></textarea>
+      </div>
+
+      <div class="flex gap-3 pt-4 border-t border-forest-800">
+        <button type="submit" class="btn-pri flex-1">💾 Guardar tarea</button>
+        <button type="button" onclick="closeModal('modal-tarea')" class="btn-sec">Cancelar</button>
+        <button type="button" id="tar-btn-eliminar" onclick="eliminarTarea()" class="btn-danger hidden">🗑 Eliminar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal Detalle Tarea (ver/cambiar estado, comentar) -->
+<div class="modal" id="modal-tarea-detalle">
+  <div class="bg-forest-900 border border-forest-800 max-w-xl w-full max-h-[90vh] overflow-y-auto">
+    <header class="bg-forest-950 px-6 py-4 flex items-center justify-between border-b border-forest-800 sticky top-0 z-10">
+      <h3 class="text-lg font-display font-bold" id="detalle-tarea-titulo">Tarea</h3>
+      <button onclick="closeModal('modal-tarea-detalle')" class="text-white/60 hover:text-white text-2xl leading-none">×</button>
+    </header>
+    <div class="p-6 space-y-4" id="detalle-tarea-cuerpo">
+      <!-- Se llena dinámicamente -->
     </div>
   </div>
+</div>
 
-  <!-- MODAL VISTA PREVIA -->
-  <div id="modal-preview" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-    <div class="bg-white rounded-2xl max-w-md w-full p-6">
-      <h2 id="modal-title" class="text-xl font-700 mb-4 text-gray-900">Vista Previa</h2>
-      <div class="bg-gray-100 rounded-lg p-4 gallery-slot flex items-center justify-center">
-        <img id="modal-img" src="" alt="Preview" class="preview-img">
+<!-- Modal Producto del Catálogo (editar precios, proveedores, peso) -->
+<div class="modal" id="modal-cat-producto">
+  <div class="bg-forest-900 border border-forest-800 max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+    <header class="bg-forest-950 px-6 py-4 flex items-center justify-between border-b border-forest-800 sticky top-0 z-10">
+      <h3 class="text-lg font-display font-bold" id="modal-cat-titulo">Editar producto</h3>
+      <button onclick="closeModal('modal-cat-producto')" class="text-white/60 hover:text-white text-2xl leading-none">×</button>
+    </header>
+    <form onsubmit="saveProductoCatalogo(event)" class="p-6 space-y-5">
+      <input type="hidden" id="cat-id">
+
+      <div class="grid grid-cols-3 gap-3">
+        <div><label>Código</label><input id="cat-codigo" disabled class="opacity-60"></div>
+        <div class="col-span-2"><label>Nombre</label><input id="cat-nombre" disabled class="opacity-60"></div>
       </div>
-      <div class="mt-6 text-center text-sm text-gray-600 mb-6">
-        <p><strong>Tamaño ideal:</strong> 540px × 960px</p>
-        <p id="actual-size" class="text-xs text-gray-500 mt-1"></p>
+
+      <div class="grid grid-cols-3 gap-3 pt-3 border-t border-forest-800">
+        <div>
+          <label>💰 Precio Minorista sin IVA</label>
+          <input id="cat-min-sin-iva" type="number" step="0.01" min="0" oninput="recalcPreciosPreview()">
+        </div>
+        <div>
+          <label>📦 Costo proveedor</label>
+          <input id="cat-costo" type="number" step="0.01" min="0" oninput="recalcPreciosPreview()">
+        </div>
+        <div>
+          <label>📊 Margen mayorista (%)</label>
+          <input id="cat-margen" type="number" step="0.01" min="0" placeholder="Por defecto" oninput="recalcPreciosPreview()">
+          <p class="text-[10px] text-white/40 mt-1">Vacío = usa el de la categoría</p>
+        </div>
       </div>
-      <button onclick="closePreview()" class="w-full bg-gray-300 hover:bg-gray-400 text-gray-900 px-4 py-2 rounded-lg font-600 transition">Cerrar</button>
-    </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <div><label>⚖️ Peso (kg)</label><input id="cat-peso" type="number" step="0.001" min="0"></div>
+        <div>
+          <label>Proveedor principal</label>
+          <select id="cat-proveedor"></select>
+        </div>
+      </div>
+
+      <!-- Vista previa de cálculo -->
+      <div class="bg-forest-950 border border-brass-500/30 p-4 rounded">
+        <p class="text-brass-400 text-xs tracking-widest uppercase font-bold mb-3">Vista previa de las 4 listas</p>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
+          <div>
+            <p class="text-white/40 text-[10px] uppercase">Minorista s/IVA</p>
+            <p class="text-white text-lg font-bold" id="preview-min-sin">$0</p>
+          </div>
+          <div>
+            <p class="text-white/40 text-[10px] uppercase">Minorista c/IVA</p>
+            <p class="text-white text-lg font-bold" id="preview-min-con">$0</p>
+          </div>
+          <div>
+            <p class="text-white/40 text-[10px] uppercase">Mayorista s/IVA</p>
+            <p class="text-brass-400 text-lg font-bold" id="preview-may-sin">$0</p>
+          </div>
+          <div>
+            <p class="text-white/40 text-[10px] uppercase">Mayorista c/IVA</p>
+            <p class="text-brass-400 text-lg font-bold" id="preview-may-con">$0</p>
+          </div>
+        </div>
+        <div class="mt-3 pt-3 border-t border-forest-800 text-center">
+          <p class="text-white/50 text-xs">Rentabilidad: <span id="preview-rentabilidad" class="font-bold">—</span></p>
+        </div>
+      </div>
+
+      <!-- Notas internas -->
+      <div><label>Notas internas</label><textarea id="cat-notas" rows="2"></textarea></div>
+
+      <div class="flex gap-3 pt-4 border-t border-forest-800">
+        <button type="submit" class="btn-pri flex-1">💾 Guardar cambios</button>
+        <button type="button" onclick="closeModal('modal-cat-producto')" class="btn-sec">Cancelar</button>
+      </div>
+    </form>
   </div>
+</div>
 
-  <script>
-    // Slots disponibles
-    const slots = ['logo', 'rafias', 'postes', 'alambre', 'hardware'];
+<script src="supabase-config.js"></script>
+<script>
+// ============ SISTEMA DE ACCESOS ============
+// Cada clave tiene un nivel de permisos diferente:
+//   - dueño: acceso TOTAL (puede tocar todo)
+//   - empleado: NO puede tocar Productos (precios) ni Empleados ni Contenido web
+const USUARIOS = {
+  'greengarden2026': { rol: 'dueño',    nombre: 'Gastón' },
+  'fernando2026':    { rol: 'empleado', nombre: 'Fernando' },
+  'lucas2026':       { rol: 'empleado', nombre: 'Lucas' }
+};
 
-    // Cargar imágenes al iniciar
-    window.addEventListener('load', () => {
-      slots.forEach(slot => {
-        const stored = localStorage.getItem(`gg-gallery-${slot}`);
-        if (stored) {
-          const img = new Image();
-          img.src = stored;
-          img.className = 'w-full h-full object-cover rounded-lg';
-          const preview = document.getElementById(`preview-${slot}`);
-          preview.innerHTML = '';
-          preview.appendChild(img);
+// Solapas que solo puede ver el DUEÑO
+const TABS_SOLO_DUEÑO = ['productos', 'contenido', 'listas'];
 
-          // Agregar botón X
-          const deleteBtn = document.createElement('button');
-          deleteBtn.className = 'absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold opacity-0 hover:opacity-100 transition';
-          deleteBtn.innerHTML = '×';
-          deleteBtn.onclick = (e) => { e.preventDefault(); deleteImage(slot); };
-          const dropZone = document.getElementById(`drop-${slot}`);
-          dropZone.appendChild(deleteBtn);
-        }
-      });
-      setupDragDrop();
+function getUsuarioActual(){
+  const data = sessionStorage.getItem('gg_admin');
+  return data ? JSON.parse(data) : null;
+}
+
+function doLogin(e){
+  e.preventDefault();
+  const v = document.getElementById('admin-pwd').value;
+  const user = USUARIOS[v];
+  if(user){
+    sessionStorage.setItem('gg_admin', JSON.stringify(user));
+    showApp();
+  } else {
+    document.getElementById('login-err').classList.remove('hidden');
+  }
+}
+function logout(){ sessionStorage.removeItem('gg_admin'); location.reload(); }
+function showApp(){
+  document.getElementById('login-gate').classList.add('hidden');
+  document.getElementById('app').classList.remove('hidden');
+
+  // Aplicar restricciones según el rol
+  const user = getUsuarioActual();
+  if(user && user.rol === 'empleado'){
+    // Ocultar solapas que solo puede ver el dueño
+    TABS_SOLO_DUEÑO.forEach(tab => {
+      const btn = document.querySelector(`[data-tab="${tab}"]`);
+      if(btn) btn.style.display = 'none';
     });
+  }
 
-    // Drag & Drop
-    function setupDragDrop() {
-      slots.forEach(slot => {
-        const dropZone = document.getElementById(`drop-${slot}`);
-        dropZone.addEventListener('click', () => document.getElementById(`img-${slot}`).click());
+  // Mostrar nombre del usuario logueado
+  if(user){
+    const headerInfo = document.querySelector('header .text-brass-400');
+    if(headerInfo) headerInfo.textContent = `Panel · ${user.nombre} (${user.rol})`;
+  }
 
-        dropZone.addEventListener('dragover', (e) => {
-          e.preventDefault();
-          dropZone.classList.add('drag-over');
-        });
+  loadAll();
+}
+if(sessionStorage.getItem('gg_admin')) showApp();
 
-        dropZone.addEventListener('dragleave', () => {
-          dropZone.classList.remove('drag-over');
-        });
+const ESTADO_LABELS = {
+  recibido:'Recibido', fabricacion:'En fabricación', listo:'Producto listo',
+  despacho:'Preparando despacho', enviado:'En camino', retiro_listo:'Listo p/ retirar', entregado:'Entregado'
+};
 
-        dropZone.addEventListener('drop', (e) => {
-          e.preventDefault();
-          dropZone.classList.remove('drag-over');
-          const files = e.dataTransfer.files;
-          if (files.length > 0) {
-            const input = document.getElementById(`img-${slot}`);
-            input.files = files;
-            handleImage(input, slot);
-          }
-        });
-      });
+function showTab(tab, btn){
+  // Bloqueo de seguridad: empleados NO pueden ver solapas restringidas
+  const user = getUsuarioActual();
+  if(user && user.rol === 'empleado' && TABS_SOLO_DUEÑO.includes(tab)){
+    alert('No tenés permiso para acceder a esta sección. Contactá al administrador.');
+    return;
+  }
+
+  document.querySelectorAll('header .tab-btn').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  ['analitica','cotizador','pedidos-mat','pedidos-mo','stock','productos','proveedores','listas','historial','tareas','empleados','contenido'].forEach(t=>{
+    const el = document.getElementById('tab-'+t);
+    if(el) el.classList.toggle('hidden', t !== tab);
+  });
+  if(tab==='analitica')   cargarAnalitica();
+  if(tab==='pedidos-mat' || tab==='pedidos-mo')  loadPedidos();
+  if(tab==='stock')       loadStock();
+  if(tab==='productos')   loadProductosAdmin();
+  if(tab==='proveedores') loadProveedoresAdmin();
+  if(tab==='listas')      loadListasPrecios();
+  if(tab==='historial')   loadHistorialPrecios();
+  if(tab==='tareas')      loadTareas();
+  if(tab==='empleados')   loadEmpleados();
+  if(tab==='contenido')   loadContenido();
+}
+function openModal(id){ document.getElementById(id).classList.add('open'); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+
+let allPedidos=[], allEmpleados=[], allProductos=[], allStock=[];
+let filterMat='all', filterMo='all', filterStockKey='todos';
+
+async function loadAll(){
+  await Promise.all([ loadPedidos(), loadEmpleados(true), loadProductosAdmin(true), loadStock(true) ]);
+  renderFiltros();
+  // Realtime: refrescar cuando cambien los pedidos en la DB
+  supabase.subscribeTable('pedidos', () => {
+    loadPedidos();
+    // Si estás en analitica, refrescala
+    const tabActiva = document.querySelector('header .tab-btn.active')?.dataset.tab;
+    if(tabActiva === 'analitica') cargarAnalitica();
+  });
+  supabase.subscribeTable('stock', () => {
+    if(!document.getElementById('tab-stock').classList.contains('hidden')) loadStock();
+  });
+}
+
+async function loadPedidos(){
+  allPedidos = await supabase.getPedidos();
+  renderKPIs('mat');  renderKPIs('mo');
+  renderPedidos('mat');
+  renderPedidos('mo');
+}
+
+function pedidosByTipo(tipo){
+  return allPedidos.filter(p => (p.tipo||'solo_materiales') === tipo);
+}
+
+function renderKPIs(scope){
+  const tipo = scope === 'mat' ? 'solo_materiales' : 'materiales_mano_obra';
+  const arr = pedidosByTipo(tipo);
+  const c = { total:arr.length, recibido:0, fabricacion:0, listo:0, despacho:0, enviado:0, entregado:0 };
+  arr.forEach(p=>{ if(c[p.estado]!==undefined) c[p.estado]++; });
+  const enproc = c.recibido+c.fabricacion+c.listo+c.despacho+c.enviado;
+  document.getElementById(`pedidos-${scope}-kpis`).innerHTML = `
+    <div class="bg-forest-900 border border-forest-800 p-4"><p class="text-[10px] tracking-widest uppercase text-white/40">Total</p><p class="text-2xl font-display font-bold">${c.total}</p></div>
+    <div class="bg-forest-900 border border-brass-500/30 p-4"><p class="text-[10px] tracking-widest uppercase text-brass-400">En proceso</p><p class="text-2xl font-display font-bold text-brass-400">${enproc}</p></div>
+    <div class="bg-forest-900 border border-forest-800 p-4"><p class="text-[10px] tracking-widest uppercase text-white/40">Fabricación</p><p class="text-2xl font-display font-bold">${c.fabricacion}</p></div>
+    <div class="bg-forest-900 border border-forest-800 p-4"><p class="text-[10px] tracking-widest uppercase text-white/40">En camino</p><p class="text-2xl font-display font-bold">${c.enviado}</p></div>
+    <div class="bg-forest-900 border border-forest-800 p-4"><p class="text-[10px] tracking-widest uppercase text-white/40">Entregados</p><p class="text-2xl font-display font-bold text-green-400">${c.entregado}</p></div>
+  `;
+}
+
+function renderFiltros(){
+  ['mat','mo'].forEach(scope=>{
+    const cont = document.getElementById(`pedidos-${scope}-filters`);
+    if(!cont) return;
+    cont.innerHTML = `
+      <button class="btn-sec filter-btn-${scope} active" data-f="all" onclick="filterPedidos('${scope}','all',this)">Todos</button>
+      <button class="btn-sec filter-btn-${scope}" data-f="recibido" onclick="filterPedidos('${scope}','recibido',this)">Recibidos</button>
+      <button class="btn-sec filter-btn-${scope}" data-f="fabricacion" onclick="filterPedidos('${scope}','fabricacion',this)">Fabricación</button>
+      <button class="btn-sec filter-btn-${scope}" data-f="listo" onclick="filterPedidos('${scope}','listo',this)">Listos</button>
+      <button class="btn-sec filter-btn-${scope}" data-f="despacho" onclick="filterPedidos('${scope}','despacho',this)">Despacho</button>
+      <button class="btn-sec filter-btn-${scope}" data-f="enviado" onclick="filterPedidos('${scope}','enviado',this)">En camino</button>
+      <button class="btn-sec filter-btn-${scope}" data-f="entregado" onclick="filterPedidos('${scope}','entregado',this)">Entregados</button>
+    `;
+  });
+}
+
+function filterPedidos(scope, f, btn){
+  if(scope === 'mat') filterMat = f; else filterMo = f;
+  document.querySelectorAll(`.filter-btn-${scope}`).forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderPedidos(scope);
+}
+
+function renderPedidos(scope){
+  const tipo = scope === 'mat' ? 'solo_materiales' : 'materiales_mano_obra';
+  const filter = scope === 'mat' ? filterMat : filterMo;
+  let arr = pedidosByTipo(tipo);
+  if(filter !== 'all') arr = arr.filter(p => p.estado === filter);
+  const tbl = document.getElementById(`pedidos-${scope}-table`);
+  if(arr.length===0){ tbl.innerHTML = '<p class="text-white/40 text-sm p-8 text-center">No hay pedidos en este filtro.</p>'; return; }
+  tbl.innerHTML = `
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead class="bg-forest-950 text-white/50">
+          <tr>
+            <th class="text-left px-4 py-3 text-[10px] tracking-widest uppercase">Código</th>
+            <th class="text-left px-4 py-3 text-[10px] tracking-widest uppercase">Cliente</th>
+            <th class="text-left px-4 py-3 text-[10px] tracking-widest uppercase">Items</th>
+            ${scope==='mo'?'<th class="text-left px-4 py-3 text-[10px] tracking-widest uppercase">M.O. $</th>':''}
+            <th class="text-left px-4 py-3 text-[10px] tracking-widest uppercase">Boleta</th>
+            <th class="text-left px-4 py-3 text-[10px] tracking-widest uppercase">Estado</th>
+            <th class="text-left px-4 py-3 text-[10px] tracking-widest uppercase">Fecha</th>
+            <th class="text-right px-4 py-3 text-[10px] tracking-widest uppercase">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${arr.map(p=>`
+            <tr class="border-t border-forest-800 hover:bg-forest-800/40">
+              <td class="px-4 py-3 font-mono text-xs">${p.codigo}</td>
+              <td class="px-4 py-3"><p class="font-semibold">${p.cliente_nombre}</p><p class="text-white/40 text-xs">${p.cliente_telefono||''}</p></td>
+              <td class="px-4 py-3 text-white/70 text-xs">${(p.productos||[]).length}</td>
+              ${scope==='mo'?`<td class="px-4 py-3 text-white/70 text-xs">$${p.mano_obra_costo? Number(p.mano_obra_costo).toLocaleString('es-AR'):'—'}</td>`:''}
+              <td class="px-4 py-3">${p.boleta_url ? `<a href="${p.boleta_url}" target="_blank" class="text-brass-400 hover:text-brass-300 text-xs underline">📎 Ver</a>` : '<span class="text-white/30 text-xs">—</span>'}</td>
+              <td class="px-4 py-3"><span class="estado-pill e-${p.estado}">${ESTADO_LABELS[p.estado]||p.estado}</span></td>
+              <td class="px-4 py-3 text-white/50 text-xs">${new Date(p.created_at).toLocaleDateString('es-AR')}</td>
+              <td class="px-4 py-3 text-right space-x-1 whitespace-nowrap">
+                <button onclick="copyTrackingLink('${p.codigo}')" class="btn-sec text-[10px] py-1 px-2">📋</button>
+                <button onclick="enviarLinkWA('${p.codigo}','${(p.cliente_telefono||'').replace(/[^0-9]/g,'')}')" class="btn-sec text-[10px] py-1 px-2" ${p.cliente_telefono?'':'disabled'}>📲</button>
+                <button onclick="editPedido('${p.id}')" class="btn-sec text-[10px] py-1 px-2">Editar</button>
+                <button onclick="deletePedido('${p.id}')" class="btn-danger">×</button>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+function copyTrackingLink(codigo){
+  const url = `${location.origin}/seguimiento.html?codigo=${codigo}`;
+  navigator.clipboard.writeText(url);
+  toast('✓ Link copiado: ' + url);
+}
+function enviarLinkWA(codigo, tel){
+  const url = `${location.origin}/seguimiento.html?codigo=${codigo}`;
+  const m = encodeURIComponent(`Hola! Te paso el link para seguir el estado de tu pedido en Green Garden Lobos:\n\n${url}\n\nCódigo: ${codigo}`);
+  window.open(`https://wa.me/549${tel}?text=${m}`, '_blank');
+}
+
+function toast(text){
+  const t=document.createElement('div');
+  t.textContent=text;
+  t.style.cssText='position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:#b8923f;color:#0f1a11;padding:.85rem 1.5rem;font-weight:700;font-size:.8rem;letter-spacing:.05em;z-index:200;box-shadow:0 8px 24px rgba(0,0,0,.5);max-width:90%;text-align:center;';
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(),2800);
+}
+
+function togglePedTipo(){
+  const tipo = document.querySelector('input[name="ped-tipo"]:checked').value;
+  document.getElementById('ped-mo-section').classList.toggle('hidden', tipo !== 'materiales_mano_obra');
+}
+
+function openPedidoModal(tipoPredef){
+  document.getElementById('modal-pedido-titulo').textContent='Nuevo pedido';
+  document.getElementById('form-pedido').reset();
+  document.getElementById('ped-id').value='';
+  document.getElementById('ped-codigo').value='';
+  document.getElementById('ped-productos').innerHTML='';
+  document.getElementById('ped-boleta-actual').classList.add('hidden');
+  // Ocultar panel de análisis al crear nuevo pedido
+  document.getElementById('ped-analisis-section').classList.add('hidden');
+  // Tipo predefinido
+  const tipo = tipoPredef || 'solo_materiales';
+  document.querySelectorAll('input[name="ped-tipo"]').forEach(r=>{ r.checked = r.value === tipo; });
+  togglePedTipo();
+  addItemToPedido();
+  // Producción: solo operario y supervisor ACTIVOS
+  const prods = allEmpleados.filter(e => (e.rol === 'operario' || e.rol === 'supervisor') && e.activo !== false);
+  document.getElementById('ped-empleado').innerHTML = '<option value="">— Sin asignar —</option>' + prods.map(e=>`<option value="${e.id}">${e.nombre} (${e.rol})</option>`).join('');
+  // Logística: solo logística y supervisor ACTIVOS
+  const logs = allEmpleados.filter(e => (e.rol === 'logistica' || e.rol === 'supervisor') && e.activo !== false);
+  document.getElementById('ped-logistica').innerHTML = '<option value="">— Sin asignar —</option>' + logs.map(e=>`<option value="${e.id}">${e.nombre} (${e.rol})</option>`).join('');
+  openModal('modal-pedido');
+}
+
+async function editPedido(id){
+  const p = allPedidos.find(x=>x.id===id); if(!p) return;
+  document.getElementById('modal-pedido-titulo').textContent=`Pedido ${p.codigo}`;
+  document.getElementById('ped-id').value=p.id;
+  document.getElementById('ped-codigo').value=p.codigo||'';
+  document.getElementById('ped-cliente').value=p.cliente_nombre||'';
+  document.getElementById('ped-tel').value=p.cliente_telefono||'';
+  document.getElementById('ped-email').value=p.cliente_email||'';
+  document.getElementById('ped-total').value=p.total||'';
+  document.getElementById('ped-metodo').value=p.metodo_entrega||'envio';
+  document.getElementById('ped-direccion').value=p.direccion_entrega||'';
+  document.getElementById('ped-estado').value=p.estado||'recibido';
+  document.getElementById('ped-obs').value=p.observaciones||'';
+  // Tipo
+  const tipo = p.tipo || 'solo_materiales';
+  document.querySelectorAll('input[name="ped-tipo"]').forEach(r=>{ r.checked = r.value === tipo; });
+  togglePedTipo();
+  document.getElementById('ped-mo-desc').value = p.mano_obra_descripcion || '';
+  document.getElementById('ped-mo-costo').value = p.mano_obra_costo || '';
+  // Boleta actual
+  if(p.boleta_url){
+    document.getElementById('ped-boleta-actual').classList.remove('hidden');
+    document.getElementById('ped-boleta-link').href = p.boleta_url;
+    document.getElementById('ped-boleta-link').textContent = '📎 ' + p.boleta_url.split('/').pop();
+  } else {
+    document.getElementById('ped-boleta-actual').classList.add('hidden');
+  }
+  // Producción: solo operarios y supervisor ACTIVOS (más el asignado actual aunque esté inactivo)
+  const prods = allEmpleados.filter(e => (e.rol === 'operario' || e.rol === 'supervisor') && (e.activo !== false || e.id === p.empleado_asignado));
+  document.getElementById('ped-empleado').innerHTML = '<option value="">— Sin asignar —</option>' + prods.map(e=>`<option value="${e.id}" ${e.id===p.empleado_asignado?'selected':''}>${e.nombre}${e.activo===false?' (inactivo)':''}</option>`).join('');
+  // Logística: solo logística y supervisor ACTIVOS (más el asignado actual aunque esté inactivo)
+  const logs = allEmpleados.filter(e => (e.rol === 'logistica' || e.rol === 'supervisor') && (e.activo !== false || e.id === p.empleado_logistica));
+  document.getElementById('ped-logistica').innerHTML = '<option value="">— Sin asignar —</option>' + logs.map(e=>`<option value="${e.id}" ${e.id===p.empleado_logistica?'selected':''}>${e.nombre}${e.activo===false?' (inactivo)':''}</option>`).join('');
+  document.getElementById('ped-productos').innerHTML='';
+  (p.productos||[]).forEach(it=>addItemToPedido(it));
+  if(!p.productos||p.productos.length===0) addItemToPedido();
+
+  // Mostrar panel de análisis solo al EDITAR pedidos existentes
+  document.getElementById('ped-analisis-section').classList.remove('hidden');
+  setTimeout(() => recalcularAnalisis(), 100);
+
+  openModal('modal-pedido');
+}
+
+// Recalcula el análisis del pedido (peso, costo, ganancia neta)
+async function recalcularAnalisis(){
+  const items = document.querySelectorAll('#ped-productos > div');
+  // Asegurar que el catálogo esté cargado
+  if(allCatalogo.length === 0){
+    allCatalogo = await supabase.getCatalogo({ activo: true });
+  }
+  let pesoTotal = 0, costoTotal = 0, ingresoTotal = 0;
+  const detalle = [];
+
+  items.forEach(item => {
+    const select = item.querySelector('.ped-item-prod');
+    const qtyInp = item.querySelector('.ped-item-qty');
+    const priceInp = item.querySelector('.ped-item-precio');
+    if(!select || !qtyInp) return;
+    const prodId = select.value;
+    const qty = parseFloat(qtyInp.value || 0);
+    const precio = parseFloat(priceInp?.value || 0);
+    if(!prodId || qty <= 0) return;
+
+    // Buscar el producto del catálogo (por id de productos viejos o por código)
+    const prodMatch = allCatalogo.find(c =>
+      c.id === prodId ||
+      c.codigo === prodId ||
+      (select.options[select.selectedIndex]?.text || '').toLowerCase().includes((c.nombre || '').toLowerCase().substring(0, 20))
+    );
+
+    const peso = prodMatch ? parseFloat(prodMatch.peso_kg || 0) : 0;
+    const costo = prodMatch ? parseFloat(prodMatch.costo_proveedor_actual || 0) : 0;
+    const subPeso = peso * qty;
+    const subCosto = costo * qty;
+    const subIngreso = precio * qty;
+    pesoTotal += subPeso;
+    costoTotal += subCosto;
+    ingresoTotal += subIngreso;
+
+    detalle.push({
+      nombre: select.options[select.selectedIndex]?.text || '—',
+      qty,
+      peso, subPeso,
+      costo, subCosto,
+      precio, subIngreso
+    });
+  });
+
+  // Sumar mano de obra si aplica
+  const mdoCosto = parseFloat(document.getElementById('ped-mo-costo')?.value || 0);
+  // Para MDO: el "costo" es 0 (no compramos nada), el "ingreso" es lo que cobramos
+  if(mdoCosto > 0){
+    ingresoTotal += mdoCosto;
+    detalle.push({
+      nombre: '🛠 Mano de obra',
+      qty: 1, peso: 0, subPeso: 0, costo: 0, subCosto: 0, precio: mdoCosto, subIngreso: mdoCosto
+    });
+  }
+
+  const ganancia = ingresoTotal - costoTotal;
+  const gananciaPct = ingresoTotal > 0 ? ((ganancia / ingresoTotal) * 100).toFixed(1) : 0;
+
+  document.getElementById('ana-peso-total').textContent = pesoTotal > 0 ? `${pesoTotal.toFixed(2)} kg` : '— kg';
+  document.getElementById('ana-costo-total').textContent = '$' + Math.round(costoTotal).toLocaleString('es-AR');
+  document.getElementById('ana-ingreso-total').textContent = '$' + Math.round(ingresoTotal).toLocaleString('es-AR');
+  const ganEl = document.getElementById('ana-ganancia-total');
+  ganEl.textContent = '$' + Math.round(ganancia).toLocaleString('es-AR') + ` (${gananciaPct}%)`;
+  ganEl.style.color = ganancia > 0 ? '#86efac' : ganancia < 0 ? '#fca5a5' : '#ffffff70';
+
+  // Detalle
+  const det = document.getElementById('ana-detalle-items');
+  if(detalle.length === 0){
+    det.innerHTML = '<p class="text-white/40 text-xs p-2">Sin items para analizar.</p>';
+  } else {
+    det.innerHTML = `
+      <table class="w-full text-[11px]">
+        <thead class="bg-forest-950 text-white/40">
+          <tr>
+            <th class="text-left px-2 py-1">Producto</th>
+            <th class="text-right px-2 py-1">Cant</th>
+            <th class="text-right px-2 py-1">Peso</th>
+            <th class="text-right px-2 py-1">Costo</th>
+            <th class="text-right px-2 py-1">Ingreso</th>
+            <th class="text-right px-2 py-1">Margen</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${detalle.map(d => {
+            const m = d.subIngreso > 0 ? (((d.subIngreso - d.subCosto) / d.subIngreso) * 100).toFixed(0) : '—';
+            return `
+              <tr class="border-t border-forest-800">
+                <td class="px-2 py-1 text-white/80">${d.nombre}</td>
+                <td class="px-2 py-1 text-right text-white/70">${d.qty}</td>
+                <td class="px-2 py-1 text-right text-white/60">${d.subPeso > 0 ? d.subPeso.toFixed(2) + 'kg' : '—'}</td>
+                <td class="px-2 py-1 text-right text-amber-400">$${Math.round(d.subCosto).toLocaleString('es-AR')}</td>
+                <td class="px-2 py-1 text-right text-white">$${Math.round(d.subIngreso).toLocaleString('es-AR')}</td>
+                <td class="px-2 py-1 text-right text-brass-400">${m}%</td>
+              </tr>
+            `;
+          }).join('')}
+        </tbody>
+      </table>
+    `;
+  }
+}
+
+function addItemToPedido(item){
+  const cont=document.getElementById('ped-productos');
+  const div=document.createElement('div');
+  div.className='grid grid-cols-12 gap-2 items-start bg-forest-800 p-3 border border-forest-700';
+  div.innerHTML=`
+    <select class="col-span-7 ped-item-prod">
+      <option value="">— elegir producto —</option>
+      ${allProductos.map(p=>`<option value="${p.id}" ${item&&item.id===p.id?'selected':''}>${p.nombre}</option>`).join('')}
+    </select>
+    <input type="number" min="1" value="${item?.qty||1}" class="col-span-2 ped-item-qty">
+    <input type="text" value="${item?.notas||''}" placeholder="Notas..." class="col-span-2 ped-item-notas">
+    <button type="button" onclick="this.parentElement.remove()" class="col-span-1 text-red-400 hover:text-red-300 text-xl">×</button>
+  `;
+  cont.appendChild(div);
+}
+
+async function savePedido(e){
+  e.preventDefault();
+  const id=document.getElementById('ped-id').value;
+  const items=[];
+  document.querySelectorAll('#ped-productos > div').forEach(row=>{
+    const pid=row.querySelector('.ped-item-prod').value;
+    const qty=parseFloat(row.querySelector('.ped-item-qty').value)||1;
+    const notas=row.querySelector('.ped-item-notas').value;
+    if(pid){
+      const p=allProductos.find(x=>x.id===pid);
+      if(p) items.push({id:p.id,nombre:p.nombre,descripcion:p.descripcion,imagen:p.imagen_url,qty,notas});
     }
-
-    // Manejar carga de imagen
-    function handleImage(input, slot) {
-      const file = input.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const base64 = e.target.result;
-        localStorage.setItem(`gg-gallery-${slot}`, base64);
-
-        const img = new Image();
-        img.src = base64;
-        img.className = 'w-full h-full object-cover rounded-lg';
-
-        const preview = document.getElementById(`preview-${slot}`);
-        preview.innerHTML = '';
-        preview.appendChild(img);
-
-        // Agregar botón X
-        const deleteBtn = document.createElement('button');
-        deleteBtn.className = 'absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold opacity-0 hover:opacity-100 transition';
-        deleteBtn.innerHTML = '×';
-        deleteBtn.onclick = (e) => { e.preventDefault(); deleteImage(slot); };
-        const dropZone = document.getElementById(`drop-${slot}`);
-        dropZone.appendChild(deleteBtn);
-
-        alert(`✓ Imagen guardada: ${slot}`);
-      };
-      reader.readAsDataURL(file);
+  });
+  const tipo = document.querySelector('input[name="ped-tipo"]:checked').value;
+  const data={
+    tipo,
+    cliente_nombre:document.getElementById('ped-cliente').value,
+    cliente_telefono:document.getElementById('ped-tel').value||null,
+    cliente_email:document.getElementById('ped-email').value||null,
+    total:parseFloat(document.getElementById('ped-total').value)||null,
+    metodo_entrega:document.getElementById('ped-metodo').value,
+    direccion_entrega:document.getElementById('ped-direccion').value||null,
+    empleado_asignado:document.getElementById('ped-empleado').value||null,
+    empleado_logistica:document.getElementById('ped-logistica').value||null,
+    estado:document.getElementById('ped-estado').value,
+    observaciones:document.getElementById('ped-obs').value||null,
+    productos:items,
+    mano_obra_descripcion: tipo === 'materiales_mano_obra' ? (document.getElementById('ped-mo-desc').value || null) : null,
+    mano_obra_costo: tipo === 'materiales_mano_obra' ? (parseFloat(document.getElementById('ped-mo-costo').value) || null) : null,
+  };
+  let r;
+  if(id){ await supabase.updatePedido(id,data); r={id, codigo: document.getElementById('ped-codigo').value || allPedidos.find(p=>p.id===id)?.codigo}; }
+  else { r=await supabase.createPedido(data); }
+  // Subir boleta si hay
+  const boletaFile = document.getElementById('ped-boleta-file').files[0];
+  if(boletaFile && r?.id){
+    toast('⏳ Subiendo boleta...');
+    const url = await supabase.uploadBoleta(r.codigo, boletaFile);
+    if(url) await supabase.updatePedido(r.id, { boleta_url: url });
+  }
+  closeModal('modal-pedido');
+  await loadPedidos();
+  if(r?.codigo && !id){
+    if(confirm(`✓ Pedido creado: ${r.codigo}\n\n¿Copiar link de seguimiento?`)){
+      copyTrackingLink(r.codigo);
     }
+  } else if(id){
+    toast('✓ Pedido actualizado');
+  }
+}
+async function deletePedido(id){ if(!confirm('¿Eliminar este pedido?')) return; await supabase.deletePedido(id); await loadPedidos(); }
 
-    // Vista previa
-    function viewPreview(slot) {
-      const stored = localStorage.getItem(`gg-gallery-${slot}`);
-      if (!stored) {
-        alert('No hay imagen cargada aún');
-        return;
+/* ===== STOCK ===== */
+async function loadStock(silent){
+  // Cargar stock + asegurar que cada producto tenga fila
+  allStock = await supabase.getStock();
+  const stockIds = new Set(allStock.map(s => s.producto_id));
+  // Crear filas faltantes
+  for(const prod of allProductos){
+    if(!stockIds.has(prod.id)){
+      await supabase.setStockProducto(prod.id, { stock_actual: 0, unidad: 'unidad' });
+    }
+  }
+  if(silent) return;
+  // Recargar después de crear faltantes
+  allStock = await supabase.getStock();
+  renderStock();
+}
+
+function calcularStockNecesario(){
+  // Sumar todos los items de pedidos NO entregados
+  const necesario = {};
+  allPedidos.forEach(p => {
+    if(p.estado === 'entregado') return; // ya descontado
+    (p.productos||[]).forEach(it => {
+      necesario[it.id] = (necesario[it.id] || 0) + (parseFloat(it.qty) || 0);
+    });
+  });
+  return necesario;
+}
+
+function filterStock(f, btn){
+  filterStockKey = f;
+  document.querySelectorAll('.stock-filter').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderStock();
+}
+
+function renderStock(){
+  const necesario = calcularStockNecesario();
+
+  // Combinar info de stock + producto
+  let rows = allStock.map(s => {
+    const prod = s.productos || allProductos.find(p => p.id === s.producto_id) || {};
+    const requerido = necesario[s.producto_id] || 0;
+    const disponible = parseFloat(s.stock_actual) || 0;
+    const faltante = Math.max(0, requerido - disponible);
+    return {
+      producto_id: s.producto_id,
+      nombre: prod.nombre || s.producto_id,
+      categoria: prod.categoria || '',
+      imagen: prod.imagen_url || '',
+      unidad: s.unidad || 'unidad',
+      stock_actual: disponible,
+      stock_minimo: parseFloat(s.stock_minimo) || 0,
+      requerido,
+      faltante,
+      ok: disponible >= requerido && (s.stock_minimo === 0 || disponible >= s.stock_minimo),
+      notas: s.notas || ''
+    };
+  });
+
+  // KPIs
+  const totalProds = rows.length;
+  const conPedidos = rows.filter(r => r.requerido > 0).length;
+  const faltantes  = rows.filter(r => r.faltante > 0).length;
+  const bajoMinimo = rows.filter(r => r.stock_minimo > 0 && r.stock_actual < r.stock_minimo).length;
+  document.getElementById('stock-kpis').innerHTML = `
+    <div class="bg-forest-900 border border-forest-800 p-4"><p class="text-[10px] tracking-widest uppercase text-white/40">Productos en catálogo</p><p class="text-2xl font-display font-bold">${totalProds}</p></div>
+    <div class="bg-forest-900 border border-brass-500/30 p-4"><p class="text-[10px] tracking-widest uppercase text-brass-400">Con pedidos pendientes</p><p class="text-2xl font-display font-bold text-brass-400">${conPedidos}</p></div>
+    <div class="bg-forest-900 border ${faltantes>0?'border-red-500/40':'border-forest-800'} p-4"><p class="text-[10px] tracking-widest uppercase ${faltantes>0?'text-red-400':'text-white/40'}">⚠ Faltante para pedidos</p><p class="text-2xl font-display font-bold ${faltantes>0?'text-red-400':'text-white'}">${faltantes}</p></div>
+    <div class="bg-forest-900 border ${bajoMinimo>0?'border-orange-500/40':'border-forest-800'} p-4"><p class="text-[10px] tracking-widest uppercase ${bajoMinimo>0?'text-orange-400':'text-white/40'}">Bajo mínimo</p><p class="text-2xl font-display font-bold ${bajoMinimo>0?'text-orange-400':'text-white'}">${bajoMinimo}</p></div>
+  `;
+
+  // Filtro
+  if(filterStockKey === 'faltante')   rows = rows.filter(r => r.faltante > 0);
+  if(filterStockKey === 'suficiente') rows = rows.filter(r => r.faltante === 0 && r.requerido > 0);
+
+  // Ordenar: faltantes primero
+  rows.sort((a,b) => b.faltante - a.faltante);
+
+  const tbl = document.getElementById('stock-table');
+  if(rows.length === 0){
+    tbl.innerHTML = '<p class="text-white/40 text-sm p-8 text-center">Sin productos en este filtro.</p>';
+    return;
+  }
+  tbl.innerHTML = `
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead class="bg-forest-950 text-white/50">
+          <tr>
+            <th class="text-left px-4 py-3 text-[10px] tracking-widest uppercase">Producto</th>
+            <th class="text-left px-4 py-3 text-[10px] tracking-widest uppercase">Stock actual</th>
+            <th class="text-left px-4 py-3 text-[10px] tracking-widest uppercase">Requerido<br><span class="text-[8px] normal-case opacity-60">(pedidos pendientes)</span></th>
+            <th class="text-left px-4 py-3 text-[10px] tracking-widest uppercase">Faltante</th>
+            <th class="text-left px-4 py-3 text-[10px] tracking-widest uppercase">Mínimo</th>
+            <th class="text-right px-4 py-3 text-[10px] tracking-widest uppercase">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows.map(r => `
+            <tr class="border-t border-forest-800 hover:bg-forest-800/40 ${r.faltante>0?'bg-red-900/10':''}">
+              <td class="px-4 py-3">
+                <div class="flex items-center gap-3">
+                  ${r.imagen ? `<img src="${r.imagen}" class="w-10 h-10 object-cover bg-forest-800 flex-shrink-0">` : `<div class="w-10 h-10 bg-forest-800 flex-shrink-0"></div>`}
+                  <div>
+                    <p class="font-semibold">${r.nombre}</p>
+                    <p class="text-white/40 text-[10px] tracking-widest uppercase">${r.categoria}</p>
+                  </div>
+                </div>
+              </td>
+              <td class="px-4 py-3"><p class="font-bold ${r.stock_actual<=r.stock_minimo&&r.stock_minimo>0?'text-orange-400':'text-white'}">${r.stock_actual.toLocaleString('es-AR')} <span class="text-white/40 text-[10px]">${r.unidad}</span></p></td>
+              <td class="px-4 py-3"><p class="${r.requerido>0?'text-brass-400 font-bold':'text-white/40'}">${r.requerido.toLocaleString('es-AR')}</p></td>
+              <td class="px-4 py-3">${r.faltante>0?`<p class="text-red-400 font-bold">⚠ ${r.faltante.toLocaleString('es-AR')}</p>`:'<p class="text-green-400 text-xs">✓ OK</p>'}</td>
+              <td class="px-4 py-3 text-white/50 text-xs">${r.stock_minimo}</td>
+              <td class="px-4 py-3 text-right space-x-1 whitespace-nowrap">
+                <button onclick="openIngresoModal('${r.producto_id}','${r.nombre.replace(/'/g,"\\'")}')" class="btn-sec text-[10px] py-1 px-2">+ Ingreso</button>
+                <button onclick="openStockModal('${r.producto_id}','${r.nombre.replace(/'/g,"\\'")}')" class="btn-sec text-[10px] py-1 px-2">Editar</button>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+function openStockModal(prodId, nombre){
+  const s = allStock.find(x=>x.producto_id===prodId) || {};
+  document.getElementById('stock-prod-id').value = prodId;
+  document.getElementById('stock-prod-nombre').textContent = nombre;
+  document.getElementById('stock-actual').value = s.stock_actual || 0;
+  document.getElementById('stock-unidad').value = s.unidad || 'unidad';
+  document.getElementById('stock-minimo').value = s.stock_minimo || 0;
+  document.getElementById('stock-notas').value = s.notas || '';
+  openModal('modal-stock');
+}
+
+async function saveStock(e){
+  e.preventDefault();
+  const prodId = document.getElementById('stock-prod-id').value;
+  await supabase.setStockProducto(prodId, {
+    stock_actual: parseFloat(document.getElementById('stock-actual').value) || 0,
+    unidad: document.getElementById('stock-unidad').value,
+    stock_minimo: parseFloat(document.getElementById('stock-minimo').value) || 0,
+    notas: document.getElementById('stock-notas').value || null,
+  });
+  closeModal('modal-stock');
+  await loadStock();
+  toast('✓ Stock actualizado');
+}
+
+function openIngresoModal(prodId, nombre){
+  document.getElementById('ing-prod-id').value = prodId;
+  document.getElementById('ing-prod-nombre').textContent = nombre;
+  document.getElementById('ing-cantidad').value = '';
+  document.getElementById('ing-motivo').value = '';
+  openModal('modal-ingreso');
+}
+
+async function saveIngreso(e){
+  e.preventDefault();
+  const prodId = document.getElementById('ing-prod-id').value;
+  const cantidad = parseFloat(document.getElementById('ing-cantidad').value);
+  const motivo = document.getElementById('ing-motivo').value;
+  await supabase.ingresarStock(prodId, cantidad, motivo, 'Admin');
+  closeModal('modal-ingreso');
+  await loadStock();
+  toast(`✓ Ingreso registrado: +${cantidad}`);
+}
+
+/* ===== PRODUCTOS ===== */
+async function loadProductosAdmin(silent){
+  allProductos=await supabase.getProductos();
+  if(silent) return;
+  const grid=document.getElementById('productos-grid-admin');
+  if(allProductos.length===0){ grid.innerHTML='<p class="col-span-full text-white/40 text-sm p-8 text-center">Sin productos.</p>'; return; }
+  grid.innerHTML=allProductos.map(p=>`
+    <div class="bg-forest-900 border border-forest-800 hover:border-brass-500 transition">
+      <div class="aspect-[4/3] bg-forest-800 overflow-hidden"><img src="${p.imagen_url||''}" class="w-full h-full object-cover"></div>
+      <div class="p-3">
+        <div class="flex items-center justify-between gap-1 mb-1">
+          <p class="text-[9px] tracking-widest uppercase text-brass-400">${p.categoria}${p.destacado?' · ⭐':''}</p>
+          ${p.codigo ? `<span class="text-[9px] font-mono bg-forest-800 text-brass-400 px-1.5 py-0.5 border border-brass-500/30">${p.codigo}</span>` : ''}
+        </div>
+        <p class="font-semibold text-white text-sm leading-tight mb-1">${p.nombre}</p>
+        <p class="text-white/40 text-[11px] mb-1">${p.descripcion||''}</p>
+        ${p.precio_unitario ? `<p class="text-green-400 text-xs font-semibold mb-2">$${Number(p.precio_unitario).toLocaleString('es-AR')}</p>` : '<div class="mb-2"></div>'}
+        <div class="flex gap-1">
+          <button onclick="editProducto('${p.id}')" class="btn-sec flex-1 text-[10px] py-1.5">Editar</button>
+          <button onclick="delProducto('${p.id}')" class="btn-danger">×</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+function openProductoModal(){
+  document.getElementById('modal-prod-titulo').textContent='Nuevo producto';
+  document.querySelector('#modal-producto form').reset();
+  document.getElementById('prod-id-actual').value='';
+  document.getElementById('prod-id').readOnly=false;
+  document.getElementById('prod-img-preview').style.display='none';
+  openModal('modal-producto');
+}
+function editProducto(id){
+  const p=allProductos.find(x=>x.id===id); if(!p) return;
+  document.getElementById('modal-prod-titulo').textContent=`Editar: ${p.nombre}`;
+  document.getElementById('prod-id-actual').value=p.id;
+  document.getElementById('prod-id').value=p.id;
+  document.getElementById('prod-id').readOnly=true;
+  document.getElementById('prod-codigo').value=p.codigo||'';
+  document.getElementById('prod-cat').value=p.categoria;
+  document.getElementById('prod-nombre').value=p.nombre;
+  document.getElementById('prod-desc').value=p.descripcion||'';
+  document.getElementById('prod-precio').value=p.precio_unitario||0;
+  document.getElementById('prod-orden').value=p.orden||0;
+  document.getElementById('prod-destacado').checked=p.destacado||false;
+  if(p.imagen_url){
+    const img=document.getElementById('prod-img-preview');
+    img.src=p.imagen_url; img.style.display='block';
+  }
+  openModal('modal-producto');
+}
+async function saveProducto(e){
+  e.preventDefault();
+  const idActual=document.getElementById('prod-id-actual').value;
+  const data={
+    id:document.getElementById('prod-id').value.trim().toLowerCase(),
+    codigo:document.getElementById('prod-codigo').value.trim()||null,
+    categoria:document.getElementById('prod-cat').value,
+    nombre:document.getElementById('prod-nombre').value,
+    descripcion:document.getElementById('prod-desc').value,
+    precio_unitario:parseFloat(document.getElementById('prod-precio').value)||0,
+    orden:parseInt(document.getElementById('prod-orden').value)||0,
+    destacado:document.getElementById('prod-destacado').checked,
+  };
+  let prodId=idActual||data.id;
+  if(idActual){
+    delete data.id;
+    await supabase.updateProducto(idActual,data);
+  } else {
+    const created=await supabase.createProducto(data);
+    if(!created){ alert('Error: el ID ya existe.'); return; }
+    prodId=created.id;
+  }
+  const file=document.getElementById('prod-img-file').files[0];
+  if(file){ await supabase.uploadProductoImagen(prodId,file); }
+  closeModal('modal-producto');
+  await loadProductosAdmin();
+}
+async function delProducto(id){ if(!confirm('¿Eliminar producto?')) return; await supabase.deleteProducto(id); await loadProductosAdmin(); }
+
+/* ===== EMPLEADOS ===== */
+let mostrarInactivos = false;
+
+async function loadEmpleados(silent){
+  allEmpleados=await supabase.getEmpleados();
+  if(silent) return;
+  const tbl=document.getElementById('empleados-table');
+  if(allEmpleados.length===0){ tbl.innerHTML='<p class="text-white/40 text-sm p-8 text-center">Sin empleados.</p>'; return; }
+
+  // Filtrar según el toggle
+  const empleadosVisibles = mostrarInactivos
+    ? allEmpleados
+    : allEmpleados.filter(e => e.activo !== false);
+  const cantInactivos = allEmpleados.filter(e => e.activo === false).length;
+
+  tbl.innerHTML=`
+    <div class="px-4 py-3 bg-forest-950 border-b border-forest-800 flex items-center justify-between flex-wrap gap-2">
+      <p class="text-white/60 text-xs">
+        Mostrando <strong class="text-brass-400">${empleadosVisibles.length}</strong> empleado(s)
+        ${cantInactivos > 0 ? `· <span class="text-white/40">${cantInactivos} dado(s) de baja</span>` : ''}
+      </p>
+      ${cantInactivos > 0 ? `
+        <button onclick="toggleInactivos()" class="text-brass-400 hover:text-brass-300 text-[10px] tracking-widest uppercase font-semibold">
+          ${mostrarInactivos ? '👁 Ocultar dados de baja' : '👁 Ver dados de baja'}
+        </button>
+      ` : ''}
+    </div>
+    <table class="w-full text-sm">
+      <thead class="bg-forest-950 text-white/50">
+        <tr>
+          <th class="text-left px-4 py-3 text-[10px] tracking-widest uppercase">Estado</th>
+          <th class="text-left px-4 py-3 text-[10px] tracking-widest uppercase">Nombre</th>
+          <th class="text-left px-4 py-3 text-[10px] tracking-widest uppercase">Rol</th>
+          <th class="text-left px-4 py-3 text-[10px] tracking-widest uppercase">PIN</th>
+          <th class="text-right px-4 py-3 text-[10px] tracking-widest uppercase">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${empleadosVisibles.map(e=>{
+          const inactivo = e.activo === false;
+          return `
+          <tr class="border-t border-forest-800 ${inactivo ? 'opacity-50' : ''}">
+            <td class="px-4 py-3">
+              ${inactivo
+                ? '<span class="estado-pill" style="background:#7f1d1d40;color:#fca5a5;border:1px solid #ef444480;">Inactivo</span>'
+                : '<span class="estado-pill" style="background:#16a34a40;color:#86efac;border:1px solid #22c55e80;">Activo</span>'
+              }
+            </td>
+            <td class="px-4 py-3 font-semibold">${e.nombre}</td>
+            <td class="px-4 py-3 text-white/60">${e.rol}</td>
+            <td class="px-4 py-3 font-mono">${e.pin}</td>
+            <td class="px-4 py-3 text-right space-x-1">
+              ${inactivo
+                ? `<button onclick="reactivarEmpleado('${e.id}', '${e.nombre.replace(/'/g, "\\'")}')" class="btn-sec text-[10px] py-1 px-3" style="color:#86efac;border-color:#22c55e80;">↻ Reactivar</button>`
+                : `<button onclick="delEmpleado('${e.id}', '${e.nombre.replace(/'/g, "\\'")}')" class="btn-danger">Dar de baja</button>`
+              }
+            </td>
+          </tr>
+        `;}).join('')}
+      </tbody>
+    </table>
+  `;
+}
+
+function toggleInactivos(){
+  mostrarInactivos = !mostrarInactivos;
+  loadEmpleados();
+}
+
+function openEmpleadoModal(){ document.querySelector('#modal-empleado form').reset(); openModal('modal-empleado'); }
+
+async function saveEmpleado(e){
+  e.preventDefault();
+  await supabase.createEmpleado({
+    nombre:document.getElementById('emp-nombre').value,
+    pin:document.getElementById('emp-pin').value,
+    rol:document.getElementById('emp-rol').value,
+  });
+  closeModal('modal-empleado'); await loadEmpleados();
+}
+
+async function delEmpleado(id, nombre){
+  if(!confirm(`¿Dar de baja a "${nombre}"?\n\nNo se borra del sistema (queda el historial de sus pedidos).\nPodrás reactivarlo más tarde si lo necesitás.`)) return;
+  console.log('[delEmpleado] Intentando dar de baja ID:', id);
+  const ok = await supabase.deleteEmpleado(id);
+  console.log('[delEmpleado] Resultado:', ok);
+  if(!ok){
+    alert('❌ No se pudo dar de baja al empleado.\n\nAbrí la consola del navegador (F12 → Console) y mostrame el error rojo que aparece ahí.');
+    return;
+  }
+  toast('✓ Empleado dado de baja');
+  await loadEmpleados();
+}
+
+async function reactivarEmpleado(id, nombre){
+  if(!confirm(`¿Reactivar al empleado "${nombre}"?`)) return;
+  console.log('[reactivarEmpleado] Intentando reactivar ID:', id);
+  const ok = await supabase.reactivarEmpleado(id);
+  console.log('[reactivarEmpleado] Resultado:', ok);
+  if(!ok){
+    alert('❌ No se pudo reactivar al empleado.\n\nAbrí la consola (F12) y revisá el error.');
+    return;
+  }
+  toast('✓ Empleado reactivado');
+  await loadEmpleados();
+}
+
+/* ===== CONTENIDO ===== */
+async function loadContenido(){
+  const c=await supabase.getContent();
+  // Cargar Gemini API key (de DB, fallback a localStorage)
+  document.getElementById('c-gemini-key').value = c.gemini_key || localStorage.getItem('gg_gemini_key') || '';
+  document.getElementById('c-hero-title').value=c.hero_title||'';
+  document.getElementById('c-hero-desc').value=c.hero_desc||'';
+  document.getElementById('c-whatsapp').value=c.whatsapp||'';
+  document.getElementById('c-email').value=c.email||'';
+}
+async function saveContenido(){
+  const f={
+    hero_title:document.getElementById('c-hero-title').value,
+    hero_desc:document.getElementById('c-hero-desc').value,
+    whatsapp:document.getElementById('c-whatsapp').value,
+    email:document.getElementById('c-email').value,
+  };
+  for(const [k,v] of Object.entries(f)){ await supabase.setContent(k,v); }
+  toast('✓ Cambios guardados');
+}
+
+// ============ OCR DE BOLETAS (Gemini Flash) ============
+let _cachedGeminiKey = null;
+async function getGeminiKey(){
+  if(_cachedGeminiKey) return _cachedGeminiKey;
+  // Primero intenta de la DB (compartida)
+  try {
+    const c = await supabase.getContent();
+    if(c.gemini_key){
+      _cachedGeminiKey = c.gemini_key;
+      return _cachedGeminiKey;
+    }
+  } catch(e){}
+  // Fallback al localStorage (legacy)
+  return localStorage.getItem('gg_gemini_key') || '';
+}
+
+async function saveGeminiKey(){
+  const key = document.getElementById('c-gemini-key').value.trim();
+  if(!key){ document.getElementById('gemini-key-status').textContent = '⚠️ Ingresá una API key.'; return; }
+  if(!key.startsWith('AIza')){ document.getElementById('gemini-key-status').textContent = '⚠️ La clave debe empezar con "AIza".'; return; }
+
+  document.getElementById('gemini-key-status').innerHTML = '<span class="text-brass-400">⏳ Validando con Google...</span>';
+  // Validación rápida con un ping a Gemini
+  try {
+    const test = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${key}`);
+    if(!test.ok){
+      const err = await test.text();
+      document.getElementById('gemini-key-status').innerHTML = `<span class="text-red-400">❌ Key inválida (${test.status}). ${err.includes('API_KEY_INVALID')?'Está mal escrita o fue revocada.':err.slice(0,100)}</span>`;
+      return;
+    }
+  } catch(e) {
+    document.getElementById('gemini-key-status').innerHTML = `<span class="text-red-400">❌ Error de red al validar: ${e.message}</span>`;
+    return;
+  }
+
+  // Guardar en DB (compartido) y cache
+  await supabase.setContent('gemini_key', key);
+  _cachedGeminiKey = key;
+  // También guardar en localStorage como respaldo
+  localStorage.setItem('gg_gemini_key', key);
+  document.getElementById('gemini-key-status').innerHTML = '<span class="text-green-400">✓ API Key validada y guardada (compartida en todo el sistema).</span>';
+  toast('✓ API Key guardada');
+}
+
+function onBoletaSelected(){
+  const file = document.getElementById('ped-boleta-file').files[0];
+  const ocrBox = document.getElementById('ped-ocr-box');
+  if(file){ ocrBox.classList.remove('hidden'); }
+  else { ocrBox.classList.add('hidden'); }
+}
+
+// Items detectados por OCR pendientes de revisar
+let _ocrItemsDetectados = [];
+
+async function leerBoletaConIA(){
+  const file = document.getElementById('ped-boleta-file').files[0];
+  const status = document.getElementById('ped-ocr-status');
+  const btn = document.getElementById('ped-ocr-btn');
+
+  if(!file){ status.classList.remove('hidden'); status.innerHTML = '<span class="text-red-400">⚠️ Primero subí la boleta.</span>'; return; }
+
+  const apiKey = await getGeminiKey();
+  if(!apiKey){
+    status.classList.remove('hidden');
+    status.innerHTML = '<span class="text-red-400">⚠️ Falta la API Key de Gemini. Configurala en "Contenido web" → "Configuración IA".</span>';
+    return;
+  }
+
+  const isImg = file.type.startsWith('image/');
+  const isPdf = file.type === 'application/pdf';
+  if(!isImg && !isPdf){
+    status.classList.remove('hidden');
+    status.innerHTML = '<span class="text-red-400">⚠️ Formato no soportado. Subí imagen o PDF.</span>';
+    return;
+  }
+
+  btn.disabled = true; btn.textContent = '⏳ Leyendo...';
+  status.classList.remove('hidden');
+  status.innerHTML = '<span class="text-brass-400">🤖 La IA está leyendo la boleta...</span>';
+
+  try {
+    const base64 = await fileToBase64(file);
+
+    // Catálogo con códigos
+    const productosCatalogo = (allProductos||[]).map(p => ({
+      id: p.id,
+      codigo: p.codigo || '',
+      nombre: p.nombre,
+      descripcion: p.descripcion||''
+    }));
+
+    const prompt = `Sos un asistente de Green Garden Lobos (alambrados). Leé esta boleta/presupuesto y extraé los items con MÁXIMA precisión.
+
+CATÁLOGO DE PRODUCTOS REGISTRADOS (id interno + código de la empresa):
+${JSON.stringify(productosCatalogo, null, 2)}
+
+INSTRUCCIONES:
+1. Leé la boleta y extraé TODOS los items con sus cantidades, descripciones y precios.
+2. Para CADA item, intentá matchearlo con un producto del catálogo así:
+   - PRIMERO: por código exacto (campo "codigo" del catálogo coincide con el código de la boleta como "I33220", "E443", "pl15", etc.)
+   - SEGUNDO: por similitud de nombre/descripción
+3. Si NO matchea ningún producto del catálogo, devolvé igual el item con producto_id=null. Después se podrá registrar como producto nuevo.
+4. Para cada item detectá:
+   - codigo_boleta: el código que aparece en la boleta (ej: "I33220", "E443")
+   - nombre_boleta: descripción exacta como aparece (ej: "INTERMEDIO 3X3 2,20MTS")
+   - qty: cantidad
+   - precio_unitario: precio por unidad si aparece
+   - precio_total: total de la línea si aparece
+5. Detectá también: cliente, dirección/ubicación, teléfono, total general, y si hay mano de obra/instalación facturada por separado (ej: "MANO DE OBRA / ENVIO").
+
+Devolvé SOLO un JSON válido, sin markdown:
+
+{
+  "items": [
+    {
+      "producto_id": "id-del-catalogo-o-null",
+      "codigo_boleta": "código que aparece en la boleta o null",
+      "nombre_boleta": "descripción de la boleta",
+      "qty": número,
+      "precio_unitario": número o null,
+      "precio_total": número o null
+    }
+  ],
+  "cliente": "nombre o null",
+  "telefono": "telefono o null",
+  "direccion": "ubicación o null",
+  "mano_obra": número o null,
+  "total": número o null
+}`;
+
+    const body = {
+      contents: [{
+        parts: [
+          { text: prompt },
+          { inline_data: { mime_type: file.type, data: base64 } }
+        ]
+      }],
+      generationConfig: { temperature: 0.1, response_mime_type: 'application/json' }
+    };
+
+    // Modelos en orden de preferencia (con fallback automático)
+    // 1.5-flash y 1.5-flash-8b tienen cuotas más generosas que 2.0
+    const modelos = ['gemini-1.5-flash-latest', 'gemini-1.5-flash-8b-latest', 'gemini-2.0-flash'];
+    let res = null;
+    let lastError = '';
+    let modeloUsado = null;
+    for(const modelo of modelos){
+      try {
+        const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelo}:generateContent?key=${apiKey}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+        if(r.ok){ res = r; modeloUsado = modelo; break; }
+        const errTxt = await r.text();
+        lastError = `${r.status}: ${errTxt.slice(0,200)}`;
+        // Si es error de cuota (429), probamos el siguiente modelo
+        // Si es 400 o 401, no tiene sentido reintentar — break
+        if(r.status === 400 || r.status === 401 || r.status === 403){
+          throw new Error(`Error de Gemini (${r.status}). ${errTxt.includes('API_KEY_INVALID')?'API Key inválida — revisá tu clave en Configuración IA.':errTxt.slice(0,200)}`);
+        }
+      } catch(e) {
+        if(e.message.includes('Gemini')) throw e;
+        lastError = e.message;
       }
+    }
+    if(!res){
+      throw new Error(`No se pudo conectar a Gemini con ningún modelo. Probá esperar 1 minuto. Detalle: ${lastError}`);
+    }
 
-      const img = new Image();
-      img.onload = function() {
-        document.getElementById('modal-title').textContent = `Vista Previa - ${slot.charAt(0).toUpperCase() + slot.slice(1)}`;
-        document.getElementById('modal-img').src = stored;
-        document.getElementById('actual-size').textContent = `Tamaño actual: ${this.width}px × ${this.height}px`;
-        document.getElementById('modal-preview').classList.remove('hidden');
+    const data = await res.json();
+    const txt = data?.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
+    let parsed;
+    try { parsed = JSON.parse(txt); }
+    catch(e){
+      const match = txt.match(/\{[\s\S]*\}/);
+      parsed = match ? JSON.parse(match[0]) : { items: [] };
+    }
+
+    if(!parsed.items || !Array.isArray(parsed.items) || parsed.items.length === 0){
+      status.innerHTML = '<span class="text-orange-400">⚠️ La IA no detectó items. Cargalos manualmente.</span>';
+      return;
+    }
+
+    // Si la IA detectó datos del cliente, sugerir
+    if(parsed.cliente && !document.getElementById('ped-cliente').value){
+      document.getElementById('ped-cliente').value = parsed.cliente;
+    }
+    if(parsed.telefono && !document.getElementById('ped-tel').value){
+      document.getElementById('ped-tel').value = parsed.telefono;
+    }
+    if(parsed.direccion && !document.getElementById('ped-direccion').value){
+      document.getElementById('ped-direccion').value = parsed.direccion;
+    }
+    if(parsed.total && !document.getElementById('ped-total').value){
+      document.getElementById('ped-total').value = parsed.total;
+    }
+    const moCostoEl = document.getElementById('ped-mo-costo');
+    if(parsed.mano_obra && moCostoEl && !moCostoEl.value){
+      moCostoEl.value = parsed.mano_obra;
+    }
+
+    // Almacenar items y abrir modal de revisión
+    _ocrItemsDetectados = parsed.items;
+    abrirModalRevisionOCR();
+
+    const matcheados = parsed.items.filter(i => i.producto_id).length;
+    const sinMatch = parsed.items.length - matcheados;
+    status.innerHTML = `<span class="text-green-400">✓ ${parsed.items.length} items detectados</span> (${matcheados} matcheados · ${sinMatch} para crear). Revisalos en el modal.`;
+  } catch(err) {
+    console.error(err);
+    status.innerHTML = `<span class="text-red-400">⚠️ Error: ${err.message}</span>`;
+  } finally {
+    btn.disabled = false; btn.textContent = '📋 Leer y autocompletar';
+  }
+}
+
+// ============ MODAL DE REVISIÓN OCR ============
+function abrirModalRevisionOCR(){
+  const items = _ocrItemsDetectados;
+  if(!items || items.length === 0) return;
+
+  // Construir tabla de revisión
+  const tabla = items.map((it, idx) => {
+    const matched = it.producto_id;
+    const prod = matched ? (allProductos||[]).find(p => p.id === it.producto_id) : null;
+
+    return `<tr class="border-b border-forest-700">
+      <td class="px-2 py-2 text-xs">
+        <input type="checkbox" id="ocr-chk-${idx}" checked class="w-4 h-4">
+      </td>
+      <td class="px-2 py-2 text-xs">
+        ${matched
+          ? `<span class="text-green-400">✓ ${prod?.nombre || it.producto_id}</span><br><span class="text-white/40 text-[10px]">${prod?.codigo || ''}</span>`
+          : `<span class="text-orange-400">⚡ NUEVO</span><br><span class="text-white/40 text-[10px]">${it.codigo_boleta || '(sin código)'}</span>`
+        }
+      </td>
+      <td class="px-2 py-2 text-xs">
+        ${matched
+          ? `<span class="text-white">${prod?.nombre || ''}</span><br><span class="text-white/50 text-[10px]">${it.nombre_boleta||''}</span>`
+          : `<input type="text" id="ocr-nombre-${idx}" value="${(it.nombre_boleta||'').replace(/"/g,'&quot;')}" class="w-full bg-forest-800 border border-forest-700 text-white text-xs px-2 py-1">`
+        }
+      </td>
+      <td class="px-2 py-2 text-xs text-center">
+        <input type="number" min="0.01" step="0.01" id="ocr-qty-${idx}" value="${it.qty||1}" class="w-16 bg-forest-800 border border-forest-700 text-white text-xs px-2 py-1 text-center">
+      </td>
+      <td class="px-2 py-2 text-xs text-right">
+        <input type="number" min="0" step="0.01" id="ocr-precio-${idx}" value="${it.precio_unitario||0}" class="w-24 bg-forest-800 border border-forest-700 text-white text-xs px-2 py-1 text-right" placeholder="0">
+      </td>
+    </tr>`;
+  }).join('');
+
+  const matched = items.filter(i => i.producto_id).length;
+  const nuevos = items.length - matched;
+
+  const html = `
+    <div class="modal open" id="modal-ocr-revision">
+      <div class="bg-forest-900 border border-brass-500 max-w-4xl w-full max-h-[92vh] overflow-y-auto">
+        <header class="bg-forest-950 px-6 py-4 flex items-center justify-between sticky top-0 border-b border-brass-500/30 z-10">
+          <div>
+            <h3 class="text-lg font-display font-bold">🤖 Revisar items detectados</h3>
+            <p class="text-white/40 text-xs">✓ ${matched} matcheados · ⚡ ${nuevos} se crearán como producto nuevo</p>
+          </div>
+          <button onclick="cerrarModalOCR()" class="text-white/60 hover:text-white text-2xl leading-none">×</button>
+        </header>
+        <div class="p-6">
+          <p class="text-white/60 text-xs mb-4">Revisá los items detectados. Los marcados como ⚡ NUEVO se van a registrar automáticamente en tu catálogo de productos para que aparezcan en stock y rankings.</p>
+
+          <div class="bg-forest-950 border border-forest-800 overflow-x-auto">
+            <table class="w-full">
+              <thead class="bg-forest-800">
+                <tr>
+                  <th class="px-2 py-2 text-[10px] text-left text-white/60">✓</th>
+                  <th class="px-2 py-2 text-[10px] text-left text-white/60">Estado / Código</th>
+                  <th class="px-2 py-2 text-[10px] text-left text-white/60">Nombre</th>
+                  <th class="px-2 py-2 text-[10px] text-center text-white/60">Cant.</th>
+                  <th class="px-2 py-2 text-[10px] text-right text-white/60">$ Unit.</th>
+                </tr>
+              </thead>
+              <tbody>${tabla}</tbody>
+            </table>
+          </div>
+
+          <div class="flex justify-end gap-2 mt-5">
+            <button onclick="cerrarModalOCR()" class="bg-forest-800 hover:bg-forest-700 text-white text-xs px-4 py-2 transition">Cancelar</button>
+            <button onclick="aplicarOCR()" class="btn-pri">✓ Aplicar al pedido</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+
+  // Insertar en DOM
+  const existing = document.getElementById('modal-ocr-revision');
+  if(existing) existing.remove();
+  document.body.insertAdjacentHTML('beforeend', html);
+}
+
+function cerrarModalOCR(){
+  const m = document.getElementById('modal-ocr-revision');
+  if(m) m.remove();
+}
+
+async function aplicarOCR(){
+  const items = _ocrItemsDetectados;
+  const seleccionados = [];
+
+  for(let i=0; i<items.length; i++){
+    const chk = document.getElementById('ocr-chk-'+i);
+    if(!chk || !chk.checked) continue;
+
+    const it = items[i];
+    const qty = parseFloat(document.getElementById('ocr-qty-'+i).value) || 1;
+    const precio = parseFloat(document.getElementById('ocr-precio-'+i).value) || 0;
+
+    let producto_id = it.producto_id;
+
+    // Si es producto nuevo → crearlo
+    if(!producto_id){
+      const nombreInput = document.getElementById('ocr-nombre-'+i);
+      const nombre = nombreInput?.value || it.nombre_boleta || '(Sin nombre)';
+      const codigo = it.codigo_boleta || null;
+
+      // Generar id único basado en código o slug del nombre
+      const newId = (codigo || nombre)
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g,'-')
+        .replace(/^-|-$/g,'')
+        .slice(0,40) + '-' + Math.floor(Math.random()*1000);
+
+      const nuevoProducto = {
+        id: newId,
+        codigo: codigo,
+        nombre: nombre,
+        descripcion: '',
+        categoria: 'general',
+        orden: 999,
+        destacado: false,
+        activo: true,
+        precio_unitario: precio
       };
-      img.src = stored;
-    }
 
-    function closePreview() {
-      document.getElementById('modal-preview').classList.add('hidden');
-    }
+      try {
+        await supabase.createProducto(nuevoProducto);
+        producto_id = newId;
 
-    // Eliminar imagen
-    function deleteImage(slot) {
-      if (!confirm(`¿Eliminar imagen de ${slot}?`)) return;
+        // También crear entrada en stock
+        await supabase.setStockProducto(newId, {
+          stock_actual: 0,
+          stock_minimo: 0,
+          unidad: 'unidad',
+          costo_unitario: precio
+        });
 
-      localStorage.removeItem(`gg-gallery-${slot}`);
-      const preview = document.getElementById(`preview-${slot}`);
-      preview.innerHTML = '<p class="text-gray-400 text-sm">Haz clic o arrastra</p>';
-      document.getElementById(`img-${slot}`).value = '';
-      alert('✓ Imagen eliminada');
-    }
-
-    // Logout
-    function logout() {
-      if (confirm('¿Salir del panel de administración?')) {
-        sessionStorage.removeItem('gg-admin-logged');
-        window.location.href = 'index.html';
+        // Refrescar catálogo en memoria
+        allProductos.push(nuevoProducto);
+      } catch(e){
+        console.error('Error creando producto:', e);
+        toast('⚠ Error creando "' + nombre + '"');
+        continue;
+      }
+    } else {
+      // Si matcheó pero no tiene precio, actualizarlo
+      const prod = allProductos.find(p => p.id === producto_id);
+      if(prod && precio > 0 && !prod.precio_unitario){
+        try {
+          await supabase.updateProducto(producto_id, { precio_unitario: precio });
+          prod.precio_unitario = precio;
+        } catch(e){}
       }
     }
-  </script>
 
+    seleccionados.push({
+      id: producto_id,
+      qty: qty,
+      precio_unitario: precio,
+      notas: it.codigo_boleta ? `cod: ${it.codigo_boleta}` : ''
+    });
+  }
+
+  // Limpiar productos actuales y agregar los nuevos
+  document.getElementById('ped-productos').innerHTML = '';
+  seleccionados.forEach(s => addItemToPedido(s));
+
+  cerrarModalOCR();
+  toast(`✓ ${seleccionados.length} items aplicados al pedido`);
+}
+
+function fileToBase64(file){
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = () => resolve(r.result.split(',')[1]);
+    r.onerror = reject;
+    r.readAsDataURL(file);
+  });
+}
+
+// Cargar API key al abrir el tab contenido
+const _origLoadContenido = typeof loadContenido === 'function' ? loadContenido : null;
+
+// ============ ANALÍTICA ============
+function fmtMoney(n){
+  if(!n) return '$0';
+  return '$' + Number(n).toLocaleString('es-AR', {maximumFractionDigits:0});
+}
+function fmtNum(n){
+  return Number(n||0).toLocaleString('es-AR', {maximumFractionDigits:2});
+}
+
+async function cargarAnalitica(){
+  const rango = document.getElementById('ana-rango')?.value || '30';
+  let desde = null;
+  if(rango !== 'all'){
+    const d = new Date();
+    d.setDate(d.getDate() - parseInt(rango));
+    desde = d.toISOString().slice(0,10);
+  }
+  const hasta = new Date().toISOString().slice(0,10);
+
+  // Cargar datos en paralelo
+  const [pedidos, ranking, stock] = await Promise.all([
+    supabase.getResumenAnalitica(desde, hasta),
+    supabase.getRankingProductos(),
+    supabase.getStock()
+  ]);
+
+  // ===== KPIs principales =====
+  const total = pedidos.length;
+  const entregados = pedidos.filter(p => p.estado === 'entregado');
+  const enProceso = pedidos.filter(p => p.estado !== 'entregado');
+  const facturadoTotal = entregados.reduce((s,p) => s + (Number(p.total)||0), 0);
+
+  document.getElementById('ana-kpis-principales').innerHTML = `
+    <div class="bg-forest-900 border-l-4 border-brass-500 p-5">
+      <p class="text-[10px] tracking-widest uppercase text-brass-400 font-bold">Pedidos totales</p>
+      <p class="text-3xl font-display font-bold text-white mt-1">${total}</p>
+      <p class="text-[10px] text-white/40 mt-1">${entregados.length} entregados · ${enProceso.length} en proceso</p>
+    </div>
+    <div class="bg-forest-900 border-l-4 border-green-500 p-5">
+      <p class="text-[10px] tracking-widest uppercase text-green-400 font-bold">Facturación entregada</p>
+      <p class="text-3xl font-display font-bold text-white mt-1">${fmtMoney(facturadoTotal)}</p>
+      <p class="text-[10px] text-white/40 mt-1">Suma de totales de pedidos entregados</p>
+    </div>
+    <div class="bg-forest-900 border-l-4 border-blue-500 p-5">
+      <p class="text-[10px] tracking-widest uppercase text-blue-400 font-bold">Productos vendidos</p>
+      <p class="text-3xl font-display font-bold text-white mt-1">${ranking.reduce((s,r)=>s+Number(r.cantidad_vendida||0),0).toLocaleString('es-AR')}</p>
+      <p class="text-[10px] text-white/40 mt-1">Unidades totales (entregadas)</p>
+    </div>
+    <div class="bg-forest-900 border-l-4 border-purple-500 p-5">
+      <p class="text-[10px] tracking-widest uppercase text-purple-400 font-bold">Productos distintos</p>
+      <p class="text-3xl font-display font-bold text-white mt-1">${ranking.length}</p>
+      <p class="text-[10px] text-white/40 mt-1">SKUs vendidos al menos una vez</p>
+    </div>
+  `;
+
+  // ===== Solo materiales vs Obras =====
+  const soloMat = entregados.filter(p => p.tipo === 'solo_materiales' || p.tipo === 'materiales' || !p.tipo);
+  const obras = entregados.filter(p => p.tipo === 'materiales_mano_obra');
+
+  const soloMatFact = soloMat.reduce((s,p)=>s+(Number(p.total)||0),0);
+  const obrasFactMat = obras.reduce((s,p)=>{
+    const total = Number(p.total)||0;
+    const mo = Number(p.mano_obra_costo)||0;
+    return s + (total - mo);
+  },0);
+  const obrasFactMO = obras.reduce((s,p)=>s+(Number(p.mano_obra_costo)||0),0);
+
+  document.getElementById('ana-solo-mat').innerHTML = `
+    <div class="flex justify-between"><span class="text-white/60">Cantidad de pedidos:</span><span class="font-bold text-white">${soloMat.length}</span></div>
+    <div class="flex justify-between"><span class="text-white/60">Facturación total:</span><span class="font-bold text-green-400">${fmtMoney(soloMatFact)}</span></div>
+    <div class="flex justify-between text-xs"><span class="text-white/40">Promedio por pedido:</span><span class="text-white/60">${fmtMoney(soloMat.length ? soloMatFact/soloMat.length : 0)}</span></div>
+  `;
+
+  document.getElementById('ana-obras').innerHTML = `
+    <div class="flex justify-between"><span class="text-white/60">Cantidad de obras:</span><span class="font-bold text-white">${obras.length}</span></div>
+    <div class="flex justify-between"><span class="text-white/60">Facturación de materiales:</span><span class="font-bold text-blue-400">${fmtMoney(obrasFactMat)}</span></div>
+    <div class="flex justify-between"><span class="text-white/60">Facturación de mano de obra:</span><span class="font-bold text-brass-400">${fmtMoney(obrasFactMO)}</span></div>
+    <div class="flex justify-between text-xs pt-2 border-t border-white/10"><span class="text-white/40">Total obras:</span><span class="text-white/80 font-semibold">${fmtMoney(obrasFactMat + obrasFactMO)}</span></div>
+  `;
+
+  // ===== Stock crítico =====
+  const critico = stock.filter(s => Number(s.stock_actual||0) <= Number(s.stock_minimo||0));
+  const productosMap = {};
+  (allProductos||[]).forEach(p => { productosMap[p.id] = p; });
+  document.getElementById('ana-stock-critico').innerHTML = critico.length
+    ? critico.slice(0,10).map(s => {
+        const prod = productosMap[s.producto_id];
+        const nombre = prod ? prod.nombre : s.producto_id;
+        return `<div class="flex justify-between items-center py-2 border-b border-white/5">
+          <div>
+            <p class="text-white text-sm">${nombre}</p>
+            <p class="text-white/40 text-[10px]">Mín: ${fmtNum(s.stock_minimo)} ${s.unidad||''}</p>
+          </div>
+          <span class="text-red-400 font-bold">${fmtNum(s.stock_actual)} ${s.unidad||''}</span>
+        </div>`;
+      }).join('')
+    : '<p class="text-white/40 text-sm">✓ Sin productos críticos</p>';
+
+  // ===== Productos parados (sin venta en 60 días) =====
+  const hace60 = new Date();
+  hace60.setDate(hace60.getDate() - 60);
+  const parados = ranking.filter(r => !r.ultima_venta || new Date(r.ultima_venta) < hace60);
+  const sinVenta = (allProductos||[]).filter(p => !ranking.find(r => r.producto_id === p.id));
+
+  const todosParados = [...parados.map(r => ({...r, motivo: 'Sin ventas hace 60+ días', fecha: r.ultima_venta})), ...sinVenta.map(p => ({producto_id: p.id, nombre: p.nombre, motivo: 'Nunca vendido', fecha: null}))];
+
+  document.getElementById('ana-parados').innerHTML = todosParados.length
+    ? todosParados.slice(0,10).map(p => `<div class="flex justify-between items-center py-2 border-b border-white/5">
+        <div>
+          <p class="text-white text-sm">${p.nombre || p.producto_id}</p>
+          <p class="text-white/40 text-[10px]">${p.motivo}${p.fecha ? ' · última: '+new Date(p.fecha).toLocaleDateString('es-AR') : ''}</p>
+        </div>
+        <span class="text-orange-400 text-xs">😴</span>
+      </div>`).join('')
+    : '<p class="text-white/40 text-sm">✓ Todos los productos rotan bien</p>';
+
+  // ===== Ranking productos =====
+  if(ranking.length === 0){
+    document.getElementById('ana-ranking').innerHTML = '<p class="text-white/40 text-sm">No hay ventas registradas todavía.</p>';
+  } else {
+    const max = Number(ranking[0].cantidad_vendida)||1;
+    document.getElementById('ana-ranking').innerHTML = ranking.slice(0,15).map((r,i) => {
+      const pct = Math.round((Number(r.cantidad_vendida)/max)*100);
+      const medal = i===0?'🥇':i===1?'🥈':i===2?'🥉':`<span class="text-white/40">#${i+1}</span>`;
+      return `<div class="flex items-center gap-3">
+        <div class="w-8 text-center font-bold">${medal}</div>
+        <div class="flex-1 min-w-0">
+          <div class="flex justify-between text-sm mb-1">
+            <span class="text-white truncate pr-2">${r.nombre || r.producto_id}</span>
+            <span class="text-brass-400 font-bold flex-shrink-0">${fmtNum(r.cantidad_vendida)} u</span>
+          </div>
+          <div class="bg-forest-800 h-2 overflow-hidden">
+            <div class="bg-gradient-to-r from-brass-600 to-brass-400 h-full" style="width:${pct}%"></div>
+          </div>
+          <p class="text-[10px] text-white/40 mt-1">${r.pedidos_con_producto} pedidos · última venta: ${r.ultima_venta ? new Date(r.ultima_venta).toLocaleDateString('es-AR') : '—'}</p>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  // ===== Detalle de obras =====
+  if(obras.length === 0){
+    document.getElementById('ana-obras-detalle').innerHTML = '<p class="text-white/40 text-sm">No hay obras entregadas en el período seleccionado.</p>';
+  } else {
+    document.getElementById('ana-obras-detalle').innerHTML = obras.map(o => {
+      const items = (o.productos||[]).length;
+      const totalQty = (o.productos||[]).reduce((s,it)=>s+Number(it.qty||0),0);
+      const totalMat = (Number(o.total)||0) - (Number(o.mano_obra_costo)||0);
+      return `<div class="bg-forest-800 border border-forest-700 p-4">
+        <div class="flex flex-wrap items-start justify-between gap-3 mb-2">
+          <div>
+            <p class="font-bold text-white">${o.cliente_nombre||'—'}</p>
+            <p class="text-[10px] text-white/40 font-mono">${o.codigo} · ${new Date(o.created_at).toLocaleDateString('es-AR')}</p>
+          </div>
+          <div class="text-right">
+            <p class="text-green-400 font-bold">${fmtMoney(o.total)}</p>
+            <p class="text-[10px] text-white/40">Total obra</p>
+          </div>
+        </div>
+        <p class="text-xs text-white/60 mb-1">${o.mano_obra_descripcion||'(Sin descripción)'}</p>
+        <div class="flex gap-4 text-[10px] text-white/50 pt-2 border-t border-white/5 mt-2">
+          <span>📦 ${items} productos · ${fmtNum(totalQty)} u</span>
+          <span>🧱 Materiales: ${fmtMoney(totalMat)}</span>
+          <span>🔧 Mano de obra: ${fmtMoney(o.mano_obra_costo)}</span>
+        </div>
+      </div>`;
+    }).join('');
+  }
+}
+
+// ============ PWA + Realtime ============
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(err => console.warn('SW:', err));
+  });
+}
+
+let _deferredInstall = null;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  _deferredInstall = e;
+  const btn = document.createElement('button');
+  btn.id = 'install-btn';
+  btn.style.cssText = 'position:fixed;bottom:1rem;right:1rem;z-index:200;background:#b8923f;color:#0f1a11;border:none;padding:.85rem 1.2rem;font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;font-weight:700;cursor:pointer;box-shadow:0 8px 24px rgba(184,146,63,.4);';
+  btn.textContent = '📲 Instalar app';
+  btn.onclick = async () => { _deferredInstall.prompt(); await _deferredInstall.userChoice; btn.remove(); _deferredInstall = null; };
+  if (!document.getElementById('install-btn')) document.body.appendChild(btn);
+});
+
+// iOS install prompt
+window.addEventListener('load', () => {
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+  if(isIOS && !isStandalone && !sessionStorage.getItem('gg_ios_install_dismissed')){
+    setTimeout(() => {
+      if (document.getElementById('ios-install')) return;
+      const b = document.createElement('div');
+      b.id = 'ios-install';
+      b.style.cssText = 'position:fixed;bottom:1rem;left:1rem;right:1rem;z-index:200;background:#0f1a11;border:1.5px solid #b8923f;padding:1rem;color:white;box-shadow:0 12px 40px rgba(0,0,0,.5);max-width:500px;margin:0 auto;';
+      b.innerHTML = `<div style="display:flex;align-items:start;gap:.8rem;"><div style="font-size:1.4rem;">📲</div><div style="flex:1;"><p style="font-weight:700;margin-bottom:.4rem;font-size:.9rem;">Instalá Green Garden Admin</p><p style="font-size:.75rem;color:rgba(255,255,255,.7);line-height:1.5;">Tocá <strong>Compartir ⬆</strong> y luego <strong>"Agregar a Inicio"</strong>.</p></div><button onclick="document.getElementById('ios-install').remove();sessionStorage.setItem('gg_ios_install_dismissed','1');" style="background:transparent;border:none;color:rgba(255,255,255,.6);font-size:1.4rem;cursor:pointer;padding:0 .3rem;">×</button></div>`;
+      document.body.appendChild(b);
+    }, 3000);
+  }
+});
+
+// ============================================================
+// SISTEMA DE PROVEEDORES Y LISTAS DE PRECIOS
+// ============================================================
+let allProveedores = [];
+let allCategorias = [];
+let allCatalogo = [];
+
+/* ===== PROVEEDORES ===== */
+async function loadProveedoresAdmin(){
+  allProveedores = await supabase.getProveedores();
+  const tbl = document.getElementById('proveedores-table');
+  const activos = allProveedores.filter(p => p.activo !== false);
+  if(activos.length === 0){
+    tbl.innerHTML = '<p class="text-white/40 text-sm p-8 text-center">Aún no hay proveedores cargados. Tocá "+ Nuevo proveedor" para empezar.</p>';
+    return;
+  }
+  tbl.innerHTML = `
+    <table class="w-full text-sm">
+      <thead class="bg-forest-950 text-white/50">
+        <tr>
+          <th class="text-left px-4 py-3 text-[10px] tracking-widest uppercase">Nombre</th>
+          <th class="text-left px-4 py-3 text-[10px] tracking-widest uppercase">Contacto</th>
+          <th class="text-left px-4 py-3 text-[10px] tracking-widest uppercase">CUIT</th>
+          <th class="text-left px-4 py-3 text-[10px] tracking-widest uppercase">Pago</th>
+          <th class="text-right px-4 py-3 text-[10px] tracking-widest uppercase">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${activos.map(p => `
+          <tr class="border-t border-forest-800">
+            <td class="px-4 py-3 font-semibold">${p.nombre}</td>
+            <td class="px-4 py-3 text-white/70 text-xs">
+              ${p.contacto_telefono ? `📞 ${p.contacto_telefono}<br>` : ''}
+              ${p.contacto_email ? `✉ ${p.contacto_email}` : ''}
+            </td>
+            <td class="px-4 py-3 text-white/60 font-mono text-xs">${p.cuit || '—'}</td>
+            <td class="px-4 py-3 text-white/60 text-xs">${p.condiciones_pago || '—'}</td>
+            <td class="px-4 py-3 text-right space-x-1 whitespace-nowrap">
+              <button onclick="editProveedor('${p.id}')" class="btn-sec text-[10px] py-1 px-3">Editar</button>
+              <button onclick="delProveedor('${p.id}', '${p.nombre.replace(/'/g, "\\'")}')" class="btn-danger">Dar de baja</button>
+            </td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
+}
+
+function openProveedorModal(){
+  document.querySelector('#modal-proveedor form').reset();
+  document.getElementById('prov-id').value = '';
+  document.getElementById('modal-prov-titulo').textContent = 'Nuevo proveedor';
+  openModal('modal-proveedor');
+}
+
+function editProveedor(id){
+  const p = allProveedores.find(x => x.id === id);
+  if(!p) return;
+  document.getElementById('prov-id').value = p.id;
+  document.getElementById('prov-nombre').value = p.nombre || '';
+  document.getElementById('prov-tel').value = p.contacto_telefono || '';
+  document.getElementById('prov-email').value = p.contacto_email || '';
+  document.getElementById('prov-cuit').value = p.cuit || '';
+  document.getElementById('prov-dir').value = p.direccion || '';
+  document.getElementById('prov-pago').value = p.condiciones_pago || '';
+  document.getElementById('prov-notas').value = p.notas || '';
+  document.getElementById('modal-prov-titulo').textContent = `Editar: ${p.nombre}`;
+  openModal('modal-proveedor');
+}
+
+async function saveProveedor(e){
+  e.preventDefault();
+  const id = document.getElementById('prov-id').value;
+  const data = {
+    nombre: document.getElementById('prov-nombre').value.trim(),
+    contacto_telefono: document.getElementById('prov-tel').value.trim() || null,
+    contacto_email: document.getElementById('prov-email').value.trim() || null,
+    cuit: document.getElementById('prov-cuit').value.trim() || null,
+    direccion: document.getElementById('prov-dir').value.trim() || null,
+    condiciones_pago: document.getElementById('prov-pago').value.trim() || null,
+    notas: document.getElementById('prov-notas').value.trim() || null
+  };
+  let ok;
+  if(id){
+    ok = await supabase.updateProveedor(id, data);
+  } else {
+    const created = await supabase.createProveedor(data);
+    ok = !!created;
+  }
+  if(!ok){ alert('❌ No se pudo guardar el proveedor.'); return; }
+  toast(id ? '✓ Proveedor actualizado' : '✓ Proveedor creado');
+  closeModal('modal-proveedor');
+  await loadProveedoresAdmin();
+}
+
+async function delProveedor(id, nombre){
+  if(!confirm(`¿Dar de baja al proveedor "${nombre}"?\n\nNo se borra, queda inactivo (preserva el historial).`)) return;
+  const ok = await supabase.deleteProveedor(id);
+  if(!ok){ alert('❌ No se pudo dar de baja.'); return; }
+  toast('✓ Proveedor dado de baja');
+  await loadProveedoresAdmin();
+}
+
+/* ===== LISTAS DE PRECIOS ===== */
+async function loadListasPrecios(){
+  // Cargar categorías para el filtro si no se cargaron
+  if(allCategorias.length === 0){
+    allCategorias = await supabase.getCategorias();
+    const sel = document.getElementById('listas-filtro-categoria');
+    sel.innerHTML = '<option value="">Todas las categorías</option>' +
+      allCategorias.map(c => `<option value="${c.id}">${c.icono || ''} ${c.nombre} (${c.margen_default_pct}%)</option>`).join('');
+  }
+  if(allProveedores.length === 0){
+    allProveedores = await supabase.getProveedores();
+  }
+
+  const filtros = {};
+  const cat = document.getElementById('listas-filtro-categoria').value;
+  if(cat) filtros.categoria_id = cat;
+  filtros.activo = true;
+
+  allCatalogo = await supabase.getCatalogo(filtros);
+
+  // Filtro por búsqueda en cliente
+  const busq = document.getElementById('listas-filtro-buscar').value.toLowerCase().trim();
+  const visibles = busq
+    ? allCatalogo.filter(p => p.nombre.toLowerCase().includes(busq) || p.codigo.toLowerCase().includes(busq))
+    : allCatalogo;
+
+  // Verificar alertas de rentabilidad
+  const conPerdida = visibles.filter(p => {
+    if(!p.costo_proveedor_actual || !p.precio_minorista_sin_iva) return false;
+    return parseFloat(p.costo_proveedor_actual) >= parseFloat(p.precio_minorista_sin_iva);
+  });
+
+  const alertasEl = document.getElementById('listas-alertas');
+  if(conPerdida.length > 0){
+    alertasEl.classList.remove('hidden');
+    alertasEl.innerHTML = `
+      <div style="background:#7f1d1d40;border:1px solid #ef4444;padding:.85rem 1.2rem;color:#fca5a5;">
+        ⚠️ <strong>${conPerdida.length} producto(s) con rentabilidad NEGATIVA</strong> — el costo es mayor o igual al precio minorista.
+        Revisá: ${conPerdida.slice(0,3).map(p => p.codigo).join(', ')}${conPerdida.length > 3 ? '...' : ''}
+      </div>
+    `;
+  } else {
+    alertasEl.classList.add('hidden');
+  }
+
+  const tbl = document.getElementById('listas-table');
+  if(visibles.length === 0){
+    tbl.innerHTML = '<p class="text-white/40 text-sm p-8 text-center">No hay productos que coincidan con el filtro.</p>';
+    return;
+  }
+
+  tbl.innerHTML = `
+    <table class="w-full text-sm">
+      <thead class="bg-forest-950 text-white/50 sticky top-0">
+        <tr>
+          <th class="text-left px-3 py-3 text-[10px] tracking-widest uppercase">Código</th>
+          <th class="text-left px-3 py-3 text-[10px] tracking-widest uppercase">Producto</th>
+          <th class="text-left px-3 py-3 text-[10px] tracking-widest uppercase">Categoría</th>
+          <th class="text-right px-3 py-3 text-[10px] tracking-widest uppercase">Costo</th>
+          <th class="text-right px-3 py-3 text-[10px] tracking-widest uppercase">Min s/IVA</th>
+          <th class="text-right px-3 py-3 text-[10px] tracking-widest uppercase">Min c/IVA</th>
+          <th class="text-right px-3 py-3 text-[10px] tracking-widest uppercase">May s/IVA</th>
+          <th class="text-right px-3 py-3 text-[10px] tracking-widest uppercase">May c/IVA</th>
+          <th class="text-right px-3 py-3 text-[10px] tracking-widest uppercase">Rent.</th>
+          <th class="text-right px-3 py-3 text-[10px] tracking-widest uppercase">Acción</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${visibles.map(p => {
+          const calc = supabase.calcularPrecios(p);
+          const rentColor = calc.rentabilidad < 30 ? '#fca5a5' : calc.rentabilidad < 45 ? '#fde047' : '#86efac';
+          return `
+            <tr class="border-t border-forest-800 hover:bg-forest-800/30">
+              <td class="px-3 py-2 font-mono text-[11px] text-white/60">${p.codigo}</td>
+              <td class="px-3 py-2 text-white/90 text-xs">${p.nombre}</td>
+              <td class="px-3 py-2 text-white/50 text-[10px]">${p.categoria?.nombre || '—'}</td>
+              <td class="px-3 py-2 text-right text-white/70 text-xs">$${Math.round(p.costo_proveedor_actual||0).toLocaleString('es-AR')}</td>
+              <td class="px-3 py-2 text-right text-white font-semibold text-xs">$${Math.round(calc.minoristaSinIva).toLocaleString('es-AR')}</td>
+              <td class="px-3 py-2 text-right text-white/80 text-xs">$${Math.round(calc.minoristaConIva).toLocaleString('es-AR')}</td>
+              <td class="px-3 py-2 text-right text-brass-400 text-xs">$${Math.round(calc.mayoristaSinIva).toLocaleString('es-AR')}</td>
+              <td class="px-3 py-2 text-right text-brass-400/80 text-xs">$${Math.round(calc.mayoristaConIva).toLocaleString('es-AR')}</td>
+              <td class="px-3 py-2 text-right text-[11px] font-bold" style="color:${rentColor};">${calc.rentabilidad}%</td>
+              <td class="px-3 py-2 text-right">
+                <button onclick="editProductoCatalogo('${p.id}')" class="btn-sec text-[10px] py-1 px-3">Editar</button>
+              </td>
+            </tr>
+          `;
+        }).join('')}
+      </tbody>
+    </table>
+  `;
+}
+
+function editProductoCatalogo(id){
+  const p = allCatalogo.find(x => x.id === id);
+  if(!p) return;
+  document.getElementById('cat-id').value = p.id;
+  document.getElementById('cat-codigo').value = p.codigo;
+  document.getElementById('cat-nombre').value = p.nombre;
+  document.getElementById('cat-min-sin-iva').value = p.precio_minorista_sin_iva || 0;
+  document.getElementById('cat-costo').value = p.costo_proveedor_actual || 0;
+  document.getElementById('cat-margen').value = p.margen_personalizado_pct || '';
+  document.getElementById('cat-peso').value = p.peso_kg || 0;
+  document.getElementById('cat-notas').value = p.notas_internas || '';
+  document.getElementById('modal-cat-titulo').textContent = `Editar: ${p.nombre}`;
+
+  // Cargar proveedores en select
+  const sel = document.getElementById('cat-proveedor');
+  sel.innerHTML = '<option value="">— Sin asignar —</option>' +
+    allProveedores.filter(pr => pr.activo !== false).map(pr =>
+      `<option value="${pr.id}" ${pr.id === p.proveedor_actual_id ? 'selected' : ''}>${pr.nombre}</option>`
+    ).join('');
+
+  // Guardar referencia al producto para recalcular previews
+  window._editandoProducto = p;
+  recalcPreciosPreview();
+  openModal('modal-cat-producto');
+}
+
+function recalcPreciosPreview(){
+  const min = parseFloat(document.getElementById('cat-min-sin-iva').value || 0);
+  const costo = parseFloat(document.getElementById('cat-costo').value || 0);
+  const margenInput = document.getElementById('cat-margen').value;
+  const p = window._editandoProducto || {};
+  const margen = margenInput !== '' ? parseFloat(margenInput) : (p.categoria?.margen_default_pct || 35);
+
+  const productoMock = {
+    precio_minorista_sin_iva: min,
+    costo_proveedor_actual: costo,
+    margen_personalizado_pct: margen,
+    factor_iva: 1.105
+  };
+  const c = supabase.calcularPrecios(productoMock);
+
+  document.getElementById('preview-min-sin').textContent = '$' + Math.round(c.minoristaSinIva).toLocaleString('es-AR');
+  document.getElementById('preview-min-con').textContent = '$' + Math.round(c.minoristaConIva).toLocaleString('es-AR');
+  document.getElementById('preview-may-sin').textContent = '$' + Math.round(c.mayoristaSinIva).toLocaleString('es-AR');
+  document.getElementById('preview-may-con').textContent = '$' + Math.round(c.mayoristaConIva).toLocaleString('es-AR');
+
+  const rentEl = document.getElementById('preview-rentabilidad');
+  if(min > 0 && costo > 0){
+    const color = c.rentabilidad < 30 ? '#fca5a5' : c.rentabilidad < 45 ? '#fde047' : '#86efac';
+    rentEl.style.color = color;
+    rentEl.textContent = `${c.rentabilidad}% (margen aplicado: ${c.margenAplicado}%)`;
+  } else {
+    rentEl.style.color = '#ffffff60';
+    rentEl.textContent = '— (faltan datos)';
+  }
+}
+
+async function saveProductoCatalogo(e){
+  e.preventDefault();
+  const id = document.getElementById('cat-id').value;
+  const margenInput = document.getElementById('cat-margen').value;
+  const data = {
+    precio_minorista_sin_iva: parseFloat(document.getElementById('cat-min-sin-iva').value) || 0,
+    costo_proveedor_actual: parseFloat(document.getElementById('cat-costo').value) || 0,
+    margen_personalizado_pct: margenInput !== '' ? parseFloat(margenInput) : null,
+    peso_kg: parseFloat(document.getElementById('cat-peso').value) || 0,
+    proveedor_actual_id: document.getElementById('cat-proveedor').value || null,
+    notas_internas: document.getElementById('cat-notas').value.trim() || null
+  };
+  const ok = await supabase.updateProductoCatalogo(id, data);
+  if(!ok){ alert('❌ No se pudo guardar.'); return; }
+  toast('✓ Cambios guardados');
+  closeModal('modal-cat-producto');
+  await loadListasPrecios();
+}
+
+/* ===== HISTORIAL DE PRECIOS ===== */
+async function loadHistorialPrecios(){
+  // Llenar filtro de trimestres con los últimos 8
+  const selTri = document.getElementById('historial-trimestre');
+  if(selTri.options.length <= 1){
+    const now = new Date();
+    const opts = [];
+    for(let i=0;i<8;i++){
+      const d = new Date(now.getFullYear(), now.getMonth() - i*3, 1);
+      const tri = `${d.getFullYear()}-Q${Math.floor(d.getMonth()/3) + 1}`;
+      opts.push(tri);
+    }
+    selTri.innerHTML = '<option value="">Todos los trimestres</option>' +
+      [...new Set(opts)].map(t => `<option value="${t}">${t}</option>`).join('');
+  }
+
+  const filtros = {};
+  const tri = document.getElementById('historial-trimestre').value;
+  const tipo = document.getElementById('historial-tipo').value;
+  if(tri) filtros.trimestre = tri;
+  if(tipo) filtros.tipo_precio = tipo;
+
+  const data = await supabase.getHistorialPrecios(filtros);
+  const tbl = document.getElementById('historial-table');
+
+  if(data.length === 0){
+    tbl.innerHTML = '<p class="text-white/40 text-sm p-8 text-center">Aún no hay cambios registrados. Los cambios se registran automáticamente al modificar precios.</p>';
+    return;
+  }
+
+  tbl.innerHTML = `
+    <table class="w-full text-sm">
+      <thead class="bg-forest-950 text-white/50">
+        <tr>
+          <th class="text-left px-3 py-3 text-[10px] tracking-widest uppercase">Fecha</th>
+          <th class="text-left px-3 py-3 text-[10px] tracking-widest uppercase">Trimestre</th>
+          <th class="text-left px-3 py-3 text-[10px] tracking-widest uppercase">Producto</th>
+          <th class="text-left px-3 py-3 text-[10px] tracking-widest uppercase">Tipo</th>
+          <th class="text-left px-3 py-3 text-[10px] tracking-widest uppercase">Proveedor</th>
+          <th class="text-right px-3 py-3 text-[10px] tracking-widest uppercase">Anterior</th>
+          <th class="text-right px-3 py-3 text-[10px] tracking-widest uppercase">Nuevo</th>
+          <th class="text-right px-3 py-3 text-[10px] tracking-widest uppercase">Variación</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${data.map(h => {
+          const v = parseFloat(h.variacion_pct || 0);
+          const vColor = v > 0 ? '#fca5a5' : v < 0 ? '#86efac' : '#ffffff70';
+          const flecha = v > 0 ? '▲' : v < 0 ? '▼' : '—';
+          return `
+            <tr class="border-t border-forest-800">
+              <td class="px-3 py-2 text-white/60 text-[11px]">${new Date(h.fecha_cambio).toLocaleString('es-AR')}</td>
+              <td class="px-3 py-2 text-brass-400 font-mono text-xs">${h.trimestre || '—'}</td>
+              <td class="px-3 py-2 text-white/90 text-xs">
+                ${h.catalogo?.codigo ? `<span class="font-mono text-white/40">${h.catalogo.codigo}</span> ` : ''}
+                ${h.catalogo?.nombre || '—'}
+              </td>
+              <td class="px-3 py-2 text-white/60 text-[11px]">${h.tipo_precio.replace(/_/g, ' ')}</td>
+              <td class="px-3 py-2 text-white/60 text-[11px]">${h.proveedor?.nombre || '—'}</td>
+              <td class="px-3 py-2 text-right text-white/60 text-xs">$${Math.round(h.precio_anterior||0).toLocaleString('es-AR')}</td>
+              <td class="px-3 py-2 text-right text-white font-semibold text-xs">$${Math.round(h.precio_nuevo||0).toLocaleString('es-AR')}</td>
+              <td class="px-3 py-2 text-right font-bold text-xs" style="color:${vColor};">${flecha} ${Math.abs(v)}%</td>
+            </tr>
+          `;
+        }).join('')}
+      </tbody>
+    </table>
+  `;
+}
+
+// ============================================================
+// SISTEMA DE TAREAS
+// ============================================================
+let allTareas = [];
+const PRIORIDAD_COLORES = {
+  baja:    { bg:'#16a34a40', color:'#86efac', border:'#22c55e', emoji:'🟢', label:'Baja'    },
+  media:   { bg:'#ca8a0440', color:'#fde047', border:'#eab308', emoji:'🟡', label:'Media'   },
+  alta:    { bg:'#ea580c40', color:'#fdba74', border:'#f97316', emoji:'🟠', label:'Alta'    },
+  urgente: { bg:'#7f1d1d40', color:'#fca5a5', border:'#ef4444', emoji:'🔴', label:'Urgente' }
+};
+const CATEGORIA_LABELS = {
+  general: '📌 General',
+  fabrica: '🏭 Fábrica',
+  administrativa: '📊 Administrativa',
+  logistica: '🚚 Logística',
+  mantenimiento: '🛠 Mantenimiento'
+};
+const ESTADO_TAREA_LABELS = {
+  pendiente: 'Pendiente',
+  en_progreso: 'En progreso',
+  completada: 'Completada',
+  cancelada: 'Cancelada'
+};
+
+async function loadTareas(){
+  // Cargar empleados para los selects de filtros
+  if(allEmpleados.length === 0) allEmpleados = await supabase.getEmpleados();
+  const selEmp = document.getElementById('tareas-filtro-empleado');
+  if(selEmp.options.length <= 1){
+    const activos = allEmpleados.filter(e => e.activo !== false);
+    selEmp.innerHTML = '<option value="">Todos los empleados</option>' +
+      activos.map(e => `<option value="${e.id}">${e.nombre}</option>`).join('');
+  }
+
+  // Filtros
+  const filtros = {};
+  const fEmp = document.getElementById('tareas-filtro-empleado').value;
+  const fPri = document.getElementById('tareas-filtro-prioridad').value;
+  if(fPri) filtros.prioridad = fPri;
+
+  allTareas = await supabase.getTareas(filtros);
+
+  // Filtrar por empleado en cliente
+  let tareasVisibles = allTareas;
+  if(fEmp){
+    tareasVisibles = allTareas.filter(t =>
+      (t.asignados || []).some(a => a.empleado_id === fEmp)
+    );
+  }
+
+  // Estadísticas
+  const ahora = new Date();
+  const inicioMes = new Date(ahora.getFullYear(), ahora.getMonth(), 1);
+  const stats = {
+    pendientes: tareasVisibles.filter(t => t.estado === 'pendiente').length,
+    progreso: tareasVisibles.filter(t => t.estado === 'en_progreso').length,
+    completadasMes: tareasVisibles.filter(t => t.estado === 'completada' && t.fecha_completada && new Date(t.fecha_completada) >= inicioMes).length,
+    atrasadas: tareasVisibles.filter(t => t.estado !== 'completada' && t.estado !== 'cancelada' && t.fecha_limite && new Date(t.fecha_limite) < ahora).length
+  };
+  document.getElementById('tareas-cnt-pendientes').textContent = stats.pendientes;
+  document.getElementById('tareas-cnt-progreso').textContent = stats.progreso;
+  document.getElementById('tareas-cnt-completadas').textContent = stats.completadasMes;
+  document.getElementById('tareas-cnt-atrasadas').textContent = stats.atrasadas;
+
+  // Kanban
+  const columnas = [
+    { id: 'pendiente',   titulo: '📋 Pendientes',   color: '#fde047', tareas: tareasVisibles.filter(t => t.estado === 'pendiente') },
+    { id: 'en_progreso', titulo: '🚀 En progreso',  color: '#67e8f9', tareas: tareasVisibles.filter(t => t.estado === 'en_progreso') },
+    { id: 'completada',  titulo: '✓ Completadas',   color: '#86efac', tareas: tareasVisibles.filter(t => t.estado === 'completada').slice(0, 20) }
+  ];
+
+  const kanban = document.getElementById('tareas-kanban');
+  kanban.innerHTML = columnas.map(col => `
+    <div class="bg-forest-900 border border-forest-800 flex flex-col" style="min-height: 400px;">
+      <div class="px-4 py-3 border-b border-forest-800 flex items-center justify-between">
+        <p class="font-bold text-sm" style="color:${col.color};">${col.titulo}</p>
+        <span class="text-white/40 text-xs">${col.tareas.length}</span>
+      </div>
+      <div class="p-3 space-y-2 flex-1 overflow-y-auto" style="max-height: 600px;">
+        ${col.tareas.length === 0
+          ? '<p class="text-white/30 text-xs text-center p-4">Sin tareas</p>'
+          : col.tareas.map(t => renderTareaCard(t)).join('')
+        }
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderTareaCard(t){
+  const p = PRIORIDAD_COLORES[t.prioridad] || PRIORIDAD_COLORES.media;
+  const ahora = new Date();
+  const fechaLim = t.fecha_limite ? new Date(t.fecha_limite) : null;
+  const atrasada = fechaLim && fechaLim < ahora && t.estado !== 'completada' && t.estado !== 'cancelada';
+  const fechaLimStr = fechaLim ? fechaLim.toLocaleString('es-AR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : null;
+
+  const asignados = (t.asignados || []).filter(a => a.empleado);
+  const recurrente = t.es_recurrente ? '🔁 ' : '';
+
+  return `
+    <div onclick="abrirDetalleTarea('${t.id}')"
+         class="bg-forest-800 border-l-4 p-3 cursor-pointer hover:bg-forest-700 transition"
+         style="border-color: ${p.border};">
+      <div class="flex items-start justify-between gap-2 mb-2">
+        <p class="text-white text-sm font-semibold flex-1">${recurrente}${escapeHtml(t.titulo)}</p>
+        <span class="estado-pill text-[9px]" style="background:${p.bg};color:${p.color};border:1px solid ${p.border};">${p.emoji}</span>
+      </div>
+      ${t.descripcion ? `<p class="text-white/60 text-[11px] mb-2 line-clamp-2">${escapeHtml(t.descripcion).substring(0, 80)}${t.descripcion.length > 80 ? '...' : ''}</p>` : ''}
+      <div class="flex items-center justify-between flex-wrap gap-1 text-[10px]">
+        <span class="text-white/40">${CATEGORIA_LABELS[t.categoria] || t.categoria}</span>
+        ${fechaLimStr
+          ? `<span class="${atrasada ? 'text-red-400 font-bold' : 'text-white/50'}">${atrasada ? '⚠ ' : '📅 '}${fechaLimStr}</span>`
+          : ''
+        }
+      </div>
+      ${asignados.length > 0 ? `
+        <div class="flex flex-wrap gap-1 mt-2 pt-2 border-t border-forest-700">
+          ${asignados.map(a => `<span class="text-[9px] bg-brass-500/20 text-brass-400 px-2 py-0.5 rounded">${escapeHtml(a.empleado?.nombre || a.empleado_nombre || '?')}</span>`).join('')}
+        </div>
+      ` : '<p class="text-[9px] text-white/30 mt-2 pt-2 border-t border-forest-700">Sin asignar</p>'}
+    </div>
+  `;
+}
+
+function escapeHtml(str){
+  if(!str) return '';
+  return String(str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+// ===== MODAL CREAR/EDITAR TAREA =====
+async function openTareaModal(tareaId){
+  document.querySelector('#modal-tarea form').reset();
+  document.getElementById('tar-id').value = tareaId || '';
+  document.getElementById('tar-recurrencia-opts').classList.add('hidden');
+  document.getElementById('tar-btn-eliminar').classList.toggle('hidden', !tareaId);
+  document.getElementById('modal-tarea-titulo').textContent = tareaId ? 'Editar tarea' : 'Nueva tarea';
+
+  // Cargar empleados (checkboxes)
+  if(allEmpleados.length === 0) allEmpleados = await supabase.getEmpleados();
+  const cont = document.getElementById('tar-asignados-list');
+  const activos = allEmpleados.filter(e => e.activo !== false);
+  if(activos.length === 0){
+    cont.innerHTML = '<p class="text-white/40 text-xs">No hay empleados activos. Cargá empleados primero.</p>';
+  } else {
+    cont.innerHTML = activos.map(e => `
+      <label class="flex items-center gap-2 cursor-pointer text-white/80 hover:text-white text-sm py-1">
+        <input type="checkbox" class="tar-emp-check w-4 h-4" data-id="${e.id}" data-nombre="${escapeHtml(e.nombre)}">
+        <span>${escapeHtml(e.nombre)} <span class="text-white/40 text-[10px]">(${e.rol})</span></span>
+      </label>
+    `).join('');
+  }
+
+  // Cargar pedidos para vincular
+  const selPed = document.getElementById('tar-pedido');
+  if(typeof allPedidos !== 'undefined' && allPedidos.length > 0){
+    selPed.innerHTML = '<option value="">— No vincular —</option>' +
+      allPedidos.slice(0, 50).map(p => `<option value="${p.id}">${p.codigo} — ${escapeHtml(p.cliente_nombre || 'Sin nombre')}</option>`).join('');
+  }
+
+  // Si es editar: pre-cargar datos
+  if(tareaId){
+    const t = await supabase.getTareaById(tareaId);
+    if(!t){ alert('No se encontró la tarea.'); closeModal('modal-tarea'); return; }
+    document.getElementById('tar-titulo').value = t.titulo || '';
+    document.getElementById('tar-desc').value = t.descripcion || '';
+    document.getElementById('tar-categoria').value = t.categoria || 'general';
+    document.getElementById('tar-prioridad').value = t.prioridad || 'media';
+    document.getElementById('tar-tiempo').value = t.tiempo_estimado_min || '';
+    document.getElementById('tar-notas').value = t.notas || '';
+    if(t.fecha_limite) document.getElementById('tar-fecha-limite').value = t.fecha_limite.slice(0, 16);
+    if(t.pedido_id) selPed.value = t.pedido_id;
+    if(t.es_recurrente){
+      document.getElementById('tar-recurrente').checked = true;
+      document.getElementById('tar-recurrencia-opts').classList.remove('hidden');
+      document.getElementById('tar-recurrencia-tipo').value = t.recurrencia_tipo || 'diaria';
+      if(t.proxima_generacion) document.getElementById('tar-recurrencia-proxima').value = t.proxima_generacion.slice(0, 16);
+    }
+    // Marcar asignados
+    const idsAsignados = (t.asignados || []).map(a => a.empleado_id);
+    document.querySelectorAll('.tar-emp-check').forEach(cb => {
+      cb.checked = idsAsignados.includes(cb.dataset.id);
+    });
+  }
+
+  openModal('modal-tarea');
+}
+
+function toggleRecurrencia(){
+  const chk = document.getElementById('tar-recurrente').checked;
+  document.getElementById('tar-recurrencia-opts').classList.toggle('hidden', !chk);
+}
+
+async function saveTarea(e){
+  e.preventDefault();
+  const id = document.getElementById('tar-id').value;
+
+  // Recoger empleados asignados
+  const asignados = [...document.querySelectorAll('.tar-emp-check:checked')].map(cb => ({
+    empleado_id: cb.dataset.id,
+    empleado_nombre: cb.dataset.nombre
+  }));
+
+  const recurrente = document.getElementById('tar-recurrente').checked;
+  const usuario = getUsuarioActual();
+
+  const data = {
+    titulo: document.getElementById('tar-titulo').value.trim(),
+    descripcion: document.getElementById('tar-desc').value.trim() || null,
+    categoria: document.getElementById('tar-categoria').value,
+    prioridad: document.getElementById('tar-prioridad').value,
+    fecha_limite: document.getElementById('tar-fecha-limite').value || null,
+    tiempo_estimado_min: parseInt(document.getElementById('tar-tiempo').value) || null,
+    pedido_id: document.getElementById('tar-pedido').value || null,
+    notas: document.getElementById('tar-notas').value.trim() || null,
+    creada_por_nombre: usuario?.nombre || 'Admin',
+    es_recurrente: recurrente,
+    recurrencia_tipo: recurrente ? document.getElementById('tar-recurrencia-tipo').value : null,
+    proxima_generacion: recurrente ? (document.getElementById('tar-recurrencia-proxima').value || null) : null
+  };
+
+  let ok;
+  if(id){
+    // UPDATE: solo campos de la tarea (asignados se manejan aparte)
+    ok = await supabase.updateTarea(id, data);
+    // Sincronizar asignaciones: borrar todas y agregar las nuevas
+    if(ok){
+      const tareaActual = await supabase.getTareaById(id);
+      for(const a of (tareaActual.asignados || [])){
+        await supabase.removeAsignacion(a.id);
+      }
+      for(const a of asignados){
+        await supabase.addAsignacion(id, a.empleado_id, a.empleado_nombre);
+      }
+    }
+  } else {
+    // CREATE
+    data.asignados = asignados;
+    const creada = await supabase.createTarea(data);
+    ok = !!creada;
+  }
+
+  if(!ok){ alert('❌ No se pudo guardar la tarea.'); return; }
+  toast(id ? '✓ Tarea actualizada' : '✓ Tarea creada');
+  closeModal('modal-tarea');
+  await loadTareas();
+}
+
+async function eliminarTarea(){
+  const id = document.getElementById('tar-id').value;
+  if(!id) return;
+  if(!confirm('¿Eliminar esta tarea?\n\nSi es recurrente, también se cancelarán las futuras generaciones.')) return;
+  const ok = await supabase.deleteTarea(id);
+  if(!ok){ alert('❌ No se pudo eliminar.'); return; }
+  toast('✓ Tarea eliminada');
+  closeModal('modal-tarea');
+  await loadTareas();
+}
+
+// ===== DETALLE DE TAREA =====
+async function abrirDetalleTarea(id){
+  const t = await supabase.getTareaById(id);
+  if(!t){ alert('No se encontró la tarea.'); return; }
+
+  const p = PRIORIDAD_COLORES[t.prioridad] || PRIORIDAD_COLORES.media;
+  const fechaLim = t.fecha_limite ? new Date(t.fecha_limite).toLocaleString('es-AR') : 'Sin fecha límite';
+  const asignados = (t.asignados || []).map(a => a.empleado?.nombre || a.empleado_nombre || '?').join(', ') || 'Nadie';
+  const comentarios = (t.comentarios || []).sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
+
+  document.getElementById('detalle-tarea-titulo').textContent = t.titulo;
+
+  document.getElementById('detalle-tarea-cuerpo').innerHTML = `
+    <div class="flex items-center gap-2 flex-wrap">
+      <span class="estado-pill text-xs" style="background:${p.bg};color:${p.color};border:1px solid ${p.border};">${p.emoji} ${p.label}</span>
+      <span class="text-white/60 text-xs">${CATEGORIA_LABELS[t.categoria] || t.categoria}</span>
+      ${t.es_recurrente ? '<span class="text-brass-400 text-xs">🔁 Recurrente (' + t.recurrencia_tipo + ')</span>' : ''}
+    </div>
+
+    ${t.descripcion ? `<div class="bg-forest-950 border border-forest-800 p-3"><p class="text-white/80 text-sm whitespace-pre-wrap">${escapeHtml(t.descripcion)}</p></div>` : ''}
+
+    <div class="grid grid-cols-2 gap-3 text-xs">
+      <div><p class="text-white/40 uppercase text-[10px]">Asignados</p><p class="text-white/90">${escapeHtml(asignados)}</p></div>
+      <div><p class="text-white/40 uppercase text-[10px]">Fecha límite</p><p class="text-white/90">${fechaLim}</p></div>
+      <div><p class="text-white/40 uppercase text-[10px]">Creada por</p><p class="text-white/90">${escapeHtml(t.creada_por_nombre || '—')}</p></div>
+      <div><p class="text-white/40 uppercase text-[10px]">Tiempo estimado</p><p class="text-white/90">${t.tiempo_estimado_min ? t.tiempo_estimado_min + ' min' : '—'}</p></div>
+    </div>
+
+    <!-- Cambiar estado -->
+    <div class="pt-3 border-t border-forest-800">
+      <p class="text-brass-400 text-[10px] uppercase font-bold mb-2">Cambiar estado</p>
+      <div class="flex flex-wrap gap-2">
+        ${['pendiente','en_progreso','completada','cancelada'].map(est => `
+          <button onclick="cambiarEstadoTarea('${t.id}','${est}')"
+                  class="text-xs px-3 py-1.5 ${t.estado === est ? 'btn-pri' : 'btn-sec'}">
+            ${ESTADO_TAREA_LABELS[est]}
+          </button>
+        `).join('')}
+      </div>
+    </div>
+
+    <!-- Comentarios -->
+    <div class="pt-3 border-t border-forest-800">
+      <p class="text-brass-400 text-[10px] uppercase font-bold mb-2">Comentarios / Progreso</p>
+      <div class="flex gap-2 mb-3">
+        <input id="nuevo-comentario-${t.id}" placeholder="Escribir comentario..." class="text-xs flex-1">
+        <button onclick="agregarComentarioTarea('${t.id}')" class="btn-sec text-xs">Enviar</button>
+      </div>
+      <div class="max-h-64 overflow-y-auto space-y-2">
+        ${comentarios.length === 0
+          ? '<p class="text-white/30 text-xs">Sin comentarios.</p>'
+          : comentarios.map(c => `
+              <div class="bg-forest-950 border border-forest-800 p-2 text-xs">
+                <p class="text-brass-400 font-semibold">${escapeHtml(c.empleado_nombre || 'Sistema')}</p>
+                <p class="text-white/80 mt-1">${escapeHtml(c.comentario)}</p>
+                <p class="text-white/40 text-[10px] mt-1">${new Date(c.created_at).toLocaleString('es-AR')}</p>
+              </div>
+            `).join('')
+        }
+      </div>
+    </div>
+
+    <div class="flex gap-2 pt-3 border-t border-forest-800">
+      <button onclick="closeModal('modal-tarea-detalle'); openTareaModal('${t.id}')" class="btn-pri flex-1">✏ Editar tarea</button>
+      <button onclick="closeModal('modal-tarea-detalle')" class="btn-sec">Cerrar</button>
+    </div>
+  `;
+  openModal('modal-tarea-detalle');
+}
+
+async function cambiarEstadoTarea(id, nuevoEstado){
+  const ok = await supabase.updateTarea(id, { estado: nuevoEstado });
+  if(!ok){ alert('❌ No se pudo cambiar el estado.'); return; }
+  toast('✓ Estado actualizado');
+  await abrirDetalleTarea(id);
+  await loadTareas();
+}
+
+async function agregarComentarioTarea(tarea_id){
+  const inp = document.getElementById('nuevo-comentario-' + tarea_id);
+  const txt = inp.value.trim();
+  if(!txt) return;
+  const usuario = getUsuarioActual();
+  const ok = await supabase.addComentarioTarea(
+    tarea_id,
+    null,
+    usuario?.nombre || 'Admin',
+    txt
+  );
+  if(!ok){ alert('❌ No se pudo guardar el comentario.'); return; }
+  inp.value = '';
+  await abrirDetalleTarea(tarea_id);
+}
+</script>
 </body>
 </html>
