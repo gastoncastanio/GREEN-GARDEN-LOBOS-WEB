@@ -1464,13 +1464,23 @@ async function sincronizarStockDesdeCatalogo(){
       return { ok: false, status: resp ? resp.status : 0, error: errTxt };
     }
 
+    // Helper para generar UUID v4 (necesario porque la tabla productos no auto-genera id)
+    const genId = () => {
+      if(typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID();
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+        const r = Math.random()*16|0, v = c==='x' ? r : (r&0x3|0x8);
+        return v.toString(16);
+      });
+    };
+
     for(const c of aImportar){
       try {
         const categoria = (c.categoria && c.categoria.nombre) || 'General';
         const unidad = c.unidad || 'unidad';
 
-        // Intento 1: con todos los campos
+        // Intento 1: con todos los campos (incluyendo id generado)
         let payload = {
+          id: genId(),
           codigo: c.codigo || null,
           nombre: c.nombre,
           descripcion: c.descripcion || null,
@@ -1490,7 +1500,7 @@ async function sincronizarStockDesdeCatalogo(){
         // Intento 3: si falla por columna inexistente, mandar solo lo básico
         if(!res.ok && res.error && res.error.includes('column')){
           console.warn(`⚠️ Reintentando ${c.nombre} con campos mínimos`);
-          res = await intentarCrearProducto({ nombre: c.nombre, activo: true });
+          res = await intentarCrearProducto({ id: genId(), nombre: c.nombre, activo: true });
         }
 
         if(res.ok && res.producto && res.producto.id){
