@@ -1475,18 +1475,31 @@ async function sincronizarStockDesdeCatalogo(){
 
     for(const c of aImportar){
       try {
-        const categoria = (c.categoria && c.categoria.nombre) || 'General';
-        const unidad = c.unidad || 'unidad';
+        // Asegurar valores nunca nulos
+        const categoria = (c.categoria && typeof c.categoria === 'object' && c.categoria.nombre)
+          ? String(c.categoria.nombre).trim() || 'General'
+          : (typeof c.categoria === 'string' && c.categoria.trim()) ? c.categoria.trim() : 'General';
+        const unidad = (c.unidad && String(c.unidad).trim()) || 'unidad';
+        const codigoFinal = (c.codigo && String(c.codigo).trim()) || `AUTO-${Date.now()}-${Math.floor(Math.random()*1000)}`;
+        const nombreFinal = (c.nombre && String(c.nombre).trim()) || `Producto ${codigoFinal}`;
 
-        // Intento 1: con todos los campos (incluyendo id generado)
+        // DEBUG: log primer producto para ver estructura
+        if(creados === 0 && errores === 0){
+          console.log('🔍 Primer producto a importar (estructura):', JSON.stringify(c, null, 2));
+          console.log('🔍 Valores que voy a enviar:', { categoria, unidad, codigoFinal, nombreFinal });
+        }
+
+        // Intento 1: con TODOS los campos posibles, ninguno null
         let payload = {
           id: genId(),
-          codigo: c.codigo || null,
-          nombre: c.nombre,
-          descripcion: c.descripcion || null,
+          codigo: codigoFinal,
+          nombre: nombreFinal,
+          descripcion: c.descripcion || nombreFinal,
           categoria: categoria,
           unidad: unidad,
-          activo: true
+          activo: true,
+          precio: 0,
+          orden: 0
         };
         let res = await intentarCrearProducto(payload);
 
