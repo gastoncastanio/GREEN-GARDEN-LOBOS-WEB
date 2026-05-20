@@ -1902,8 +1902,8 @@ Devolvé SOLO un JSON válido, sin markdown:
     };
 
     // Modelos en orden de preferencia (con fallback automático)
-    // 1.5-flash y 1.5-flash-8b tienen cuotas más generosas que 2.0
-    const modelos = ['gemini-1.5-flash-latest', 'gemini-1.5-flash-8b-latest', 'gemini-2.0-flash'];
+    // Modelos 2.5 y nuevos — los 1.5 fueron deprecados y ya no tienen cuota gratis
+    const modelos = ['gemini-2.5-flash', 'gemini-2.5-flash-lite', 'gemini-2.0-flash', 'gemini-2.0-flash-lite', 'gemini-flash-latest'];
     let res = null;
     let lastError = '';
     let modeloUsado = null;
