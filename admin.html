@@ -1443,46 +1443,64 @@ async function sincronizarStockDesdeCatalogo(){
     // 4. Crear cada producto en la tabla productos + crear fila de stock con 0
     let creados = 0, errores = 0;
     const detallesError = [];
+
+    // Función auxiliar para intentar crear con diferentes combinaciones de campos
+    async function intentarCrearProducto(payload){
+      const resp = await fetch(`${SUPABASE_URL}/rest/v1/productos`, {
+        method: 'POST',
+        headers: {
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=representation'
+        },
+        body: JSON.stringify(payload)
+      }).catch(e => null);
+      if(resp && resp.ok){
+        const arr = await resp.json();
+        return { ok: true, producto: arr[0] };
+      }
+      const errTxt = resp ? await resp.text() : 'sin respuesta';
+      return { ok: false, status: resp ? resp.status : 0, error: errTxt };
+    }
+
     for(const c of aImportar){
       try {
-        // Crear producto (sin precios — solo nombre/código/categoría/unidad)
-        const nuevoProd = {
+        const categoria = (c.categoria && c.categoria.nombre) || 'General';
+        const unidad = c.unidad || 'unidad';
+
+        // Intento 1: con todos los campos
+        let payload = {
           codigo: c.codigo || null,
           nombre: c.nombre,
           descripcion: c.descripcion || null,
-          categoria: (c.categoria && c.categoria.nombre) || 'General',
-          unidad: c.unidad || 'unidad',
+          categoria: categoria,
+          unidad: unidad,
           activo: true
         };
-        // Llamar directo a fetch para capturar el error exacto
-        const resp = await fetch(`${SUPABASE_URL}/rest/v1/productos`, {
-          method: 'POST',
-          headers: {
-            'apikey': SUPABASE_KEY,
-            'Authorization': `Bearer ${SUPABASE_KEY}`,
-            'Content-Type': 'application/json',
-            'Prefer': 'return=representation'
-          },
-          body: JSON.stringify(nuevoProd)
-        }).catch(e => null);
-        if(resp && resp.ok){
-          const arr = await resp.json();
-          const creado = arr[0];
-          if(creado && creado.id){
-            await supabase.setStockProducto(creado.id, { stock_actual: 0, unidad: nuevoProd.unidad, stock_minimo: 0 });
-            allProductos.push(creado);
-            creados++;
-            continue;
-          }
+        let res = await intentarCrearProducto(payload);
+
+        // Intento 2: si falla por código duplicado, intentar sin código
+        if(!res.ok && res.error && (res.error.includes('duplicate') || res.error.includes('codigo'))){
+          console.warn(`⚠️ Reintentando ${c.nombre} sin código (duplicado)`);
+          payload.codigo = null;
+          res = await intentarCrearProducto(payload);
         }
-        // Si llegamos acá, falló
-        errores++;
-        if(resp){
-          const errTxt = await resp.text();
-          console.error(`❌ Error producto ${c.codigo || c.nombre}:`, resp.status, errTxt);
-          if(detallesError.length < 3) detallesError.push(`${c.codigo || c.nombre}: ${resp.status} - ${errTxt.slice(0,150)}`);
+
+        // Intento 3: si falla por columna inexistente, mandar solo lo básico
+        if(!res.ok && res.error && res.error.includes('column')){
+          console.warn(`⚠️ Reintentando ${c.nombre} con campos mínimos`);
+          res = await intentarCrearProducto({ nombre: c.nombre, activo: true });
+        }
+
+        if(res.ok && res.producto && res.producto.id){
+          await supabase.setStockProducto(res.producto.id, { stock_actual: 0, unidad: unidad, stock_minimo: 0 });
+          allProductos.push(res.producto);
+          creados++;
         } else {
-          console.error(`❌ Error red producto ${c.codigo || c.nombre}`);
+          errores++;
+          console.error(`❌ Error producto ${c.codigo || c.nombre}:`, res.status, res.error);
+          if(detallesError.length < 3) detallesError.push(`${c.codigo || c.nombre}: ${res.status} - ${(res.error||'').slice(0,200)}`);
         }
       } catch(e) {
         console.error('Error al importar producto', c.codigo, e);
