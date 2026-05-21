@@ -427,6 +427,39 @@
       </div>
     </div>
 
+    <!-- DESCUENTO GENERAL AL PRESUPUESTO -->
+    <div class="bg-white rounded-2xl shadow-lg p-6 border-2 border-amber-200">
+      <div class="flex items-center gap-3 mb-4">
+        <span class="text-2xl">🏷️</span>
+        <div>
+          <h3 class="text-lg font-bold text-gray-800">Descuento al total</h3>
+          <p class="text-xs text-gray-500">Opcional. Se aplica sobre el subtotal final del presupuesto.</p>
+        </div>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
+          <label class="block text-xs font-bold text-gray-600 mb-1">Tipo</label>
+          <select id="tipoDescuento" onchange="onCambioTipoDescuento()" class="input-field w-full">
+            <option value="ninguno">Sin descuento</option>
+            <option value="efectivo5">5% pago en efectivo</option>
+            <option value="efectivo10">10% pago en efectivo</option>
+            <option value="porcentaje">% personalizado</option>
+            <option value="fijo">Monto fijo en $</option>
+          </select>
+        </div>
+        <div id="bloqueDescuentoValor">
+          <label class="block text-xs font-bold text-gray-600 mb-1" id="lblDescuentoValor">Valor</label>
+          <input type="number" id="descuentoValor" min="0" step="0.01" value="0" class="input-field w-full" placeholder="0">
+        </div>
+        <div class="flex items-end">
+          <div class="bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 w-full text-center" id="cartelDescuento" style="display:none;">
+            <p class="text-[10px] uppercase tracking-wider text-amber-700 font-bold">Ahorro estimado</p>
+            <p class="text-lg font-bold text-amber-800" id="cartelDescuentoMonto">$0</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- BOTÓN CALCULAR -->
     <div class="flex justify-center">
       <button onclick="calcularPresupuesto()" class="bg-verde-oscuro hover:bg-verde-medio text-white font-bold px-10 py-4 rounded-2xl shadow-lg text-lg transition-all transform hover:scale-105 flex items-center gap-3">
@@ -531,6 +564,16 @@
             <tr class="bg-gray-50 border-t-2 border-gray-200">
               <td colspan="5" class="px-4 py-3 text-right font-bold text-gray-700">TOTAL MATERIALES</td>
               <td class="px-4 py-3 text-right font-bold text-lg text-verde-oscuro" id="totalMateriales">$0</td>
+              <td class="no-print"></td>
+            </tr>
+            <tr id="filaDescuento" class="bg-amber-50 border-t border-amber-200" style="display:none;">
+              <td colspan="5" class="px-4 py-3 text-right font-bold text-amber-700" id="lblFilaDescuento">DESCUENTO</td>
+              <td class="px-4 py-3 text-right font-bold text-amber-700" id="montoFilaDescuento">-$0</td>
+              <td class="no-print"></td>
+            </tr>
+            <tr id="filaTotalFinal" class="bg-green-50 border-t-2 border-verde-oscuro" style="display:none;">
+              <td colspan="5" class="px-4 py-3 text-right font-bold text-verde-oscuro text-base">TOTAL CON DESCUENTO</td>
+              <td class="px-4 py-3 text-right font-bold text-xl text-verde-oscuro" id="totalFinalConDescuento">$0</td>
               <td class="no-print"></td>
             </tr>
           </tfoot>
@@ -753,10 +796,10 @@ const POSTES_OLIMPICO = {
 };
 
 const POSTES_RECTO = {
-  esq: { nombre: 'Esquinero Recto 2.60m',  precio: 29700, costoProv: 18000 },
+  esq: { nombre: 'Esquinero Recto 2.60m',  precio: 36000, costoProv: 18000 },
   ref: { nombre: 'Refuerzo Recto 2.60m',   precio: 27000, costoProv: 17000 },
-  int: { nombre: 'Intermedio Recto 2.60m', precio: 23100, costoProv: 14000 },
-  pun: { nombre: 'Puntal de Apoyo',        precio: 19305, costoProv: 11700 },
+  int: { nombre: 'Intermedio Recto 2.60m', precio: 29700, costoProv: 14000 },
+  pun: { nombre: 'Puntal de Apoyo',        precio: 23100, costoProv: 11700 },
 };
 
 const POSTES_RECTO15 = {
@@ -839,7 +882,7 @@ const ACCESORIOS = {
 };
 
 const ALAMBRES = {
-  liso_metro:  { nombre: 'Acindar Fortín 17/15 × mt',      precio: 280    },
+  liso_metro:  { nombre: 'Acindar Fortín 17/15 × mt',      precio: 240    },
   liso_rollo:  { nombre: 'Acindar Fortín 17/15 × 1000mt', precio: 250000, costoProv: 200000 },
   pua_metro:   { nombre: 'Púa × metro',                    precio: 230    },
   pua500:      { nombre: 'Púa 500 metros (PUXR)',          precio: 111750, costoProv: 74500  },
@@ -1448,6 +1491,9 @@ function renderizarResultado(p) {
     document.getElementById('resObservacionesBloque').classList.add('hidden');
   }
 
+  // Aplicar descuento si está configurado
+  try { aplicarDescuentoAlTotal(); } catch(e) {}
+
   // Mostrar sección resultado
   document.getElementById('seccionResultado').classList.remove('hidden');
   document.getElementById('seccionResultado').scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -1626,10 +1672,20 @@ function recalcularTotal() {
     desglose = `Materiales ${formatPeso(presupuestoActual.totalMateriales)} + M.O. ${formatPeso(mdo)}`;
   }
 
+  // Aplicar descuento general al total final
+  const totalSinDesc = total;
+  const desc = (typeof calcularMontoDescuento === 'function') ? calcularMontoDescuento(total) : 0;
+  if(desc > 0) {
+    total = total - desc;
+    desglose += ` − Descuento ${formatPeso(desc)}`;
+  }
+
   document.getElementById('totalFinal').textContent = formatPeso(total);
   const desg = document.getElementById('totalFinalDesglose');
   if (desg) desg.textContent = desglose;
   presupuestoActual.totalFinal = total;
+  presupuestoActual.totalFinalSinDescuento = totalSinDesc;
+  presupuestoActual.descuentoMonto = desc;
   presupuestoActual.tipoPresupuesto = tipo;
 }
 
@@ -2078,6 +2134,122 @@ async function generarPDF() {
   guardarPresupuesto();
 }
 
+// ============================================================
+// DESCUENTO GENERAL AL PRESUPUESTO
+// ============================================================
+function onCambioTipoDescuento() {
+  const tipo = document.getElementById('tipoDescuento').value;
+  const inp  = document.getElementById('descuentoValor');
+  const lbl  = document.getElementById('lblDescuentoValor');
+  const blq  = document.getElementById('bloqueDescuentoValor');
+
+  switch(tipo) {
+    case 'efectivo5':
+      inp.value = 5; inp.disabled = true; lbl.textContent = 'Porcentaje (%)';
+      blq.style.opacity = '0.6';
+      break;
+    case 'efectivo10':
+      inp.value = 10; inp.disabled = true; lbl.textContent = 'Porcentaje (%)';
+      blq.style.opacity = '0.6';
+      break;
+    case 'porcentaje':
+      inp.disabled = false; lbl.textContent = 'Porcentaje (%)'; blq.style.opacity = '1';
+      if(parseFloat(inp.value) === 5 || parseFloat(inp.value) === 10) inp.value = 0;
+      break;
+    case 'fijo':
+      inp.disabled = false; lbl.textContent = 'Monto ($)'; blq.style.opacity = '1';
+      inp.value = 0;
+      break;
+    default:
+      inp.value = 0; inp.disabled = true; lbl.textContent = 'Valor'; blq.style.opacity = '0.6';
+  }
+  actualizarCartelDescuento();
+  // Si ya hay un presupuesto calculado, re-aplicar el descuento
+  if (typeof presupuestoActual !== 'undefined' && presupuestoActual && presupuestoActual.totalMateriales > 0) {
+    aplicarDescuentoAlTotal();
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const inp = document.getElementById('descuentoValor');
+  if(inp) inp.addEventListener('input', () => {
+    actualizarCartelDescuento();
+    if (typeof presupuestoActual !== 'undefined' && presupuestoActual && presupuestoActual.totalMateriales > 0) {
+      aplicarDescuentoAlTotal();
+    }
+  });
+});
+
+// Calcula el monto del descuento según tipo y valor
+function calcularMontoDescuento(subtotal) {
+  const tipo = document.getElementById('tipoDescuento')?.value || 'ninguno';
+  const valor = parseFloat(document.getElementById('descuentoValor')?.value || 0);
+  if(tipo === 'ninguno' || valor <= 0) return 0;
+  if(tipo === 'fijo') return Math.min(valor, subtotal);
+  // efectivo5, efectivo10 o porcentaje → siempre %
+  return Math.round((subtotal * valor) / 100);
+}
+
+function actualizarCartelDescuento() {
+  const cartel = document.getElementById('cartelDescuento');
+  const monto  = document.getElementById('cartelDescuentoMonto');
+  if(!cartel) return;
+  // Si no hay presupuesto calculado todavía, usar el subtotal actual de la tabla
+  let subtotal = 0;
+  if (typeof presupuestoActual !== 'undefined' && presupuestoActual && presupuestoActual.totalMateriales) {
+    subtotal = presupuestoActual.totalMateriales;
+  }
+  const desc = calcularMontoDescuento(subtotal);
+  if(desc > 0) {
+    cartel.style.display = 'block';
+    monto.textContent = '-$' + Math.round(desc).toLocaleString('es-AR');
+  } else {
+    cartel.style.display = 'none';
+  }
+}
+
+// Aplica el descuento sobre el TOTAL MATERIALES y actualiza la UI
+function aplicarDescuentoAlTotal() {
+  if (typeof presupuestoActual === 'undefined' || !presupuestoActual) return;
+  const subtotal = presupuestoActual.totalMateriales || 0;
+  const tipo = document.getElementById('tipoDescuento').value;
+  const valor = parseFloat(document.getElementById('descuentoValor').value || 0);
+  const desc = calcularMontoDescuento(subtotal);
+
+  const filaDesc = document.getElementById('filaDescuento');
+  const filaTotal = document.getElementById('filaTotalFinal');
+  const lblDesc = document.getElementById('lblFilaDescuento');
+  const montoDesc = document.getElementById('montoFilaDescuento');
+  const totalFinal = document.getElementById('totalFinalConDescuento');
+
+  if(desc > 0 && subtotal > 0) {
+    let labelDescuento = 'DESCUENTO';
+    if(tipo === 'efectivo5' || tipo === 'efectivo10') labelDescuento = `DESCUENTO PAGO EN EFECTIVO (${valor}%)`;
+    else if(tipo === 'porcentaje') labelDescuento = `DESCUENTO (${valor}%)`;
+    else if(tipo === 'fijo') labelDescuento = 'DESCUENTO (monto fijo)';
+
+    filaDesc.style.display = '';
+    filaTotal.style.display = '';
+    lblDesc.textContent = labelDescuento;
+    montoDesc.textContent = '-$' + Math.round(desc).toLocaleString('es-AR');
+    totalFinal.textContent = '$' + Math.round(subtotal - desc).toLocaleString('es-AR');
+
+    presupuestoActual.descuentoAplicado = {
+      tipo,
+      valor,
+      monto: desc,
+      etiqueta: labelDescuento,
+      totalFinal: subtotal - desc
+    };
+  } else {
+    filaDesc.style.display = 'none';
+    filaTotal.style.display = 'none';
+    presupuestoActual.descuentoAplicado = null;
+  }
+  actualizarCartelDescuento();
+  // Recalcular el total final si hay mano de obra/tipo seleccionado
+  try { recalcularTotal(); } catch(e) {}
+}
 </script>
 </body>
 </html>
