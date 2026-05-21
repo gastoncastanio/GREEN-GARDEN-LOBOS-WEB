@@ -1760,8 +1760,10 @@ async function loadProductosAdmin(silent){
   allProductos=await supabase.getProductos();
   if(silent) return;
   const grid=document.getElementById('productos-grid-admin');
-  if(allProductos.length===0){ grid.innerHTML='<p class="col-span-full text-white/40 text-sm p-8 text-center">Sin productos.</p>'; return; }
-  grid.innerHTML=allProductos.map(p=>`
+  // En la pestaña Productos (catálogo web) NO mostramos los de stock interno (categoría con "_" al inicio)
+  const productosWeb = allProductos.filter(p => !(p.categoria || '').startsWith('_'));
+  if(productosWeb.length===0){ grid.innerHTML='<p class="col-span-full text-white/40 text-sm p-8 text-center">Sin productos.</p>'; return; }
+  grid.innerHTML=productosWeb.map(p=>`
     <div class="bg-forest-900 border border-forest-800 hover:border-brass-500 transition">
       <div class="aspect-[4/3] bg-forest-800 overflow-hidden"><img src="${p.imagen_url||''}" class="w-full h-full object-cover"></div>
       <div class="p-3">
