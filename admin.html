@@ -1959,12 +1959,33 @@ function openEmpleadoModal(){ document.querySelector('#modal-empleado form').res
 
 async function saveEmpleado(e){
   e.preventDefault();
-  await supabase.createEmpleado({
-    nombre:document.getElementById('emp-nombre').value,
-    pin:document.getElementById('emp-pin').value,
-    rol:document.getElementById('emp-rol').value,
-  });
-  closeModal('modal-empleado'); await loadEmpleados();
+  const nombre = document.getElementById('emp-nombre').value.trim();
+  const pin = document.getElementById('emp-pin').value.trim();
+  const rol = document.getElementById('emp-rol').value;
+
+  // Validaciones básicas
+  if(!nombre){ alert('⚠️ Ingresá el nombre del empleado.'); return; }
+  if(!/^[0-9]{4,6}$/.test(pin)){ alert('⚠️ El PIN debe tener entre 4 y 6 dígitos.'); return; }
+
+  // VALIDACIÓN: PIN no debe estar usado por otro empleado (activo o inactivo)
+  // Refrescar lista antes de validar para no usar caché desactualizado
+  const empleadosActuales = await supabase.getEmpleados();
+  const pinEnUso = empleadosActuales.find(emp => emp.pin === pin);
+  if(pinEnUso){
+    const estado = pinEnUso.activo === false ? ' (inactivo)' : '';
+    alert(`❌ Ese PIN ya lo usa "${pinEnUso.nombre.trim()}"${estado}.\n\nElegí otro PIN distinto.`);
+    return;
+  }
+
+  const creado = await supabase.createEmpleado({ nombre, pin, rol });
+  if(!creado){
+    alert('❌ No se pudo crear el empleado. Revisá la consola.');
+    return;
+  }
+
+  toast(`✓ Empleado "${nombre}" creado con PIN ${pin}`);
+  closeModal('modal-empleado');
+  await loadEmpleados();
 }
 
 async function delEmpleado(id, nombre){
