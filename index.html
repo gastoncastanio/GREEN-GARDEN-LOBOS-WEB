@@ -921,6 +921,8 @@ async function loadProductos(){
   if(!prods || prods.length === 0){
     prods = PRODUCTOS_DEFAULT;
   }
+  // Filtrar productos de uso interno (stock) — categorías que empiezan con "_" NO se muestran en la web
+  prods = prods.filter(p => !(p.categoria || '').startsWith('_'));
   productosData = prods;
   renderProductos('tejidos');
 }
@@ -1134,6 +1136,20 @@ if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js').catch(err => console.warn('SW:', err));
   });
 }
+
+// Eliminar "Armar presupuesto online" si aparece
+document.addEventListener('DOMContentLoaded', () => {
+  const removeArmarPresupuesto = () => {
+    document.querySelectorAll('a').forEach(link => {
+      if (link.textContent.includes('Armar presupuesto online')) {
+        link.remove();
+      }
+    });
+  };
+  removeArmarPresupuesto();
+  // Ejecutar cada 500ms por si aparece dinámicamente
+  setInterval(removeArmarPresupuesto, 500);
+});
 </script>
 </body>
 </html>

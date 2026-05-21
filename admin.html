@@ -1475,9 +1475,12 @@ async function sincronizarStockDesdeCatalogo(){
 
     for(const c of aImportar){
       try {
-        // Asegurar valores nunca nulos
-        const categoria = (c.categoria && typeof c.categoria === 'object' && c.categoria.nombre)
-          ? String(c.categoria.nombre).trim() || 'General'
+        // IMPORTANTE: marcar como "_stock_interno" para que NO aparezca en la web pública.
+        // Solo los productos con categoría sin "_" al inicio se muestran en la web.
+        const categoria = '_stock_interno';
+        // Guardamos la categoría original en descripción para referencia
+        const categoriaOriginal = (c.categoria && typeof c.categoria === 'object' && c.categoria.nombre)
+          ? String(c.categoria.nombre).trim()
           : (typeof c.categoria === 'string' && c.categoria.trim()) ? c.categoria.trim() : 'General';
         const unidad = (c.unidad && String(c.unidad).trim()) || 'unidad';
         const codigoFinal = (c.codigo && String(c.codigo).trim()) || `AUTO-${Date.now()}-${Math.floor(Math.random()*1000)}`;
@@ -1495,7 +1498,7 @@ async function sincronizarStockDesdeCatalogo(){
           id: genId(),
           codigo: codigoFinal,
           nombre: nombreFinal,
-          descripcion: c.descripcion || nombreFinal,
+          descripcion: c.descripcion || `[${categoriaOriginal}] ${nombreFinal}`,
           categoria: categoria,
           activo: true,
           orden: 0,
