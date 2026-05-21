@@ -1688,6 +1688,57 @@ function abrirModalNuevoProductoStock(){
   })();
 }
 
+// ============ ELIMINAR PRODUCTO DEL STOCK (borrado completo) ============
+async function eliminarProductoStock(productoId, nombre, codigo){
+  const labelCodigo = codigo ? ` (${codigo})` : '';
+  // Confirmación 1
+  if(!confirm(`⚠️ ¿Eliminar "${nombre}"${labelCodigo}?\n\nSe va a borrar PERMANENTEMENTE de la base de datos:\n- El producto\n- Su fila de stock\n- Esta acción NO se puede deshacer.`)) return;
+  // Confirmación 2 (escribir BORRAR)
+  const confirm2 = prompt(`Para confirmar, escribí BORRAR (en mayúsculas) y tocá OK:`);
+  if(confirm2 !== 'BORRAR'){
+    toast('Cancelado. No se borró nada.');
+    return;
+  }
+
+  try {
+    // 1. Borrar fila de stock (si existe)
+    await fetch(`${SUPABASE_URL}/rest/v1/stock?producto_id=eq.${productoId}`, {
+      method: 'DELETE',
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+    });
+    // 2. Borrar movimientos de stock (si existen)
+    await fetch(`${SUPABASE_URL}/rest/v1/stock_movimientos?producto_id=eq.${productoId}`, {
+      method: 'DELETE',
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+    });
+    // 3. Borrar el producto
+    const resp = await fetch(`${SUPABASE_URL}/rest/v1/productos?id=eq.${productoId}`, {
+      method: 'DELETE',
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+    });
+    if(!resp.ok){
+      const errTxt = await resp.text();
+      console.error('Error eliminando producto:', resp.status, errTxt);
+      // Si falla por foreign key (está en algún pedido), avisar
+      if(errTxt.includes('foreign key') || errTxt.includes('referenced')){
+        alert(`❌ No se puede eliminar "${nombre}" porque está usado en algún pedido del historial.\n\nUsá "Editar" para dejarlo en stock=0 si ya no lo manejás.`);
+      } else {
+        alert(`❌ Error al eliminar: ${errTxt.slice(0,200)}`);
+      }
+      return;
+    }
+
+    // Actualizar caché local
+    allProductos = allProductos.filter(p => p.id !== productoId);
+    allStock = allStock.filter(s => s.producto_id !== productoId);
+    toast(`✓ "${nombre}" eliminado`);
+    renderStock();
+  } catch(e){
+    console.error(e);
+    alert('❌ Error: ' + e.message);
+  }
+}
+
 function calcularStockNecesario(){
   // Sumar todos los items de pedidos NO entregados
   const necesario = {};
@@ -1793,9 +1844,12 @@ function renderStock(){
               <td class="px-4 py-3">
                 <div class="flex items-center gap-3">
                   ${r.imagen ? `<img src="${r.imagen}" class="w-10 h-10 object-cover bg-forest-800 flex-shrink-0">` : `<div class="w-10 h-10 bg-forest-800 flex-shrink-0"></div>`}
-                  <div>
+                  <div class="min-w-0">
                     <p class="font-semibold">${r.nombre}</p>
-                    <p class="text-white/40 text-[10px] tracking-widest uppercase">${r.categoria}</p>
+                    <div class="flex items-center gap-2 flex-wrap mt-0.5">
+                      ${r.codigo ? `<span class="font-mono text-[10px] bg-forest-800 text-brass-400 px-1.5 py-0.5 border border-brass-500/30">${r.codigo}</span>` : ''}
+                      <p class="text-white/40 text-[10px] tracking-widest uppercase">${r.categoria}</p>
+                    </div>
                   </div>
                 </div>
               </td>
@@ -1806,6 +1860,7 @@ function renderStock(){
               <td class="px-4 py-3 text-right space-x-1 whitespace-nowrap">
                 <button onclick="openIngresoModal('${r.producto_id}','${r.nombre.replace(/'/g,"\\'")}')" class="btn-sec text-[10px] py-1 px-2">+ Ingreso</button>
                 <button onclick="openStockModal('${r.producto_id}','${r.nombre.replace(/'/g,"\\'")}')" class="btn-sec text-[10px] py-1 px-2">Editar</button>
+                <button onclick="eliminarProductoStock('${r.producto_id}','${r.nombre.replace(/'/g,"\\'")}','${(r.codigo||'').replace(/'/g,"\\'")}')" class="btn-danger text-[10px] py-1 px-2" title="Eliminar producto del stock">🗑</button>
               </td>
             </tr>
           `).join('')}
