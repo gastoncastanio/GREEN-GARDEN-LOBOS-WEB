@@ -1489,17 +1489,17 @@ async function sincronizarStockDesdeCatalogo(){
           console.log('🔍 Valores que voy a enviar:', { categoria, unidad, codigoFinal, nombreFinal });
         }
 
-        // Intento 1: con TODOS los campos posibles, ninguno null
+        // Intento 1: SOLO con columnas que existen en la tabla productos
+        // (no incluir 'unidad' ni 'precio' — esos campos no existen en esta tabla)
         let payload = {
           id: genId(),
           codigo: codigoFinal,
           nombre: nombreFinal,
           descripcion: c.descripcion || nombreFinal,
           categoria: categoria,
-          unidad: unidad,
           activo: true,
-          precio: 0,
-          orden: 0
+          orden: 0,
+          precio_unitario: 0
         };
         let res = await intentarCrearProducto(payload);
 
@@ -1523,12 +1523,11 @@ async function sincronizarStockDesdeCatalogo(){
             id: genId(),
             nombre: c.nombre,
             categoria: categoria || 'General',
-            unidad: unidad || 'unidad',
             codigo: c.codigo || `AUTO-${Date.now()}`,
             activo: true,
-            precio: 0,
             descripcion: c.descripcion || c.nombre,
-            orden: 0
+            orden: 0,
+            precio_unitario: 0
           });
         }
 
