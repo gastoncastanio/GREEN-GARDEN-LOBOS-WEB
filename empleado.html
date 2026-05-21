@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <!-- PWA -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#0f1a11">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Green Garden">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="/icons/icon-192.png">
+  <title>Panel Operativo · GREEN GARDEN LOBOS</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" type="image/png" href="logo-oficial.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = { theme:{ extend:{
+      colors:{
+        forest:{50:'#f3f6f3',100:'#e3ebe3',200:'#c7d6c7',300:'#9eb89e',400:'#6f9170',500:'#4d7250',600:'#3a5a3d',700:'#2f4732',800:'#273a2a',900:'#1f2f22',950:'#0f1a11'},
+        brass:{300:'#e8c97a',400:'#d4a85a',500:'#b8923f',600:'#9a7a32'}
+      },
+      fontFamily:{display:['Playfair Display','serif'],sans:['Inter','sans-serif']}
+    }}}
+  </script>
+  <style>
+    body{font-family:'Inter',sans-serif;background:#f3f6f3;color:#1f2f22;}
+    h1,h2,h3{font-family:'Playfair Display',serif;}
+    .btn-pri{background:#0f1a11;color:white;padding:.85rem 1.4rem;font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;font-weight:700;cursor:pointer;border:none;}
+    .btn-pri:hover{background:#1f2f22;}
+    .btn-brass{background:#b8923f;color:#0f1a11;padding:.7rem 1.2rem;font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;font-weight:700;cursor:pointer;border:none;}
+    .btn-brass:hover{background:#d4a85a;}
+    input,select,textarea{padding:.7rem .9rem;border:1px solid #c7d6c7;outline:none;width:100%;background:white;}
+    input:focus,select:focus,textarea:focus{border-color:#b8923f;}
+    .estado-pill{display:inline-block;padding:.25rem .7rem;font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;font-weight:700;}
+    .e-recibido{background:#dbeafe;color:#1e40af;}
+    .e-fabricacion{background:#fef3c7;color:#92400e;}
+    .e-listo{background:#dcfce7;color:#166534;}
+    .e-despacho{background:#ede9fe;color:#5b21b6;}
+    .e-enviado,.e-retiro_listo{background:#ffedd5;color:#9a3412;}
+    .e-entregado{background:#bbf7d0;color:#14532d;}
+    @keyframes slideIn { from{opacity:0;transform:translateY(-12px);} to{opacity:1;transform:translateY(0);} }
+    .role-badge{display:inline-block;padding:2px 8px;font-size:.6rem;letter-spacing:.15em;text-transform:uppercase;font-weight:700;}
+    .role-prod{background:#fef3c7;color:#92400e;}
+    .role-log{background:#dbeafe;color:#1e40af;}
+    .role-sup{background:#ede9fe;color:#5b21b6;}
+  </style>
+</head>
+<body class="min-h-screen">
+
+<!-- Login -->
+<div id="login-gate" class="min-h-screen flex items-center justify-center p-5">
+  <div class="bg-white border border-forest-100 p-8 md:p-12 max-w-md w-full shadow-xl">
+    <img src="logo-oficial.png" class="w-16 h-16 mx-auto mb-6">
+    <p class="text-brass-500 text-[10px] font-bold tracking-[0.25em] uppercase text-center mb-2">Panel Operativo</p>
+    <h1 class="text-2xl font-display font-bold text-forest-950 text-center mb-8">Acceso empleados</h1>
+    <form onsubmit="doLogin(event)" class="space-y-4">
+      <div>
+        <p class="text-[10px] tracking-widest uppercase text-forest-700 font-semibold mb-2">Tu PIN</p>
+        <input type="password" id="emp-pin" inputmode="numeric" pattern="[0-9]{4,6}" autofocus class="text-center text-2xl tracking-widest font-mono">
+      </div>
+      <button class="btn-pri w-full">Ingresar</button>
+      <p id="login-err" class="text-red-600 text-xs text-center hidden">PIN incorrecto. Consultá con administración.</p>
+    </form>
+  </div>
+</div>
+
+<!-- App -->
+<div id="app" class="hidden">
+  <header class="bg-forest-950 text-white sticky top-0 z-30">
+    <div class="max-w-5xl mx-auto px-5 md:px-8 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <img src="logo-oficial.png" class="w-9 h-9 object-contain">
+        <div>
+          <p class="text-sm font-bold tracking-[0.15em] uppercase">Operario</p>
+          <p class="text-brass-400 text-[9px] tracking-[0.3em] uppercase" id="emp-nombre-display">—</p>
+        </div>
+      </div>
+      <button onclick="logout()" class="text-white/60 hover:text-white text-[10px] tracking-widest uppercase">Salir</button>
+    </div>
+  </header>
+
+  <!-- Tabs principales (Pedidos / Tareas) -->
+  <nav class="bg-forest-950/95 text-white sticky top-[64px] z-20 border-t border-forest-800">
+    <div class="max-w-5xl mx-auto px-5 md:px-8 flex gap-1 overflow-x-auto">
+      <button id="emp-tab-pedidos" class="px-5 py-3 text-[11px] tracking-widest uppercase font-semibold border-b-2 border-brass-500 whitespace-nowrap text-brass-400" onclick="empSwitchTab('pedidos')">📦 Pedidos</button>
+      <button id="emp-tab-tareas" class="px-5 py-3 text-[11px] tracking-widest uppercase font-semibold border-b-2 border-transparent whitespace-nowrap text-white/60" onclick="empSwitchTab('tareas')">📋 Mis Tareas <span id="emp-tareas-badge" class="ml-1 px-1.5 bg-brass-500 text-forest-950 text-[9px] hidden">0</span></button>
+    </div>
+  </nav>
+
+  <main class="max-w-5xl mx-auto px-5 md:px-8 py-8">
+
+    <!-- SECCIÓN PEDIDOS -->
+    <section id="emp-seccion-pedidos">
+      <div class="mb-6">
+        <h2 class="text-2xl md:text-3xl font-display font-bold text-forest-950 mb-1">Pedidos del día</h2>
+        <p class="text-forest-600 text-sm">Tocá un pedido para ver detalles y avanzar su estado.</p>
+      </div>
+
+      <div class="flex gap-2 flex-wrap mb-6">
+        <button class="px-4 py-2 text-xs tracking-widest uppercase font-semibold border border-forest-200 hover:border-brass-500 transition active filter-btn" data-filter="todos" onclick="filtrar('todos',this)">Todos</button>
+        <button class="px-4 py-2 text-xs tracking-widest uppercase font-semibold border border-forest-200 hover:border-brass-500 transition filter-btn" data-filter="mios" onclick="filtrar('mios',this)">Asignados a mí</button>
+        <button class="px-4 py-2 text-xs tracking-widest uppercase font-semibold border border-forest-200 hover:border-brass-500 transition filter-btn" data-filter="activos" onclick="filtrar('activos',this)">Solo en proceso</button>
+      </div>
+
+      <div id="lista-pedidos" class="space-y-3"></div>
+    </section>
+
+    <!-- SECCIÓN MIS TAREAS -->
+    <section id="emp-seccion-tareas" class="hidden">
+      <div class="mb-6">
+        <h2 class="text-2xl md:text-3xl font-display font-bold text-forest-950 mb-1">Mis Tareas</h2>
+        <p class="text-forest-600 text-sm">Tareas asignadas a vos. Marcá cuando empieces y cuando termines.</p>
+      </div>
+
+      <!-- Filtros estado -->
+      <div class="flex gap-2 flex-wrap mb-5">
+        <button class="px-3 py-1.5 text-[11px] tracking-widest uppercase font-semibold border border-forest-200 transition emp-tar-filter active" data-f="activas" onclick="empFiltrarTareas('activas',this)">📋 Activas</button>
+        <button class="px-3 py-1.5 text-[11px] tracking-widest uppercase font-semibold border border-forest-200 transition emp-tar-filter" data-f="hoy" onclick="empFiltrarTareas('hoy',this)">⏰ Hoy</button>
+        <button class="px-3 py-1.5 text-[11px] tracking-widest uppercase font-semibold border border-forest-200 transition emp-tar-filter" data-f="completadas" onclick="empFiltrarTareas('completadas',this)">✓ Completadas</button>
+      </div>
+
+      <div id="emp-lista-tareas" class="space-y-3"></div>
+    </section>
+  </main>
+</div>
+
+<!-- Modal Detalle Tarea Empleado -->
+<div id="emp-tarea-modal" class="fixed inset-0 bg-black/60 z-40 hidden items-end md:items-center justify-center p-0 md:p-4">
+  <div class="bg-white w-full max-w-2xl max-h-[92vh] overflow-y-auto">
+    <header class="bg-forest-950 text-white px-5 py-4 flex items-center justify-between sticky top-0 z-10">
+      <div class="flex-1 min-w-0">
+        <p class="text-brass-400 text-[10px] font-bold tracking-[0.25em] uppercase" id="emp-tar-prioridad">—</p>
+        <h3 class="font-display font-bold text-lg truncate" id="emp-tar-titulo">—</h3>
+      </div>
+      <button onclick="empCerrarTareaModal()" class="text-white/70 hover:text-white text-2xl leading-none">×</button>
+    </header>
+
+    <div class="p-5 md:p-6">
+      <div class="grid grid-cols-2 gap-4 mb-5 text-sm">
+        <div><p class="text-[10px] tracking-widest uppercase text-forest-500 mb-1">Categoría</p><p class="font-semibold" id="emp-tar-categoria">—</p></div>
+        <div><p class="text-[10px] tracking-widest uppercase text-forest-500 mb-1">Fecha límite</p><p class="font-semibold" id="emp-tar-fecha">—</p></div>
+      </div>
+
+      <div class="mb-5">
+        <p class="text-[10px] tracking-widest uppercase text-forest-500 mb-2">Descripción</p>
+        <p class="text-sm text-forest-900 whitespace-pre-line" id="emp-tar-desc">—</p>
+      </div>
+
+      <div class="mb-5">
+        <p class="text-[10px] tracking-widest uppercase text-forest-500 mb-2">Tiempo estimado</p>
+        <p class="text-sm text-forest-900" id="emp-tar-tiempo">—</p>
+      </div>
+
+      <div class="bg-forest-50 border border-forest-100 p-4 mb-4">
+        <p class="text-[10px] tracking-widest uppercase text-forest-700 font-bold mb-3">Mi estado en esta tarea</p>
+        <p class="mb-3"><span class="estado-pill" id="emp-tar-estado-pill">—</span></p>
+        <div class="grid grid-cols-1 gap-2" id="emp-tar-acciones"></div>
+      </div>
+
+      <div>
+        <label class="text-[10px] tracking-widest uppercase text-forest-500 mb-1 block">Comentario (opcional)</label>
+        <textarea id="emp-tar-comentario" rows="2" placeholder="Notas, demoras, etc."></textarea>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Detalle pedido modal -->
+<div id="detalle-modal" class="fixed inset-0 bg-black/60 z-40 hidden items-end md:items-center justify-center p-0 md:p-4">
+  <div class="bg-white w-full max-w-2xl max-h-[92vh] overflow-y-auto">
+    <header class="bg-forest-950 text-white px-5 py-4 flex items-center justify-between sticky top-0">
+      <div>
+        <p class="text-brass-400 text-[10px] font-bold tracking-[0.25em] uppercase" id="d-codigo">—</p>
+        <h3 class="font-display font-bold text-lg" id="d-cliente">—</h3>
+      </div>
+      <button onclick="cerrarDetalle()" class="text-white/70 hover:text-white text-2xl leading-none">×</button>
+    </header>
+
+    <div class="p-5 md:p-6">
+      <div class="grid grid-cols-2 gap-4 mb-5 text-sm">
+        <div><p class="text-[10px] tracking-widest uppercase text-forest-500 mb-1">Teléfono</p><p class="font-semibold" id="d-tel">—</p></div>
+        <div><p class="text-[10px] tracking-widest uppercase text-forest-500 mb-1">Entrega</p><p class="font-semibold" id="d-metodo">—</p></div>
+        <div class="col-span-2"><p class="text-[10px] tracking-widest uppercase text-forest-500 mb-1">Dirección</p><p class="font-semibold" id="d-direccion">—</p></div>
+      </div>
+
+      <!-- Asignaciones del pedido -->
+      <div class="grid grid-cols-2 gap-3 mb-5">
+        <div class="bg-forest-50 border-l-4 border-forest-700 p-3">
+          <p class="text-[9px] tracking-widest uppercase text-forest-700 font-bold mb-1">👷 Producción</p>
+          <p class="text-sm font-semibold text-forest-950" id="d-resp-prod">—</p>
+        </div>
+        <div class="bg-forest-50 border-l-4 border-brass-500 p-3">
+          <p class="text-[9px] tracking-widest uppercase text-brass-600 font-bold mb-1">🚚 Logística</p>
+          <p class="text-sm font-semibold text-forest-950" id="d-resp-log">—</p>
+        </div>
+      </div>
+
+      <!-- BOLETA -->
+      <div id="d-boleta-section" class="mb-6 hidden">
+        <div class="flex items-center justify-between mb-3">
+          <p class="text-[10px] tracking-widest uppercase text-brass-500 font-bold">📎 Boleta del pedido</p>
+          <a id="d-boleta-link" href="#" target="_blank" class="text-[10px] text-brass-500 hover:text-brass-600 font-bold tracking-widest uppercase">Abrir en grande →</a>
+        </div>
+        <div id="d-boleta-viewer" class="border border-forest-200 bg-forest-50 overflow-hidden"></div>
+      </div>
+
+      <!-- Tipo y mano de obra -->
+      <div id="d-mo-section" class="bg-amber-50 border border-amber-200 p-4 mb-5 hidden">
+        <p class="text-[10px] tracking-widest uppercase text-amber-700 font-bold mb-2">🔧 Incluye mano de obra</p>
+        <p class="text-sm text-forest-900" id="d-mo-desc">—</p>
+      </div>
+
+      <p class="text-[10px] tracking-widest uppercase text-brass-500 font-bold mb-3">Productos / Materiales</p>
+      <div id="d-productos" class="space-y-2 mb-6"></div>
+
+      <p class="text-[10px] tracking-widest uppercase text-brass-500 font-bold mb-3">Estado actual</p>
+      <p class="mb-4"><span class="estado-pill" id="d-estado-pill">—</span></p>
+
+      <div class="bg-forest-50 border border-forest-100 p-4 mb-4">
+        <p class="text-[10px] tracking-widest uppercase text-forest-700 font-bold mb-3">Avanzar pedido</p>
+        <div class="grid grid-cols-2 gap-2" id="d-acciones"></div>
+      </div>
+
+      <div>
+        <label class="text-[10px] tracking-widest uppercase text-forest-500 mb-1 block">Comentario opcional para este cambio</label>
+        <textarea id="d-comentario" rows="2" placeholder="Ej: terminado a las 14hs"></textarea>
+      </div>
+
+      <div>
+        <p class="text-[10px] tracking-widest uppercase text-brass-500 font-bold mt-6 mb-3">Historial</p>
+        <div id="d-timeline" class="space-y-2"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="supabase-config.js"></script>
+<script>
+const ESTADO_LABELS = {
+  recibido:'Recibido', fabricacion:'En fabricación', listo:'Producto listo',
+  despacho:'Preparando despacho', enviado:'En camino', retiro_listo:'Listo p/ retirar', entregado:'Entregado'
+};
+
+// FLUJO DE ESTADOS — cada transición indica qué rol puede hacerla
+const FLOW_NEXT = {
+  recibido:    [{key:'fabricacion',  label:'▶ Iniciar fabricación',     rol:'produccion'}],
+  fabricacion: [{key:'listo',        label:'✓ Marcar listo',            rol:'produccion'}],
+  listo:       [
+                 {key:'despacho',     label:'📦 Preparando despacho',    rol:'logistica'},
+                 {key:'retiro_listo', label:'🏪 Listo para retirar',     rol:'logistica'},
+               ],
+  despacho:    [{key:'enviado',      label:'🚚 Salió en camino',        rol:'logistica'}],
+  enviado:     [{key:'entregado',    label:'🎉 Entregado',              rol:'logistica'}],
+  retiro_listo:[{key:'entregado',    label:'🎉 Entregado / retirado',   rol:'logistica'}],
+  entregado: []
+};
+
+// Mapeo rol del empleado → área permitida
+const ROL_AREA = {
+  operario:   'produccion',
+  logistica:  'logistica',
+  supervisor: 'all',
+};
+
+function puedeAvanzar(rolEmpleado, areaRequerida){
+  const area = ROL_AREA[rolEmpleado] || 'none';
+  if(area === 'all') return true;
+  return area === areaRequerida;
+}
+
+let me = null;
+let pedidos = [];
+let detalleActual = null;
+let currentFilter = 'todos';
+let lastNotifIds = new Set();
+let dingAudio = null;
+let allEmpleadosCache = [];
+
+async function doLogin(e){
+  e.preventDefault();
+  const pin = document.getElementById('emp-pin').value;
+  const emp = await supabase.loginEmpleado(pin);
+  if(!emp){
+    document.getElementById('login-err').classList.remove('hidden');
+    return;
+  }
+  me = emp;
+  sessionStorage.setItem('gg_emp', JSON.stringify(emp));
+  showApp();
+}
+function logout(){ sessionStorage.removeItem('gg_emp'); location.reload(); }
+
+function showApp(){
+  document.getElementById('login-gate').classList.add('hidden');
+  document.getElementById('app').classList.remove('hidden');
+  document.getElementById('emp-nombre-display').textContent = `${me.nombre} · ${me.rol}`;
+  // Pedir permiso de notificaciones del navegador
+  if('Notification' in window && Notification.permission === 'default'){
+    Notification.requestPermission();
+  }
+  // Audio de "ding" para notificaciones (data URI corto)
+  dingAudio = new Audio('data:audio/wav;base64,UklGRkYBAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YSIBAACAh4+aprC5wcjOz87LxL2yp5uPg3ZqXVFIPjQrJB8bGRkbHyQrNT5IUV1qdoOPm6e1wsnP1NTQysO3qpyOgXVnWk5DOC8mIBwZGRobIScuOEFNV2NwfYqWor7K0tnf4uTk5OPg3djSysG2qZyPgnZpXVJHPDMqIyAcGhocHiQqMjpDT1tneIWRnaq3v8nQ2N3i5OXl5ePh3dnSysG2qZyOgXVoXFFGOzInIBwZGBgaHiUtNz9JU1xpd4ORnamzvL/Aw8XHycvNz9DR0tHQz87Ny8jFwby2sayopKCdm5qZmJiZmpyenqWoq62vsbS2uLu9v8HDxcfJy83P0NLT1NXV1dXV1dXV1dXU1NPT0tHQz87NzMrJyMfFxMPCwcDAv76+vb29vLu7u7u7u7u8vLy9vb29vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+');
+  // Cargar empleados (para mostrar nombres de responsables)
+  supabase.getEmpleados().then(emps => { allEmpleadosCache = emps; });
+  // Cargar primera vez sin notificar
+  cargarPedidos(true);
+  // Cargar mis tareas
+  empCargarTareas();
+  // Realtime: cuando cambia algo en pedidos, recargo al toque
+  supabase.subscribeTable('pedidos', () => cargarPedidos(false));
+  // Realtime: cuando cambia algo en tareas o asignaciones, recargo
+  supabase.subscribeTable('tareas_asignados', () => empCargarTareas());
+  supabase.subscribeTable('tareas', () => empCargarTareas());
+  // Polling de respaldo cada 30s (por si se cae el WebSocket)
+  setInterval(()=>{ cargarPedidos(false); empCargarTareas(); }, 30000);
+}
+
+const stored = sessionStorage.getItem('gg_emp');
+if(stored){ me = JSON.parse(stored); showApp(); }
+
+async function cargarPedidos(silencioso){
+  const nuevos = await supabase.getPedidos();
+  // Detectar pedidos nuevos asignados a mí
+  if(!silencioso && pedidos.length > 0){
+    const idsAnteriores = new Set(pedidos.map(p => p.id));
+    const recienAsignados = nuevos.filter(p => {
+      if(idsAnteriores.has(p.id)) {
+        // Era pedido conocido — chequear si recién me lo asignaron
+        const ant = pedidos.find(x=>x.id===p.id);
+        return esMiResponsabilidad(p) && !esMiResponsabilidad(ant) && !lastNotifIds.has(p.id);
+      } else {
+        // Es completamente nuevo
+        return esMiResponsabilidad(p) && !lastNotifIds.has(p.id);
+      }
+    });
+
+    // Detectar pedidos que llegaron a un estado donde YO debo trabajar
+    const recienListosParaMi = nuevos.filter(p => {
+      if(!idsAnteriores.has(p.id)) return false;
+      if(!esMiResponsabilidad(p)) return false;
+      const ant = pedidos.find(x=>x.id===p.id);
+      if(!ant) return false;
+      // Cambió de estado y AHORA tengo acción posible
+      const accionesAntes = (FLOW_NEXT[ant.estado]||[]).some(a => puedeAvanzar(me.rol, a.rol));
+      const accionesAhora = (FLOW_NEXT[p.estado]||[]).some(a => puedeAvanzar(me.rol, a.rol));
+      return ant.estado !== p.estado && !accionesAntes && accionesAhora && !lastNotifIds.has(p.id+':'+p.estado);
+    });
+
+    [...recienAsignados, ...recienListosParaMi].forEach(p => {
+      notificar(p);
+      lastNotifIds.add(p.id);
+      lastNotifIds.add(p.id+':'+p.estado);
+    });
+  }
+  pedidos = nuevos;
+  renderLista();
+}
+
+function esMiResponsabilidad(p){
+  if(me.rol === 'supervisor') return true;
+  if(me.rol === 'operario')  return p.empleado_asignado === me.id;
+  if(me.rol === 'logistica') return p.empleado_logistica === me.id;
+  return false;
+}
+
+function notificar(p){
+  const titulo = `🔔 Pedido para vos: ${p.cliente_nombre||p.codigo}`;
+  const cuerpo = `${ESTADO_LABELS[p.estado]||p.estado} · ${(p.productos||[]).length} items`;
+  // Sonido
+  try { dingAudio?.play().catch(()=>{}); } catch(e){}
+  // Toast en pantalla
+  showToastNotif(titulo, cuerpo, p.id);
+  // Notificación del navegador / SO
+  if('Notification' in window && Notification.permission === 'granted'){
+    const n = new Notification(titulo, {
+      body: cuerpo,
+      icon: '/logo-oficial.png',
+      tag: 'gg-'+p.id,
+    });
+    n.onclick = () => { window.focus(); abrirDetalle(p.id); n.close(); };
+  }
+}
+
+function showToastNotif(titulo, cuerpo, pedidoId){
+  const t = document.createElement('div');
+  t.style.cssText = 'position:fixed;top:5rem;right:1rem;left:1rem;max-width:380px;margin-left:auto;background:#0f1a11;color:white;border-left:4px solid #b8923f;box-shadow:0 12px 40px rgba(0,0,0,.4);z-index:300;cursor:pointer;animation:slideIn .35s ease;';
+  t.innerHTML = `
+    <div style="padding:1rem 1.25rem;">
+      <p style="font-size:.65rem;letter-spacing:.18em;text-transform:uppercase;color:#d4a85a;font-weight:700;margin-bottom:.25rem;">🔔 Nuevo pedido</p>
+      <p style="font-weight:600;font-size:.9rem;margin-bottom:.25rem;">${titulo.replace('🔔 Pedido para vos: ','')}</p>
+      <p style="font-size:.75rem;color:rgba(255,255,255,.6);">${cuerpo}</p>
+      <p style="font-size:.65rem;color:#d4a85a;margin-top:.5rem;text-decoration:underline;">Tocá para ver →</p>
+    </div>
+  `;
+  t.onclick = () => { abrirDetalle(pedidoId); t.remove(); };
+  document.body.appendChild(t);
+  setTimeout(()=>{ t.style.opacity='0'; t.style.transition='opacity .4s'; setTimeout(()=>t.remove(),400); }, 8000);
+}
+
+function filtrar(f, btn){
+  currentFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b=>{
+    b.classList.remove('bg-brass-500','text-forest-950','border-brass-500');
+  });
+  btn.classList.add('bg-brass-500','text-forest-950','border-brass-500');
+  renderLista();
+}
+
+function renderLista(){
+  let arr = [...pedidos];
+  if(currentFilter === 'mios')    arr = arr.filter(p => esMiResponsabilidad(p));
+  if(currentFilter === 'activos') arr = arr.filter(p => p.estado !== 'entregado');
+
+  const cont = document.getElementById('lista-pedidos');
+  if(arr.length === 0){
+    cont.innerHTML = '<p class="text-center text-forest-500 py-12">No hay pedidos en este filtro.</p>';
+    return;
+  }
+  cont.innerHTML = arr.map(p => {
+    const estado = ESTADO_LABELS[p.estado] || p.estado;
+    const items = (p.productos||[]).length;
+    const mio = esMiResponsabilidad(p);
+    // ¿Tiene acciones disponibles para este rol?
+    const accionesParaMi = (FLOW_NEXT[p.estado]||[]).filter(a => puedeAvanzar(me.rol, a.rol));
+    const tocaTrabajar = mio && accionesParaMi.length > 0;
+    return `
+      <button onclick="abrirDetalle('${p.id}')" class="w-full text-left bg-white border ${tocaTrabajar?'border-brass-400 ring-2 ring-brass-400/20':mio?'border-brass-200':'border-forest-100'} hover:border-brass-500 p-4 transition flex items-center gap-4">
+        <div class="w-10 h-10 rounded-full bg-forest-50 flex items-center justify-center text-forest-700 font-bold flex-shrink-0">${(p.cliente_nombre||'?').charAt(0).toUpperCase()}</div>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 mb-1 flex-wrap">
+            <p class="font-display font-bold text-forest-950 text-base truncate">${p.cliente_nombre}</p>
+            ${tocaTrabajar?'<span class="text-[9px] bg-brass-500 text-forest-950 px-1.5 py-0.5 font-bold tracking-widest uppercase">⚡ Te toca</span>':mio?'<span class="text-[9px] bg-brass-100 text-brass-700 px-1.5 py-0.5 font-bold tracking-widest uppercase">Asignado</span>':''}
+          </div>
+          <p class="text-forest-500 text-xs font-mono">${p.codigo} · ${items} items</p>
+        </div>
+        <div class="text-right">
+          <span class="estado-pill e-${p.estado}">${estado}</span>
+          <p class="text-forest-400 text-[10px] mt-1">${new Date(p.created_at).toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit'})}</p>
+        </div>
+      </button>
+    `;
+  }).join('');
+}
+
+async function abrirDetalle(id){
+  detalleActual = pedidos.find(p => p.id === id);
+  if(!detalleActual) return;
+  const p = detalleActual;
+  document.getElementById('d-codigo').textContent = p.codigo;
+  document.getElementById('d-cliente').textContent = p.cliente_nombre || '—';
+  document.getElementById('d-tel').textContent = p.cliente_telefono || '—';
+  document.getElementById('d-metodo').textContent = p.metodo_entrega === 'retiro' ? 'Retiro en local' : 'Envío domicilio';
+  document.getElementById('d-direccion').textContent = p.direccion_entrega || '—';
+
+  // Responsables asignados
+  const empProd = allEmpleadosCache.find(e => e.id === p.empleado_asignado);
+  const empLog  = allEmpleadosCache.find(e => e.id === p.empleado_logistica);
+  document.getElementById('d-resp-prod').innerHTML = empProd
+    ? `${empProd.nombre} ${empProd.id===me.id?'<span class="text-[9px] bg-brass-500 text-forest-950 px-1 py-0.5 ml-1">VOS</span>':''}`
+    : '<span class="text-forest-400 text-xs">Sin asignar</span>';
+  document.getElementById('d-resp-log').innerHTML = empLog
+    ? `${empLog.nombre} ${empLog.id===me.id?'<span class="text-[9px] bg-brass-500 text-forest-950 px-1 py-0.5 ml-1">VOS</span>':''}`
+    : '<span class="text-forest-400 text-xs">Sin asignar</span>';
+
+  // Boleta del pedido
+  const boletaSec = document.getElementById('d-boleta-section');
+  const boletaViewer = document.getElementById('d-boleta-viewer');
+  const boletaLink = document.getElementById('d-boleta-link');
+  if(p.boleta_url){
+    boletaSec.classList.remove('hidden');
+    boletaLink.href = p.boleta_url;
+    const ext = (p.boleta_url.split('.').pop()||'').toLowerCase().split('?')[0];
+    if(ext === 'pdf'){
+      boletaViewer.innerHTML = `<embed src="${p.boleta_url}" type="application/pdf" class="w-full" style="height:70vh;min-height:500px;">`;
+    } else {
+      boletaViewer.innerHTML = `<a href="${p.boleta_url}" target="_blank"><img src="${p.boleta_url}" class="w-full max-h-[70vh] object-contain bg-white" alt="Boleta"></a>`;
+    }
+  } else {
+    boletaSec.classList.add('hidden');
+    boletaViewer.innerHTML = '';
+  }
+
+  // Mano de obra
+  const moSec = document.getElementById('d-mo-section');
+  if(p.tipo === 'materiales_mano_obra' && p.mano_obra_descripcion){
+    moSec.classList.remove('hidden');
+    document.getElementById('d-mo-desc').textContent = p.mano_obra_descripcion;
+  } else {
+    moSec.classList.add('hidden');
+  }
+
+  // Productos
+  document.getElementById('d-productos').innerHTML = (p.productos||[]).map(it => `
+    <div class="flex items-center gap-3 bg-forest-50 p-3 border border-forest-100">
+      <img src="${it.imagen||'logo-oficial.png'}" class="w-10 h-10 object-cover bg-white">
+      <div class="flex-1 min-w-0">
+        <p class="font-semibold text-forest-900 text-sm">${it.nombre}</p>
+        <p class="text-forest-500 text-xs">${it.descripcion||''} ${it.notas?'· '+it.notas:''}</p>
+      </div>
+      <p class="text-forest-700 font-bold text-sm">×${it.qty}</p>
+    </div>
+  `).join('') || '<p class="text-forest-500 text-sm">Sin detalle.</p>';
+
+  // Estado actual
+  const pill = document.getElementById('d-estado-pill');
+  pill.className = `estado-pill e-${p.estado}`;
+  pill.textContent = ESTADO_LABELS[p.estado] || p.estado;
+
+  // Acciones disponibles según rol
+  const acc = FLOW_NEXT[p.estado] || [];
+  const accCont = document.getElementById('d-acciones');
+  const esMio = esMiResponsabilidad(p);
+
+  if(acc.length === 0){
+    accCont.innerHTML = '<p class="col-span-2 text-forest-500 text-xs text-center py-2">✓ Pedido cerrado · Sin más acciones</p>';
+  } else if(!esMio && me.rol !== 'supervisor'){
+    accCont.innerHTML = `<p class="col-span-2 text-forest-500 text-xs text-center py-3 bg-orange-50 border border-orange-200">🔒 Este pedido no está asignado a vos. Solo el responsable puede avanzarlo.</p>`;
+  } else {
+    accCont.innerHTML = acc.map(a => {
+      const permitido = puedeAvanzar(me.rol, a.rol);
+      const areaLbl = a.rol === 'produccion' ? 'Producción' : 'Logística';
+      if(permitido){
+        return `<button onclick="avanzarEstado('${a.key}')" class="btn-brass w-full text-center">${a.label}</button>`;
+      } else {
+        return `<button disabled class="w-full text-center opacity-50 cursor-not-allowed bg-forest-100 text-forest-500 py-3 px-4 text-xs font-bold tracking-widest uppercase border border-forest-200" title="Solo ${areaLbl}">🔒 ${a.label}<br><span class="text-[9px] normal-case">Solo ${areaLbl}</span></button>`;
+      }
+    }).join('');
+  }
+
+
+  document.getElementById('d-comentario').value = '';
+
+  // Timeline
+  const evs = await supabase.getEventos(p.id);
+  document.getElementById('d-timeline').innerHTML = evs.length ? evs.map(ev => `
+    <div class="flex items-start gap-3 text-xs">
+      <div class="w-2 h-2 rounded-full bg-brass-500 mt-1.5 flex-shrink-0"></div>
+      <div class="flex-1">
+        <p class="font-semibold text-forest-900">${ESTADO_LABELS[ev.estado]||ev.estado}</p>
+        <p class="text-forest-500">${new Date(ev.created_at).toLocaleString('es-AR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}${ev.empleado_nombre?' · '+ev.empleado_nombre:''}</p>
+        ${ev.comentario && ev.comentario !== 'Estado actualizado' ? `<p class="text-forest-700 italic mt-0.5">"${ev.comentario}"</p>` : ''}
+      </div>
+    </div>
+  `).join('') : '<p class="text-forest-400 text-xs">Sin eventos previos.</p>';
+
+  document.getElementById('detalle-modal').classList.remove('hidden');
+  document.getElementById('detalle-modal').classList.add('flex');
+}
+
+function cerrarDetalle(){
+  document.getElementById('detalle-modal').classList.add('hidden');
+  document.getElementById('detalle-modal').classList.remove('flex');
+}
+
+async function avanzarEstado(nuevoEstado){
+  if(!detalleActual) return;
+  const comentario = document.getElementById('d-comentario').value || 'Estado actualizado';
+  await supabase.updatePedido(detalleActual.id, { estado: nuevoEstado });
+  await supabase.addEvento(detalleActual.id, nuevoEstado, comentario, me.nombre);
+  cerrarDetalle();
+  await cargarPedidos();
+  // Toast
+  const t = document.createElement('div');
+  t.textContent = `✓ Pedido marcado: ${ESTADO_LABELS[nuevoEstado]}`;
+  t.style.cssText = 'position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:#0f1a11;color:#d4a85a;padding:1rem 1.5rem;font-weight:700;font-size:.85rem;z-index:200;box-shadow:0 8px 24px rgba(0,0,0,.3);';
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(), 2500);
+}
+
+// ============ PWA: registrar Service Worker + botón instalar ============
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(err => console.warn('SW:', err));
+  });
+}
+
+let _deferredInstall = null;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  _deferredInstall = e;
+  mostrarBotonInstalar();
+});
+window.addEventListener('appinstalled', () => {
+  _deferredInstall = null;
+  const b = document.getElementById('install-btn');
+  if (b) b.remove();
+});
+
+function mostrarBotonInstalar(){
+  if (document.getElementById('install-btn')) return;
+  const btn = document.createElement('button');
+  btn.id = 'install-btn';
+  btn.style.cssText = 'position:fixed;bottom:1rem;right:1rem;z-index:200;background:#b8923f;color:#0f1a11;border:none;padding:.85rem 1.2rem;font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;font-weight:700;cursor:pointer;box-shadow:0 8px 24px rgba(184,146,63,.4);display:flex;align-items:center;gap:.5rem;';
+  btn.innerHTML = '📲 Instalar app';
+  btn.onclick = async () => {
+    if(!_deferredInstall) return;
+    _deferredInstall.prompt();
+    const { outcome } = await _deferredInstall.userChoice;
+    if (outcome === 'accepted') btn.remove();
+    _deferredInstall = null;
+  };
+  document.body.appendChild(btn);
+}
+
+// iOS: el evento beforeinstallprompt no existe — mostrar instrucciones manuales
+function detectarIOS(){
+  return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+}
+function esStandalone(){
+  return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+}
+window.addEventListener('load', () => {
+  if(detectarIOS() && !esStandalone() && !sessionStorage.getItem('gg_ios_install_dismissed')){
+    setTimeout(mostrarInstrucIOS, 3000);
+  }
+});
+
+function mostrarInstrucIOS(){
+  if (document.getElementById('ios-install')) return;
+  const banner = document.createElement('div');
+  banner.id = 'ios-install';
+  banner.style.cssText = 'position:fixed;bottom:1rem;left:1rem;right:1rem;z-index:200;background:#0f1a11;border:1.5px solid #b8923f;padding:1rem;color:white;box-shadow:0 12px 40px rgba(0,0,0,.5);max-width:500px;margin:0 auto;';
+  banner.innerHTML = `
+    <div style="display:flex;align-items:start;gap:.8rem;">
+      <div style="font-size:1.4rem;">📲</div>
+      <div style="flex:1;">
+        <p style="font-weight:700;margin-bottom:.4rem;font-size:.9rem;">Instalá la app en tu iPhone</p>
+        <p style="font-size:.75rem;color:rgba(255,255,255,.7);line-height:1.5;">Tocá <strong>Compartir <span style="display:inline-block;border:1px solid #b8923f;padding:0 .3rem;border-radius:3px;">⬆</span></strong> y luego <strong>"Agregar a Inicio"</strong>. Así abrís la app como una app nativa.</p>
+      </div>
+      <button onclick="document.getElementById('ios-install').remove();sessionStorage.setItem('gg_ios_install_dismissed','1');" style="background:transparent;border:none;color:rgba(255,255,255,.6);font-size:1.4rem;cursor:pointer;padding:0 .3rem;">×</button>
+    </div>
+  `;
+  document.body.appendChild(banner);
+}
+
+// ============================================================
+// MIS TAREAS (empleado)
+// ============================================================
+let empMisTareas = [];
+let empFiltroTareas = 'activas';
+let empTareaActual = null;
+
+function empSwitchTab(tab){
+  const tPed = document.getElementById('emp-tab-pedidos');
+  const tTar = document.getElementById('emp-tab-tareas');
+  const sPed = document.getElementById('emp-seccion-pedidos');
+  const sTar = document.getElementById('emp-seccion-tareas');
+  if(tab === 'pedidos'){
+    sPed.classList.remove('hidden'); sTar.classList.add('hidden');
+    tPed.classList.add('text-brass-400','border-brass-500'); tPed.classList.remove('text-white/60','border-transparent');
+    tTar.classList.remove('text-brass-400','border-brass-500'); tTar.classList.add('text-white/60','border-transparent');
+  } else {
+    sTar.classList.remove('hidden'); sPed.classList.add('hidden');
+    tTar.classList.add('text-brass-400','border-brass-500'); tTar.classList.remove('text-white/60','border-transparent');
+    tPed.classList.remove('text-brass-400','border-brass-500'); tPed.classList.add('text-white/60','border-transparent');
+    empCargarTareas();
+  }
+}
+
+async function empCargarTareas(){
+  if(!me || !me.id) return;
+  try {
+    const todas = await supabase.getTareas();
+    // Filtrar solo las que tienen al empleado actual asignado
+    empMisTareas = todas.filter(t =>
+      (t.asignados || []).some(a => a.empleado_id === me.id)
+    );
+    empRenderTareas();
+    // Badge con cantidad de tareas activas
+    const activas = empMisTareas.filter(t => {
+      const mia = (t.asignados || []).find(a => a.empleado_id === me.id);
+      return mia && mia.estado_individual !== 'completada' && t.estado !== 'completada' && t.estado !== 'cancelada';
+    });
+    const badge = document.getElementById('emp-tareas-badge');
+    if(activas.length > 0){
+      badge.textContent = activas.length;
+      badge.classList.remove('hidden');
+    } else {
+      badge.classList.add('hidden');
+    }
+  } catch(e){
+    console.error('Error cargando tareas:', e);
+  }
+}
+
+function empFiltrarTareas(f, btn){
+  empFiltroTareas = f;
+  document.querySelectorAll('.emp-tar-filter').forEach(b => b.classList.remove('active','bg-brass-500','text-forest-950'));
+  if(btn){
+    btn.classList.add('active','bg-brass-500','text-forest-950');
+  }
+  empRenderTareas();
+}
+
+function empGetMiAsignacion(t){
+  return (t.asignados || []).find(a => a.empleado_id === me.id);
+}
+
+function empRenderTareas(){
+  const cont = document.getElementById('emp-lista-tareas');
+  if(!cont) return;
+
+  let tareas = empMisTareas.slice();
+  const hoy = new Date(); hoy.setHours(0,0,0,0);
+  const manana = new Date(hoy); manana.setDate(manana.getDate()+1);
+
+  if(empFiltroTareas === 'activas'){
+    tareas = tareas.filter(t => {
+      const mia = empGetMiAsignacion(t);
+      return mia && mia.estado_individual !== 'completada' && t.estado !== 'completada' && t.estado !== 'cancelada';
+    });
+  } else if(empFiltroTareas === 'hoy'){
+    tareas = tareas.filter(t => {
+      if(!t.fecha_limite) return false;
+      const fl = new Date(t.fecha_limite);
+      return fl >= hoy && fl < manana;
+    });
+  } else if(empFiltroTareas === 'completadas'){
+    tareas = tareas.filter(t => {
+      const mia = empGetMiAsignacion(t);
+      return (mia && mia.estado_individual === 'completada') || t.estado === 'completada';
+    });
+  }
+
+  // Ordenar: urgentes primero, luego por fecha límite
+  const prioOrden = { urgente: 0, alta: 1, media: 2, baja: 3 };
+  tareas.sort((a,b) => {
+    const pa = prioOrden[a.prioridad] ?? 4;
+    const pb = prioOrden[b.prioridad] ?? 4;
+    if(pa !== pb) return pa - pb;
+    const fa = a.fecha_limite ? new Date(a.fecha_limite).getTime() : Infinity;
+    const fb = b.fecha_limite ? new Date(b.fecha_limite).getTime() : Infinity;
+    return fa - fb;
+  });
+
+  if(tareas.length === 0){
+    cont.innerHTML = '<div class="text-center text-forest-500 text-sm py-12 bg-white border border-forest-100">No hay tareas en este filtro.</div>';
+    return;
+  }
+
+  const prioColors = {
+    urgente: 'border-red-500 bg-red-50',
+    alta:    'border-orange-400 bg-orange-50',
+    media:   'border-yellow-400 bg-yellow-50',
+    baja:    'border-forest-300 bg-white'
+  };
+  const prioEmoji = { urgente: '🔴', alta: '🟠', media: '🟡', baja: '🟢' };
+  const catEmoji = { general: '📌', fabrica: '🏭', administrativa: '📊', logistica: '🚚', mantenimiento: '🛠' };
+
+  cont.innerHTML = tareas.map(t => {
+    const mia = empGetMiAsignacion(t) || {};
+    const estadoMio = mia.estado_individual || 'pendiente';
+    const estadoLabel = {
+      pendiente: 'Pendiente',
+      en_progreso: 'En progreso',
+      completada: '✓ Completada'
+    }[estadoMio] || estadoMio;
+    const fechaTxt = t.fecha_limite
+      ? new Date(t.fecha_limite).toLocaleString('es-AR', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' })
+      : 'Sin fecha';
+    const otrosAsignados = (t.asignados || []).filter(a => a.empleado_id !== me.id).map(a => a.empleado_nombre).join(', ');
+    return `
+      <div onclick="empAbrirTarea('${t.id}')" class="cursor-pointer p-4 border-l-4 ${prioColors[t.prioridad] || 'border-forest-300 bg-white'} hover:shadow-md transition">
+        <div class="flex items-start justify-between gap-3 mb-2">
+          <div class="flex-1 min-w-0">
+            <p class="font-bold text-forest-950 text-base leading-tight">${prioEmoji[t.prioridad] || ''} ${t.titulo}</p>
+            ${t.descripcion ? `<p class="text-forest-600 text-xs mt-1 line-clamp-2">${t.descripcion}</p>` : ''}
+          </div>
+          <span class="estado-pill text-[9px] shrink-0" style="background:${estadoMio==='completada'?'#dcfce7':estadoMio==='en_progreso'?'#dbeafe':'#fef3c7'};color:${estadoMio==='completada'?'#166534':estadoMio==='en_progreso'?'#1e40af':'#854d0e'};">${estadoLabel}</span>
+        </div>
+        <div class="flex items-center justify-between text-[11px] text-forest-600 mt-3 pt-2 border-t border-forest-100">
+          <span>${catEmoji[t.categoria] || '📌'} ${t.categoria || 'general'}</span>
+          <span>⏰ ${fechaTxt}</span>
+        </div>
+        ${otrosAsignados ? `<p class="text-[10px] text-forest-400 mt-1">👥 Junto a: ${otrosAsignados}</p>` : ''}
+      </div>
+    `;
+  }).join('');
+}
+
+async function empAbrirTarea(id){
+  const t = empMisTareas.find(x => x.id === id);
+  if(!t) return;
+  empTareaActual = t;
+  const mia = empGetMiAsignacion(t) || {};
+  const estadoMio = mia.estado_individual || 'pendiente';
+
+  const prioLabel = { urgente: '🔴 URGENTE', alta: '🟠 ALTA', media: '🟡 MEDIA', baja: '🟢 BAJA' }[t.prioridad] || t.prioridad;
+  const catLabel = { general: '📌 General', fabrica: '🏭 Fábrica', administrativa: '📊 Administrativa', logistica: '🚚 Logística', mantenimiento: '🛠 Mantenimiento' }[t.categoria] || t.categoria;
+
+  document.getElementById('emp-tar-prioridad').textContent = prioLabel;
+  document.getElementById('emp-tar-titulo').textContent = t.titulo;
+  document.getElementById('emp-tar-categoria').textContent = catLabel;
+  document.getElementById('emp-tar-fecha').textContent = t.fecha_limite
+    ? new Date(t.fecha_limite).toLocaleString('es-AR', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' })
+    : 'Sin fecha';
+  document.getElementById('emp-tar-desc').textContent = t.descripcion || '(Sin descripción)';
+  document.getElementById('emp-tar-tiempo').textContent = t.tiempo_estimado_min ? `${t.tiempo_estimado_min} minutos` : 'Sin estimar';
+
+  // Estado pill
+  const pill = document.getElementById('emp-tar-estado-pill');
+  const estadoLabels = { pendiente: 'Pendiente', en_progreso: 'En progreso', completada: '✓ Completada' };
+  pill.textContent = estadoLabels[estadoMio] || estadoMio;
+  pill.style.background = estadoMio==='completada'?'#dcfce7':estadoMio==='en_progreso'?'#dbeafe':'#fef3c7';
+  pill.style.color = estadoMio==='completada'?'#166534':estadoMio==='en_progreso'?'#1e40af':'#854d0e';
+
+  // Botones de acción según estado
+  const acc = document.getElementById('emp-tar-acciones');
+  const btnSty = 'w-full px-4 py-3 text-sm font-bold tracking-widest uppercase border transition';
+  if(estadoMio === 'pendiente'){
+    acc.innerHTML = `
+      <button onclick="empMarcarEstado('en_progreso')" class="${btnSty} bg-blue-600 text-white border-blue-600 hover:bg-blue-700">▶ Comenzar tarea</button>
+      <button onclick="empMarcarEstado('completada')" class="${btnSty} bg-green-600 text-white border-green-600 hover:bg-green-700">✓ Completar directamente</button>
+    `;
+  } else if(estadoMio === 'en_progreso'){
+    acc.innerHTML = `
+      <button onclick="empMarcarEstado('completada')" class="${btnSty} bg-green-600 text-white border-green-600 hover:bg-green-700">✓ Completar tarea</button>
+      <button onclick="empMarcarEstado('pendiente')" class="${btnSty} bg-white text-forest-700 border-forest-300 hover:bg-forest-50">↩ Volver a pendiente</button>
+    `;
+  } else if(estadoMio === 'completada'){
+    acc.innerHTML = `
+      <p class="text-center text-green-700 text-sm font-semibold py-2">✓ Tarea completada por vos</p>
+      <button onclick="empMarcarEstado('en_progreso')" class="${btnSty} bg-white text-forest-700 border-forest-300 hover:bg-forest-50">↩ Reabrir tarea</button>
+    `;
+  }
+
+  document.getElementById('emp-tar-comentario').value = '';
+  document.getElementById('emp-tarea-modal').classList.remove('hidden');
+  document.getElementById('emp-tarea-modal').classList.add('flex');
+}
+
+function empCerrarTareaModal(){
+  document.getElementById('emp-tarea-modal').classList.add('hidden');
+  document.getElementById('emp-tarea-modal').classList.remove('flex');
+  empTareaActual = null;
+}
+
+async function empMarcarEstado(nuevoEstado){
+  if(!empTareaActual) return;
+  const mia = empGetMiAsignacion(empTareaActual);
+  if(!mia) { alert('No estás asignado a esta tarea'); return; }
+
+  const comentario = document.getElementById('emp-tar-comentario').value.trim();
+
+  try {
+    // Actualizar mi estado individual en la asignación
+    await supabase.updateAsignacionEstado(mia.id, nuevoEstado);
+
+    // Si TODOS los asignados completaron, marcar la tarea completa
+    if(nuevoEstado === 'completada'){
+      const todos = empTareaActual.asignados || [];
+      const completados = todos.filter(a => a.id === mia.id || a.estado_individual === 'completada').length;
+      if(completados === todos.length){
+        await supabase.updateTarea(empTareaActual.id, { estado: 'completada', fecha_completada: new Date().toISOString() });
+      } else if(empTareaActual.estado === 'pendiente'){
+        // Si yo soy el primero en marcar algo, pasar tarea a "en_progreso"
+        await supabase.updateTarea(empTareaActual.id, { estado: 'en_progreso' });
+      }
+    } else if(nuevoEstado === 'en_progreso' && empTareaActual.estado === 'pendiente'){
+      await supabase.updateTarea(empTareaActual.id, { estado: 'en_progreso' });
+    }
+
+    // Agregar comentario si hay
+    if(comentario){
+      await supabase.addComentarioTarea(empTareaActual.id, me.id, me.nombre, comentario);
+    }
+
+    empCerrarTareaModal();
+    await empCargarTareas();
+    if(window.toast) toast('✓ Estado actualizado');
+  } catch(e){
+    console.error(e);
+    alert('Error al actualizar: ' + (e.message || e));
+  }
+}
+</script>
+</body>
+</html>

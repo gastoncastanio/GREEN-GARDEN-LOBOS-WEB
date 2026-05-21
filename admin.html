@@ -720,7 +720,7 @@
       </div>
       <div><label>Condiciones de pago</label><input id="prov-pago" placeholder="ej: 30 días, contado, etc."></div>
       <div><label>Notas internas</label><textarea id="prov-notas" rows="2"></textarea></div>
-      <div class="flex gap-3 pt-4 border-t border-forest-800">
+      <div class="flex gap-3 pt-4 border-t border-forest-800 sticky bottom-0 bg-forest-900 -mx-6 -mb-6 px-6 py-4 z-10">
         <button type="submit" class="btn-pri flex-1">Guardar</button>
         <button type="button" onclick="closeModal('modal-proveedor')" class="btn-sec">Cancelar</button>
       </div>
@@ -824,7 +824,7 @@
         <textarea id="tar-notas" rows="2"></textarea>
       </div>
 
-      <div class="flex gap-3 pt-4 border-t border-forest-800">
+      <div class="flex gap-3 pt-4 border-t border-forest-800 sticky bottom-0 bg-forest-900 -mx-6 -mb-6 px-6 py-4 z-10">
         <button type="submit" class="btn-pri flex-1">💾 Guardar tarea</button>
         <button type="button" onclick="closeModal('modal-tarea')" class="btn-sec">Cancelar</button>
         <button type="button" id="tar-btn-eliminar" onclick="eliminarTarea()" class="btn-danger hidden">🗑 Eliminar</button>
@@ -2634,8 +2634,10 @@ async function loadProveedoresAdmin(){
     tbl.innerHTML = '<p class="text-white/40 text-sm p-8 text-center">Aún no hay proveedores cargados. Tocá "+ Nuevo proveedor" para empezar.</p>';
     return;
   }
+  // Vista responsive: tabla en desktop, cards en mobile
   tbl.innerHTML = `
-    <table class="w-full text-sm">
+    <!-- Tabla (solo desktop) -->
+    <table class="hidden md:table w-full text-sm">
       <thead class="bg-forest-950 text-white/50">
         <tr>
           <th class="text-left px-4 py-3 text-[10px] tracking-widest uppercase">Nombre</th>
@@ -2663,6 +2665,22 @@ async function loadProveedoresAdmin(){
         `).join('')}
       </tbody>
     </table>
+    <!-- Cards (solo mobile) -->
+    <div class="md:hidden divide-y divide-forest-800">
+      ${activos.map(p => `
+        <div class="p-4">
+          <p class="font-semibold text-white mb-1">${p.nombre}</p>
+          ${p.contacto_telefono ? `<p class="text-white/70 text-xs mb-1">📞 ${p.contacto_telefono}</p>` : ''}
+          ${p.contacto_email ? `<p class="text-white/70 text-xs mb-1">✉ ${p.contacto_email}</p>` : ''}
+          ${p.cuit ? `<p class="text-white/50 font-mono text-[10px] mb-1">CUIT: ${p.cuit}</p>` : ''}
+          ${p.condiciones_pago ? `<p class="text-white/50 text-[11px] mb-2">💳 ${p.condiciones_pago}</p>` : ''}
+          <div class="flex gap-2 mt-3">
+            <button onclick="editProveedor('${p.id}')" class="btn-sec text-[10px] py-1.5 px-3 flex-1">Editar</button>
+            <button onclick="delProveedor('${p.id}', '${p.nombre.replace(/'/g, "\\'")}')" class="btn-danger text-[10px]">Dar de baja</button>
+          </div>
+        </div>
+      `).join('')}
+    </div>
   `;
 }
 
