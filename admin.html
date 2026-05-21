@@ -1570,29 +1570,75 @@ function abrirModalNuevoProductoStock(){
   const nombre = prompt('Nombre del producto:');
   if(!nombre || !nombre.trim()) return;
   const codigo = prompt('Código (opcional, dejar vacío si no tiene):') || '';
-  const categoria = prompt('Categoría (ej: Tejidos, Postes, Accesorios):', 'General') || 'General';
+  const categoriaUsuario = prompt('Categoría informativa (ej: Tejidos, Postes, Accesorios) — solo para tu referencia:', 'General') || 'General';
   const unidad = prompt('Unidad (unidad, mt, kg, bolsa):', 'unidad') || 'unidad';
   const stockInicial = parseFloat(prompt('Stock inicial (cantidad):', '0')) || 0;
   const stockMinimo = parseFloat(prompt('Stock mínimo (alerta cuando baja de):', '0')) || 0;
 
+  // Helper para generar UUID v4 (la tabla productos no auto-genera id)
+  const genId = () => {
+    if(typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID();
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+      const r = Math.random()*16|0, v = c==='x' ? r : (r&0x3|0x8);
+      return v.toString(16);
+    });
+  };
+
   (async () => {
     try {
-      const nuevo = await supabase.createProducto({
-        codigo: codigo.trim() || null,
-        nombre: nombre.trim(),
-        categoria: categoria.trim(),
-        unidad: unidad.trim(),
-        activo: true
+      // IMPORTANTE: categoria = "_stock_interno" para que NO aparezca en la web pública
+      const nuevoId = genId();
+      const resp = await fetch(`${SUPABASE_URL}/rest/v1/productos`, {
+        method: 'POST',
+        headers: {
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=representation'
+        },
+        body: JSON.stringify({
+          id: nuevoId,
+          codigo: codigo.trim() || `AUTO-${Date.now()}`,
+          nombre: nombre.trim(),
+          descripcion: `[${categoriaUsuario.trim()}] ${nombre.trim()}`,
+          categoria: '_stock_interno',
+          activo: true,
+          orden: 0,
+          precio_unitario: 0
+        })
       });
+
+      if(!resp.ok){
+        const errTxt = await resp.text();
+        console.error('Error crear producto:', resp.status, errTxt);
+        toast(`❌ Error ${resp.status}: ${errTxt.slice(0,100)}`);
+        return;
+      }
+
+      const arr = await resp.json();
+      const nuevo = arr[0];
       if(!nuevo || !nuevo.id){
         toast('❌ Error al crear el producto');
         return;
       }
-      await supabase.setStockProducto(nuevo.id, {
-        stock_actual: stockInicial,
-        unidad: unidad.trim(),
-        stock_minimo: stockMinimo
+
+      // Crear fila en stock con cantidad inicial
+      await fetch(`${SUPABASE_URL}/rest/v1/stock`, {
+        method: 'POST',
+        headers: {
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify({
+          producto_id: nuevo.id,
+          stock_actual: stockInicial,
+          unidad: unidad.trim(),
+          stock_minimo: stockMinimo
+        })
       });
+
       allProductos.push(nuevo);
       toast(`✓ Producto "${nombre}" agregado al stock`);
       await loadStock();
