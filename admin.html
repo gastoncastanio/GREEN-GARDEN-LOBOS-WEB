@@ -1626,6 +1626,8 @@ function renderStock(){
   const necesario = calcularStockNecesario();
 
   // Combinar info de stock + producto
+  // SOLO mostrar productos con categoría que empieza con "_" (stock interno).
+  // Los productos genéricos de la web (categoría "tejidos", "postes", "accesorios", etc.) NO van en stock.
   let rows = allStock.map(s => {
     const prod = s.productos || allProductos.find(p => p.id === s.producto_id) || {};
     const requerido = necesario[s.producto_id] || 0;
@@ -1644,7 +1646,7 @@ function renderStock(){
       ok: disponible >= requerido && (s.stock_minimo === 0 || disponible >= s.stock_minimo),
       notas: s.notas || ''
     };
-  });
+  }).filter(r => (r.categoria || '').startsWith('_')); // SOLO productos de stock interno
 
   // KPIs
   const totalProds = rows.length;
