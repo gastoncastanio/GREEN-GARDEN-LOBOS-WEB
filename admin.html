@@ -1858,9 +1858,9 @@ function renderStock(){
               <td class="px-4 py-3">${r.faltante>0?`<p class="text-red-400 font-bold">⚠ ${r.faltante.toLocaleString('es-AR')}</p>`:'<p class="text-green-400 text-xs">✓ OK</p>'}</td>
               <td class="px-4 py-3 text-white/50 text-xs">${r.stock_minimo}</td>
               <td class="px-4 py-3 text-right space-x-1 whitespace-nowrap">
-                <button onclick="openIngresoModal('${r.producto_id}','${r.nombre.replace(/'/g,"\\'")}')" class="btn-sec text-[10px] py-1 px-2">+ Ingreso</button>
-                <button onclick="openStockModal('${r.producto_id}','${r.nombre.replace(/'/g,"\\'")}')" class="btn-sec text-[10px] py-1 px-2">Editar</button>
-                <button onclick="eliminarProductoStock('${r.producto_id}','${r.nombre.replace(/'/g,"\\'")}','${(r.codigo||'').replace(/'/g,"\\'")}')" class="btn-danger text-[10px] py-1 px-2" title="Eliminar producto del stock">🗑</button>
+                <button onclick="openIngresoModal('${r.producto_id}','${escapeAttr(r.nombre)}')" class="btn-sec text-[10px] py-1 px-2">+ Ingreso</button>
+                <button onclick="openStockModal('${r.producto_id}','${escapeAttr(r.nombre)}')" class="btn-sec text-[10px] py-1 px-2">Editar</button>
+                <button onclick="eliminarProductoStock('${r.producto_id}','${escapeAttr(r.nombre)}','${escapeAttr(r.codigo||'')}')" class="btn-danger text-[10px] py-1 px-2" title="Eliminar producto del stock">🗑</button>
               </td>
             </tr>
           `).join('')}
@@ -3237,6 +3237,18 @@ function renderTareaCard(t){
 function escapeHtml(str){
   if(!str) return '';
   return String(str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+// Escapa string para usar DENTRO de un atributo HTML delimitado por comillas dobles,
+// y ADEMÁS dentro de un string JS delimitado por comillas simples (onclick="fn('...')")
+function escapeAttr(str){
+  if(!str) return '';
+  return String(str)
+    .replace(/\\/g, '\\\\')
+    .replace(/'/g, "\\'")
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
 }
 
 // ===== MODAL CREAR/EDITAR TAREA =====
