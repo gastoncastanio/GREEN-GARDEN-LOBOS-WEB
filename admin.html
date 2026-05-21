@@ -935,7 +935,8 @@ const USUARIOS = {
 };
 
 // Solapas que solo puede ver el DUEÑO
-const TABS_SOLO_DUEÑO = ['productos', 'contenido', 'listas'];
+// Fernando y Lucas (rol: empleado) ven TODO menos "Contenido web"
+const TABS_SOLO_DUEÑO = ['contenido'];
 
 function getUsuarioActual(){
   const data = sessionStorage.getItem('gg_admin');
@@ -1026,6 +1027,40 @@ async function loadAll(){
   });
   supabase.subscribeTable('stock', () => {
     if(!document.getElementById('tab-stock').classList.contains('hidden')) loadStock();
+  });
+
+  // ============ REALTIME COMPLETO — los 3 admins ven todo en vivo ============
+  // Tareas: cualquier cambio se refleja en el panel de los 3
+  supabase.subscribeTable('tareas', () => {
+    if(!document.getElementById('tab-tareas').classList.contains('hidden')) loadTareas();
+  });
+  supabase.subscribeTable('tareas_asignados', () => {
+    if(!document.getElementById('tab-tareas').classList.contains('hidden')) loadTareas();
+  });
+  supabase.subscribeTable('tareas_comentarios', () => {
+    if(!document.getElementById('tab-tareas').classList.contains('hidden')) loadTareas();
+  });
+
+  // Productos
+  supabase.subscribeTable('productos', () => {
+    const tabActiva = document.querySelector('header .tab-btn.active')?.dataset.tab;
+    if(tabActiva === 'productos') loadProductosAdmin();
+    if(tabActiva === 'stock') loadStock();
+  });
+
+  // Empleados
+  supabase.subscribeTable('empleados', () => {
+    if(!document.getElementById('tab-empleados').classList.contains('hidden')) loadEmpleados();
+  });
+
+  // Proveedores
+  supabase.subscribeTable('proveedores', () => {
+    if(!document.getElementById('tab-proveedores').classList.contains('hidden')) loadProveedoresAdmin();
+  });
+
+  // Catálogo de precios (listas)
+  supabase.subscribeTable('catalogo_precios', () => {
+    if(!document.getElementById('tab-listas').classList.contains('hidden')) loadListasPrecios();
   });
 }
 
