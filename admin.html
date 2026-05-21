@@ -232,10 +232,14 @@
 
       <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6" id="stock-kpis"></div>
 
-      <div class="flex gap-2 flex-wrap mb-4">
+      <div class="flex gap-2 flex-wrap items-center mb-4">
         <button class="btn-sec stock-filter active" data-f="todos"     onclick="filterStock('todos',this)">Todos</button>
         <button class="btn-sec stock-filter" data-f="faltante"  onclick="filterStock('faltante',this)">⚠ Faltante</button>
         <button class="btn-sec stock-filter" data-f="suficiente" onclick="filterStock('suficiente',this)">✓ Suficiente</button>
+        <div class="flex-1 min-w-[200px] relative">
+          <input type="text" id="stock-buscador" placeholder="🔍 Buscar producto, código o categoría..." oninput="renderStock()" class="w-full text-sm">
+          <button type="button" onclick="document.getElementById('stock-buscador').value=''; renderStock();" class="absolute right-2 top-1/2 -translate-y-1/2 text-white/40 hover:text-white text-lg leading-none" title="Limpiar búsqueda">×</button>
+        </div>
       </div>
 
       <div class="bg-forest-900 border border-forest-800" id="stock-table"></div>
@@ -1717,6 +1721,8 @@ function renderStock(){
     return {
       producto_id: s.producto_id,
       nombre: prod.nombre || s.producto_id,
+      codigo: prod.codigo || '',
+      descripcion: prod.descripcion || '',
       categoria: prod.categoria || '',
       imagen: prod.imagen_url || '',
       unidad: s.unidad || 'unidad',
@@ -1745,12 +1751,27 @@ function renderStock(){
   if(filterStockKey === 'faltante')   rows = rows.filter(r => r.faltante > 0);
   if(filterStockKey === 'suficiente') rows = rows.filter(r => r.faltante === 0 && r.requerido > 0);
 
+  // Filtro de búsqueda (nombre, código, descripción, categoría)
+  const buscadorEl = document.getElementById('stock-buscador');
+  const busqueda = buscadorEl ? buscadorEl.value.toLowerCase().trim() : '';
+  if(busqueda){
+    rows = rows.filter(r => {
+      const enNombre = (r.nombre || '').toLowerCase().includes(busqueda);
+      const enCodigo = (r.codigo || '').toLowerCase().includes(busqueda);
+      const enDesc   = (r.descripcion || '').toLowerCase().includes(busqueda);
+      return enNombre || enCodigo || enDesc;
+    });
+  }
+
   // Ordenar: faltantes primero
   rows.sort((a,b) => b.faltante - a.faltante);
 
   const tbl = document.getElementById('stock-table');
   if(rows.length === 0){
-    tbl.innerHTML = '<p class="text-white/40 text-sm p-8 text-center">Sin productos en este filtro.</p>';
+    const msg = busqueda
+      ? `<p class="text-white/40 text-sm p-8 text-center">No se encontraron productos para "<span class="text-brass-400">${busqueda}</span>". <button type="button" onclick="document.getElementById('stock-buscador').value=''; renderStock();" class="underline text-brass-400 ml-2">Limpiar búsqueda</button></p>`
+      : '<p class="text-white/40 text-sm p-8 text-center">Sin productos en este filtro.</p>';
+    tbl.innerHTML = msg;
     return;
   }
   tbl.innerHTML = `
@@ -3098,11 +3119,12 @@ async function loadTareas(){
   document.getElementById('tareas-cnt-completadas').textContent = stats.completadasMes;
   document.getElementById('tareas-cnt-atrasadas').textContent = stats.atrasadas;
 
-  // Kanban
+  // Kanban — 4 columnas: Pendientes, En progreso, Completadas, Canceladas
   const columnas = [
     { id: 'pendiente',   titulo: '📋 Pendientes',   color: '#fde047', tareas: tareasVisibles.filter(t => t.estado === 'pendiente') },
     { id: 'en_progreso', titulo: '🚀 En progreso',  color: '#67e8f9', tareas: tareasVisibles.filter(t => t.estado === 'en_progreso') },
-    { id: 'completada',  titulo: '✓ Completadas',   color: '#86efac', tareas: tareasVisibles.filter(t => t.estado === 'completada').slice(0, 20) }
+    { id: 'completada',  titulo: '✓ Completadas',   color: '#86efac', tareas: tareasVisibles.filter(t => t.estado === 'completada').slice(0, 20) },
+    { id: 'cancelada',   titulo: '✕ Canceladas',    color: '#fca5a5', tareas: tareasVisibles.filter(t => t.estado === 'cancelada').slice(0, 20) }
   ];
 
   const kanban = document.getElementById('tareas-kanban');
