@@ -95,15 +95,22 @@
     <!-- SECCIÓN PEDIDOS -->
     <section id="emp-seccion-pedidos">
       <div class="mb-6">
-        <h2 class="text-2xl md:text-3xl font-display font-bold text-forest-950 mb-1">Pedidos del día</h2>
-        <p class="text-forest-600 text-sm">Tocá un pedido para ver detalles y avanzar su estado.</p>
+        <h2 class="text-2xl md:text-3xl font-display font-bold text-forest-950 mb-1">Mis Pedidos</h2>
+        <p class="text-forest-600 text-sm">Tus pedidos asignados, organizados por etapa.</p>
       </div>
 
-      <div class="flex gap-2 flex-wrap mb-6">
-        <button class="px-4 py-2 text-xs tracking-widest uppercase font-semibold border border-forest-200 hover:border-brass-500 transition active filter-btn" data-filter="todos" onclick="filtrar('todos',this)">Todos</button>
-        <button class="px-4 py-2 text-xs tracking-widest uppercase font-semibold border border-forest-200 hover:border-brass-500 transition filter-btn" data-filter="mios" onclick="filtrar('mios',this)">Asignados a mí</button>
-        <button class="px-4 py-2 text-xs tracking-widest uppercase font-semibold border border-forest-200 hover:border-brass-500 transition filter-btn" data-filter="activos" onclick="filtrar('activos',this)">Solo en proceso</button>
+      <!-- 3 Tabs principales por etapa -->
+      <div class="flex gap-2 flex-wrap mb-5">
+        <button class="px-3 py-2 text-[11px] tracking-widest uppercase font-semibold border border-forest-200 hover:border-brass-500 transition active filter-btn flex-1 min-w-[100px]" data-filter="fabricar" onclick="filtrar('fabricar',this)">🏭 A Fabricar <span class="ml-1 px-1.5 py-0.5 bg-brass-500 text-forest-950 text-[9px] hidden" id="cnt-fabricar">0</span></button>
+        <button class="px-3 py-2 text-[11px] tracking-widest uppercase font-semibold border border-forest-200 hover:border-brass-500 transition filter-btn flex-1 min-w-[100px]" data-filter="entrega" onclick="filtrar('entrega',this)">🚚 En Entrega <span class="ml-1 px-1.5 py-0.5 bg-brass-500 text-forest-950 text-[9px] hidden" id="cnt-entrega">0</span></button>
+        <button class="px-3 py-2 text-[11px] tracking-widest uppercase font-semibold border border-forest-200 hover:border-brass-500 transition filter-btn flex-1 min-w-[100px]" data-filter="entregados" onclick="filtrar('entregados',this)">✓ Entregados <span class="ml-1 px-1.5 py-0.5 bg-forest-200 text-forest-700 text-[9px] hidden" id="cnt-entregados">0</span></button>
       </div>
+
+      <!-- Toggle "Ver todos los pedidos" (para supervisores) -->
+      <label class="flex items-center gap-2 mb-5 text-xs text-forest-600 cursor-pointer" id="emp-todos-toggle-wrap">
+        <input type="checkbox" id="emp-ver-todos" class="w-4 h-4" onchange="renderLista()">
+        <span>Ver también pedidos no asignados a mí</span>
+      </label>
 
       <div id="lista-pedidos" class="space-y-3"></div>
     </section>
@@ -274,7 +281,7 @@ function puedeAvanzar(rolEmpleado, areaRequerida){
 let me = null;
 let pedidos = [];
 let detalleActual = null;
-let currentFilter = 'todos';
+let currentFilter = 'fabricar';
 let lastNotifIds = new Set();
 let dingAudio = null;
 let allEmpleadosCache = [];
@@ -400,6 +407,11 @@ function showToastNotif(titulo, cuerpo, pedidoId){
   setTimeout(()=>{ t.style.opacity='0'; t.style.transition='opacity .4s'; setTimeout(()=>t.remove(),400); }, 8000);
 }
 
+// Estados agrupados por etapa
+const ESTADOS_FABRICAR  = ['recibido', 'fabricacion', 'listo'];
+const ESTADOS_ENTREGA   = ['despacho', 'enviado', 'retiro_listo'];
+const ESTADOS_ENTREGADO = ['entregado'];
+
 function filtrar(f, btn){
   currentFilter = f;
   document.querySelectorAll('.filter-btn').forEach(b=>{
@@ -410,13 +422,49 @@ function filtrar(f, btn){
 }
 
 function renderLista(){
-  let arr = [...pedidos];
-  if(currentFilter === 'mios')    arr = arr.filter(p => esMiResponsabilidad(p));
-  if(currentFilter === 'activos') arr = arr.filter(p => p.estado !== 'entregado');
+  // Filtrar SOLO los pedidos asignados a este empleado (a menos que tilde "ver todos")
+  const verTodos = document.getElementById('emp-ver-todos')?.checked;
+  const base = verTodos ? [...pedidos] : pedidos.filter(p => esMiResponsabilidad(p));
+
+  // Calcular contadores por etapa
+  const cntFab = base.filter(p => ESTADOS_FABRICAR.includes(p.estado)).length;
+  const cntEnt = base.filter(p => ESTADOS_ENTREGA.includes(p.estado)).length;
+  const cntDone = base.filter(p => ESTADOS_ENTREGADO.includes(p.estado)).length;
+  const setCnt = (id, n) => {
+    const el = document.getElementById(id);
+    if(!el) return;
+    el.textContent = n;
+    el.classList.toggle('hidden', n === 0);
+  };
+  setCnt('cnt-fabricar', cntFab);
+  setCnt('cnt-entrega', cntEnt);
+  setCnt('cnt-entregados', cntDone);
+
+  // Si no eligió tab todavía, default = "fabricar"
+  if(!['fabricar','entrega','entregados'].includes(currentFilter)) currentFilter = 'fabricar';
+
+  // Filtrar por tab seleccionado
+  let arr = base;
+  if(currentFilter === 'fabricar')   arr = arr.filter(p => ESTADOS_FABRICAR.includes(p.estado));
+  if(currentFilter === 'entrega')    arr = arr.filter(p => ESTADOS_ENTREGA.includes(p.estado));
+  if(currentFilter === 'entregados') arr = arr.filter(p => ESTADOS_ENTREGADO.includes(p.estado));
+
+  // Ordenar: en fabricar/entrega los más viejos primero (más urgentes); en entregados los más nuevos primero
+  if(currentFilter === 'entregados'){
+    arr.sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
+  } else {
+    arr.sort((a,b) => new Date(a.created_at) - new Date(b.created_at));
+  }
 
   const cont = document.getElementById('lista-pedidos');
   if(arr.length === 0){
-    cont.innerHTML = '<p class="text-center text-forest-500 py-12">No hay pedidos en este filtro.</p>';
+    const msgs = {
+      fabricar:   '✨ No tenés pedidos a fabricar. ¡Buen trabajo!',
+      entrega:    '🚚 Sin pedidos en entrega.',
+      entregados: '📦 Todavía no entregaste pedidos.'
+    };
+    const sub = !verTodos ? '<p class="text-[11px] text-forest-400 mt-2">Tildá "Ver también pedidos no asignados a mí" para ver todos.</p>' : '';
+    cont.innerHTML = `<div class="text-center text-forest-500 py-12 bg-white border border-forest-100"><p>${msgs[currentFilter] || 'Sin pedidos en este filtro.'}</p>${sub}</div>`;
     return;
   }
   cont.innerHTML = arr.map(p => {
