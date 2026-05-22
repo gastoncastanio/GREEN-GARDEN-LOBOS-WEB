@@ -59,11 +59,21 @@ const supabase = {
     return c;
   },
   async setContent(id, value) {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/site_content?id=eq.${id}`, {
-      method: 'PATCH', headers: { ..._h(), 'Prefer': 'return=minimal' },
+    // 1) Intentar PATCH (update) — devolvemos representation para saber si afectó filas
+    const patch = await fetch(`${SUPABASE_URL}/rest/v1/site_content?id=eq.${id}`, {
+      method: 'PATCH', headers: { ..._h(), 'Prefer': 'return=representation' },
       body: JSON.stringify({ value, updated_at: new Date().toISOString() })
     });
-    return res.ok;
+    if (patch.ok) {
+      const data = await patch.json();
+      if (Array.isArray(data) && data.length > 0) return true; // se actualizó algo
+    }
+    // 2) Si no existía la fila, hacer INSERT
+    const insert = await fetch(`${SUPABASE_URL}/rest/v1/site_content`, {
+      method: 'POST', headers: { ..._h(), 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ id, value, updated_at: new Date().toISOString() })
+    });
+    return insert.ok;
   },
 
   // ============ PRODUCTOS ============
